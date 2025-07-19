@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import { findMechanicAction } from '@/app/actions';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,7 +39,7 @@ function SubmitButton() {
 }
 
 export default function SupportPage() {
-  const [state, formAction] = useFormState(findMechanicAction, initialState);
+  const [state, formAction] = useActionState(findMechanicAction, initialState);
   const { toast } = useToast();
   const [location, setLocation] = useState('');
   const [locationError, setLocationError] = useState('');
