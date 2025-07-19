@@ -12,11 +12,33 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Separator } from "./ui/separator";
+import { useFormState, useFormStatus } from "react-dom";
+import { generateAvatarAction } from "@/app/actions";
+import { Loader2, Sparkles } from "lucide-react";
+
+const initialAvatarState = {
+  message: '',
+  avatarDataUri: null,
+};
+
+function GenerateAvatarButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+      Generate Avatar
+    </Button>
+  );
+}
+
 
 export function CustomerProfile() {
   const reservations = findReservations();
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
+  const [avatarGenState, avatarFormAction] = useFormState(generateAvatarAction, initialAvatarState);
+  const [newAvatar, setNewAvatar] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: user.name,
@@ -30,9 +52,11 @@ export function CustomerProfile() {
 
   const handleSave = () => {
     // In a real app, you would save this data to your backend.
-    // For now, we'll just update the user object locally for demonstration.
     user.name = formData.name;
     user.email = formData.email;
+    if (newAvatar) {
+      user.avatarUrl = newAvatar;
+    }
     setIsEditing(false);
     toast({
         title: "Profile Updated",
@@ -42,6 +66,7 @@ export function CustomerProfile() {
 
   const handleCancel = () => {
     setFormData({ name: user.name, email: user.email });
+    setNewAvatar(null);
     setIsEditing(false);
   }
 
@@ -56,7 +81,7 @@ export function CustomerProfile() {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-6">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={user.avatarUrl} alt={user.name} />
+                <AvatarImage src={newAvatar || user.avatarUrl} alt={user.name} />
                 <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
               </Avatar>
               
@@ -90,6 +115,36 @@ export function CustomerProfile() {
             )}
           </div>
         </CardHeader>
+
+        {isEditing && (
+          <>
+            <Separator className="my-4" />
+            <CardContent>
+              <form action={(formData) => {
+                  avatarFormAction(formData);
+                  setNewAvatar(null);
+              }}>
+                <CardTitle className="text-lg mb-2">AI Avatar Generator</CardTitle>
+                <CardDescription className="mb-4">Describe the avatar you want, and our AI will create it for you.</CardDescription>
+                <div className="flex gap-2">
+                  <Input name="prompt" placeholder="e.g., a futuristic sports car logo" required />
+                  <GenerateAvatarButton />
+                </div>
+                {avatarGenState.message && avatarGenState.message !== 'success' && <p className="text-sm text-destructive mt-2">{avatarGenState.message}</p>}
+              </form>
+              
+              {avatarGenState.avatarDataUri && (
+                <div className="mt-6 text-center">
+                  <CardTitle className="text-lg mb-4">Generated Avatar</CardTitle>
+                  <div className="flex justify-center items-center gap-4">
+                    <Image src={avatarGenState.avatarDataUri} alt="Generated Avatar" width={100} height={100} className="rounded-full" />
+                    <Button variant="outline" onClick={() => setNewAvatar(avatarGenState.avatarDataUri)}>Use this Avatar</Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </>
+        )}
       </Card>
 
       <Card>

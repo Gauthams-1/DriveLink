@@ -1,6 +1,7 @@
 'use server';
 
 import { recommendCars, type CarRecommendationInput } from '@/ai/flows/car-recommendation';
+import { generateAvatar, type GenerateAvatarInput } from '@/ai/flows/generate-avatar';
 import { z } from 'zod';
 
 const CarRecommendationSchema = z.object({
@@ -43,6 +44,39 @@ export async function getCarRecommendation(
       message: 'An error occurred while getting recommendations.',
       recommendedCarType: null,
       reasoning: null,
+    };
+  }
+}
+
+const GenerateAvatarSchema = z.object({
+  prompt: z.string().min(3, 'Prompt must be at least 3 characters.'),
+});
+
+export async function generateAvatarAction(prevState: any, formData: FormData) {
+  const validatedFields = GenerateAvatarSchema.safeParse({
+    prompt: formData.get('prompt'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.flatten().fieldErrors.prompt?.[0] || 'Invalid input.',
+      avatarDataUri: null,
+    }
+  }
+
+  const input: GenerateAvatarInput = validatedFields.data;
+
+  try {
+    const result = await generateAvatar(input);
+    return {
+      message: 'success',
+      ...result,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: 'An error occurred during image generation.',
+      avatarDataUri: null,
     };
   }
 }
