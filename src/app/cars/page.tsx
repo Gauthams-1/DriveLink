@@ -1,37 +1,61 @@
 
+'use client';
+
 import { CarCard } from "@/components/CarCard";
 import { getAllAvailableCars } from "@/lib/data";
-import { Car } from "@/lib/types";
-import { Suspense } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import type { Car } from "@/lib/types";
+import { Suspense, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CarSearchForm } from "@/components/CarSearchForm";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type SearchParams = {
   location?: string;
-  pickup?: string;
-  dropoff?: string;
   type?: 'Sedan' | 'SUV' | 'Minivan' | 'Convertible' | 'Coupe' | 'Bike' | 'Scooter';
 };
 
 function CarList({ location, type }: { location?: string; type?: string }) {
-  const allCars = getAllAvailableCars();
-  let filteredCars: Car[] = allCars;
+  const [cars, setCars] = useState<Car[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (location) {
-    filteredCars = filteredCars.filter(car => car.location?.toLowerCase().includes(location.toLowerCase()));
-  }
+  useEffect(() => {
+    // Data fetching must happen on the client
+    const allCars = getAllAvailableCars();
+    let filteredCars: Car[] = allCars;
 
-  if (type && type !== 'all') {
-    filteredCars = filteredCars.filter(car => car.type === type);
+    if (location) {
+      filteredCars = filteredCars.filter(car => car.location?.toLowerCase().includes(location.toLowerCase()));
+    }
+
+    if (type && type !== 'all') {
+      filteredCars = filteredCars.filter(car => car.type === type);
+    }
+    setCars(filteredCars);
+    setLoading(false);
+  }, [location, type]);
+
+  if (loading) {
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex flex-col space-y-3">
+                    <Skeleton className="h-[224px] w-full rounded-lg" />
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                    </div>
+                </div>
+            ))}
+        </div>
+    )
   }
 
   return (
     <>
-      {filteredCars.length > 0 ? (
+      {cars.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredCars.map(car => (
+          {cars.map(car => (
             <CarCard key={car.id} car={car} />
           ))}
         </div>
@@ -74,21 +98,6 @@ export default function CarsPage({ searchParams }: { searchParams: SearchParams 
             <CarList location={location} type={type} />
           </Suspense>
         </div>
-        <aside className="lg:w-1/3 hidden">
-          <div className="sticky top-24">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Can't decide?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-muted-foreground mb-4">Let our AI find the perfect car for your trip based on your needs.</p>
-                     <Button asChild className="w-full">
-                        <Link href="/recommendations">Get AI Recommendation</Link>
-                    </Button>
-                </CardContent>
-            </Card>
-          </div>
-        </aside>
       </div>
     </div>
   );

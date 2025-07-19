@@ -1,24 +1,50 @@
 
+'use client';
+
 import { TruckCard } from "@/components/TruckCard";
 import { TruckSearchForm } from "@/components/TruckSearchForm";
 import { getAllAvailableTrucks } from "@/lib/data";
-import { Suspense } from "react";
+import type { Truck } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Suspense, useEffect, useState } from "react";
 
 function TruckList() {
-    const availableTrucks = getAllAvailableTrucks();
+    const [trucks, setTrucks] = useState<Truck[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTrucks(getAllAvailableTrucks());
+        setLoading(false);
+    }, []);
+    
+    if (loading) {
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[...Array(3)].map((_, i) => (
+                    <div key={i} className="flex flex-col space-y-3">
+                        <Skeleton className="h-[224px] w-full rounded-lg" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )
+    }
 
     return (
         <>
-            {availableTrucks.length > 0 ? (
+            {trucks.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {availableTrucks.map(truck => (
+                    {trucks.map(truck => (
                         <TruckCard key={truck.id} truck={truck} />
                     ))}
                 </div>
             ) : (
                 <div className="text-center col-span-full py-16 border-2 border-dashed rounded-lg">
                     <h2 className="text-2xl font-semibold mb-2">No Trucks Available</h2>
-                    <p className="text-muted-foreground">There are currently no trucks available. Please check back later.</p>
+                    <p className="text-muted-foreground">There are currently no trucks available from our partners. Please check back later.</p>
                 </div>
             )}
         </>
