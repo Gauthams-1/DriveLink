@@ -16,7 +16,7 @@ export default function RecommendationsPage() {
             </Badge>
         </div>
         <p className="text-muted-foreground mt-2 text-lg">
-          Let our smart assistant find the perfect car for your trip.
+          Describe your perfect trip, and our AI will create the perfect car for you.
         </p>
       </div>
 

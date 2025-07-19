@@ -1,6 +1,7 @@
+
 'use server';
 
-import { recommendCars, type CarRecommendationInput } from '@/ai/flows/car-recommendation';
+import { createCarFromPrompt, type CarRecommendationInput } from '@/ai/flows/create-car-from-prompt';
 import { generateAvatar, type GenerateAvatarInput } from '@/ai/flows/generate-avatar';
 import { findMechanics } from '@/ai/flows/find-mechanic';
 import { redirect } from 'next/navigation';
@@ -27,25 +28,23 @@ export async function getCarRecommendation(
   if (!validatedFields.success) {
     return {
       message: validatedFields.error.flatten().fieldErrors,
-      recommendedCarType: null,
-      reasoning: null,
+      recommendedCar: null,
     }
   }
 
   const rawFormData: CarRecommendationInput = validatedFields.data;
   
   try {
-    const result = await recommendCars(rawFormData);
+    const result = await createCarFromPrompt(rawFormData);
     return {
       message: 'success',
-      ...result,
+      recommendedCar: result,
     };
   } catch (error) {
     console.error(error);
     return {
       message: 'An error occurred while getting recommendations.',
-      recommendedCarType: null,
-      reasoning: null,
+      recommendedCar: null,
     };
   }
 }
