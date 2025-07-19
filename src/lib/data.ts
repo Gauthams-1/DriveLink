@@ -12,7 +12,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 22, // kmpl
     location: 'Mumbai, MH',
-    images: ['https://images.unsplash.com/photo-1616422285623-13ff0162193c?q=80&w=600&auto=format&fit=crop'],
+    images: ['https://placehold.co/600x400.png'],
     description: 'A reliable and fuel-efficient hatchback, perfect for city driving and small families.',
     features: ['Bluetooth', 'Backup Camera', 'Apple CarPlay'],
   },
