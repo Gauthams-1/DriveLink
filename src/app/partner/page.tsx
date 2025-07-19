@@ -37,22 +37,23 @@ export default function PartnerPage() {
     setLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (!loading && (!user || user.isGuest || !user.isPartner)) {
+      router.push('/partner/login');
+    }
+  }, [loading, user, router]);
+
   const handleLogout = () => {
     logoutUser();
     router.push('/');
   };
 
-  if (loading) {
+  if (loading || !user || user.isGuest || !user.isPartner) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         Loading...
       </div>
     );
-  }
-
-  if (!user || user.isGuest || !user.isPartner) {
-    router.push('/partner/login');
-    return null;
   }
 
   return (
