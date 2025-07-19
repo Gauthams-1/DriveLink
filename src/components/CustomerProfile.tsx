@@ -1,3 +1,6 @@
+
+'use client';
+
 import { user, findReservations } from "@/lib/data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -5,10 +8,42 @@ import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { format } from "date-fns";
 import Image from "next/image";
-import { Separator } from "./ui/separator";
+import { useState } from "react";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 export function CustomerProfile() {
   const reservations = findReservations();
+  const [isEditing, setIsEditing] = useState(false);
+  const { toast } = useToast();
+
+  const [formData, setFormData] = useState({
+    name: user.name,
+    email: user.email,
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({...prev, [name]: value}));
+  }
+
+  const handleSave = () => {
+    // In a real app, you would save this data to your backend.
+    // For now, we'll just update the user object locally for demonstration.
+    user.name = formData.name;
+    user.email = formData.email;
+    setIsEditing(false);
+    toast({
+        title: "Profile Updated",
+        description: "Your information has been saved.",
+    })
+  };
+
+  const handleCancel = () => {
+    setFormData({ name: user.name, email: user.email });
+    setIsEditing(false);
+  }
 
   return (
     <div className="space-y-8">
@@ -18,17 +53,41 @@ export function CustomerProfile() {
       </div>
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-6">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={user.avatarUrl} alt={user.name} />
-              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="text-3xl font-bold">{user.name}</h2>
-              <p className="text-muted-foreground">{user.email}</p>
-              <p className="text-sm text-muted-foreground mt-1">Member since {format(user.memberSince, 'MMMM yyyy')}</p>
-              <Button variant="outline" size="sm" className="mt-4">Edit Profile</Button>
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-6">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={user.avatarUrl} alt={user.name} />
+                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              
+              {!isEditing ? (
+                <div>
+                    <h2 className="text-3xl font-bold">{user.name}</h2>
+                    <p className="text-muted-foreground">{user.email}</p>
+                    <p className="text-sm text-muted-foreground mt-1">Member since {format(user.memberSince, 'MMMM yyyy')}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="name">Name</Label>
+                        <Input id="name" name="name" value={formData.name} onChange={handleInputChange} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
+                    </div>
+                </div>
+              )}
             </div>
+
+            {!isEditing ? (
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>Edit Profile</Button>
+            ) : (
+                <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={handleCancel}>Cancel</Button>
+                    <Button size="sm" onClick={handleSave}>Save Changes</Button>
+                </div>
+            )}
           </div>
         </CardHeader>
       </Card>
