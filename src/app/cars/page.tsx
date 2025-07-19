@@ -4,7 +4,7 @@
 import { CarCard } from "@/components/CarCard";
 import { getAllAvailableCars, findCarReservations } from "@/lib/data";
 import type { Car, CarReservationWithDetails } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { CarSearchForm } from "@/components/CarSearchForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams } from "next/navigation";
@@ -37,10 +37,10 @@ function CarList() {
       const searchTo = parseISO(dropoffDateStr);
       const allReservations = findCarReservations();
       
-      const isOverlapping = (start1: Date, end1: Date, start2: Date, end2: Date) => {
-        // This condition checks if one range starts before the other one ends, and vice-versa.
-        // It correctly handles all overlapping cases.
-        return start1 < end2 && start2 < end1;
+      const isOverlapping = (reservationStart: Date, reservationEnd: Date, searchStart: Date, searchEnd: Date) => {
+        // Correct logic: A reservation conflicts if it starts before the search ends,
+        // AND it ends after the search starts.
+        return reservationStart < searchEnd && reservationEnd > searchStart;
       }
       
       filteredCars = filteredCars.filter(car => {
@@ -51,7 +51,7 @@ function CarList() {
 
           // Check if ANY reservation for this car overlaps with the search dates
           const isBookedDuringSearch = carReservations.some(reservation => 
-              isOverlapping(searchFrom, searchTo, reservation.startDate, reservation.endDate)
+              isOverlapping(reservation.startDate, reservation.endDate, searchFrom, searchTo)
           );
           
           return !isBookedDuringSearch; // The car is available if it's NOT booked during the search period
@@ -96,7 +96,7 @@ function CarList() {
   );
 }
 
-export default function CarsPage() {
+function CarsPageContent() {
   const searchParams = useSearchParams();
   const location = searchParams.get('location');
   const type = searchParams.get('type');
@@ -127,4 +127,12 @@ export default function CarsPage() {
       </div>
     </div>
   );
+}
+
+export default function CarsPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <CarsPageContent />
+        </Suspense>
+    )
 }
