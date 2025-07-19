@@ -15,8 +15,10 @@ import { Label } from "./ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "./ui/separator";
 import { generateAvatarAction } from "@/app/actions";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, UserCheck, UserX, ShieldCheck, Mail, Phone, MapPin, Edit, X } from "lucide-react";
 import type { User } from "@/lib/types";
+import { Badge } from "./ui/badge";
+import { Textarea } from "./ui/textarea";
 
 const initialAvatarState = {
   message: '',
@@ -35,74 +37,61 @@ function GenerateAvatarButton() {
 
 
 export function CustomerProfile() {
-  const reservations = findCarReservations();
+  const [reservations, setReservations] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const [avatarGenState, avatarFormAction] = useActionState(generateAvatarAction, initialAvatarState);
   
-  // Use state to manage the user object, initializing with a default or loading state.
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [formData, setFormData] = useState<Partial<User>>({});
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-  });
-
-  // Effect to load user from localStorage on the client side after mount.
   useEffect(() => {
     const user = getCurrentUser();
     setCurrentUser(user);
-    setFormData({
-      name: user.name,
-      email: user.email,
-    });
+    setFormData(user);
+    setReservations(findCarReservations());
   }, []);
 
-  // Effect to update form data if currentUser changes from outside
-  useEffect(() => {
-    if (currentUser) {
-        setFormData({
-          name: currentUser.name,
-          email: currentUser.email,
-        });
-    }
-  }, [currentUser]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({...prev, [name]: value}));
   }
 
   const handleSave = () => {
     if (!currentUser) return;
-    const updatedUser = {
-      ...currentUser,
-      name: formData.name,
-      email: formData.email,
-      avatarUrl: avatarGenState.avatarDataUri || currentUser.avatarUrl,
+    
+    // Create a new user object with all fields from formData, falling back to currentUser
+    const updatedUser: User = {
+        ...currentUser,
+        name: formData.name || currentUser.name,
+        email: formData.email || currentUser.email,
+        phone: formData.phone || currentUser.phone,
+        address: formData.address || currentUser.address,
+        licenseNumber: formData.licenseNumber || currentUser.licenseNumber,
+        aadhaarNumber: formData.aadhaarNumber || currentUser.aadhaarNumber,
+        isVerified: !!(formData.licenseNumber && formData.aadhaarNumber), // Auto-verify if both are present
+        avatarUrl: avatarGenState.avatarDataUri || currentUser.avatarUrl,
     };
+    
     setCurrentUser(updatedUser);
-    saveUser(updatedUser); // Save to localStorage
+    saveUser(updatedUser);
     setIsEditing(false);
     toast({
         title: "Profile Updated",
         description: "Your information has been saved.",
-    })
+    });
   };
 
   const handleCancel = () => {
     if (currentUser) {
-        setFormData({ name: currentUser.name, email: currentUser.email });
+        setFormData(currentUser);
     }
     setIsEditing(false);
   }
 
   const handleUseAvatar = () => {
-    if (avatarGenState.avatarDataUri && currentUser) {
-      setCurrentUser(prevUser => ({
-        ...prevUser!,
-        avatarUrl: avatarGenState.avatarDataUri!,
-      }));
+    if (avatarGenState.avatarDataUri) {
+        setFormData(prev => ({ ...prev, avatarUrl: avatarGenState.avatarDataUri!}));
       toast({
         title: "Avatar updated!",
         description: "Click 'Save Changes' to keep it."
@@ -123,125 +112,179 @@ export function CustomerProfile() {
     )
   }
 
-
   return (
     <div className="space-y-8">
-       <div className="mb-8">
-        <h1 className="text-3xl font-bold font-headline">My Profile</h1>
-        <p className="text-muted-foreground">Manage your personal information and booking history.</p>
-      </div>
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-6">
-              <div className="relative">
-                <Avatar className="h-24 w-24 border-4 border-background ring-4 ring-primary">
-                  <AvatarImage src={isEditing && avatarGenState.avatarDataUri ? avatarGenState.avatarDataUri : currentUser.avatarUrl} alt={currentUser.name} />
-                  <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-              </div>
-              
-              {!isEditing ? (
-                <div>
-                    <h2 className="text-3xl font-bold">{currentUser.name}</h2>
-                    <p className="text-muted-foreground">{currentUser.email}</p>
-                    <p className="text-sm text-muted-foreground mt-1">Member since {format(currentUser.memberSince, 'MMMM yyyy')}</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
-                        <Input id="name" name="name" value={formData.name} onChange={handleInputChange} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
-                    </div>
-                </div>
-              )}
+       <div className="flex items-center justify-between mb-8">
+        <div>
+            <h1 className="text-3xl font-bold font-headline">My Profile</h1>
+            <p className="text-muted-foreground">Manage your personal information and booking history.</p>
+        </div>
+        {!isEditing ? (
+            <Button variant="outline" onClick={() => setIsEditing(true)}><Edit className="mr-2 h-4 w-4"/>Edit Profile</Button>
+        ) : (
+            <div className="flex gap-2">
+                <Button variant="ghost" onClick={handleCancel}><X className="mr-2 h-4 w-4"/>Cancel</Button>
+                <Button onClick={handleSave}><ShieldCheck className="mr-2 h-4 w-4"/>Save Changes</Button>
             </div>
-
-            {!isEditing ? (
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>Edit Profile</Button>
-            ) : (
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleCancel}>Cancel</Button>
-                    <Button size="sm" onClick={handleSave}>Save Changes</Button>
-                </div>
-            )}
-          </div>
-        </CardHeader>
-
-        {isEditing && (
-          <>
-            <Separator className="my-4" />
-            <CardContent>
-              <form action={avatarFormAction}>
-                <CardTitle className="text-lg mb-2">AI Avatar Generator</CardTitle>
-                <CardDescription className="mb-4">Describe the avatar you want, and our AI will create it for you.</CardDescription>
-                <div className="flex gap-2">
-                  <Input name="prompt" placeholder="e.g., a futuristic sports car logo" required />
-                  <GenerateAvatarButton />
-                </div>
-                {avatarGenState.message && avatarGenState.message !== 'success' && <p className="text-sm text-destructive mt-2">{avatarGenState.message}</p>}
-              </form>
-              
-              {avatarGenState.avatarDataUri && (
-                <div className="mt-6 text-center">
-                  <CardTitle className="text-lg mb-4">Generated Avatar</CardTitle>
-                  <div className="flex justify-center items-center gap-4">
-                    <Image src={avatarGenState.avatarDataUri} alt="Generated Avatar" width={100} height={100} className="rounded-full" />
-                    <Button variant="outline" onClick={handleUseAvatar}>Use this Avatar</Button>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </>
         )}
-      </Card>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Bookings</CardTitle>
-          <CardDescription>Your past and upcoming reservations.</CardDescription>
-        </CardHeader>
-        <CardContent>
-           {reservations.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Car</TableHead>
-                  <TableHead>Rental Period</TableHead>
-                  <TableHead className="text-right">Total Cost</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {reservations.map((reservation) => (
-                  <TableRow key={reservation.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-4">
-                        <div className="relative w-24 h-16 rounded-md overflow-hidden">
-                          <Image src={reservation.car.images[0]} alt={reservation.car.name} layout="fill" objectFit="cover" data-ai-hint="car" />
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 space-y-8">
+            <Card>
+                <CardHeader className="text-center">
+                    <Avatar className="h-24 w-24 border-4 border-background ring-4 ring-primary mx-auto">
+                      <AvatarImage src={isEditing ? formData.avatarUrl : currentUser.avatarUrl} alt={currentUser.name} />
+                      <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <CardTitle className="pt-4">{isEditing ? formData.name : currentUser.name}</CardTitle>
+                    <CardDescription>Member since {format(currentUser.memberSince, 'MMMM yyyy')}</CardDescription>
+                </CardHeader>
+                 {isEditing ? (
+                     <CardContent className="space-y-4">
+                        <div className="space-y-1">
+                            <Label htmlFor="name">Name</Label>
+                            <Input id="name" name="name" value={formData.name} onChange={handleInputChange} />
                         </div>
-                        <div>
-                          <div className="font-medium">{reservation.car.name}</div>
-                          <div className="text-sm text-muted-foreground">{reservation.car.type}</div>
+                     </CardContent>
+                 ) : null}
+            </Card>
+
+            {isEditing && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>AI Avatar Generator</CardTitle>
+                  <CardDescription>Describe your ideal avatar.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form action={avatarFormAction} className="space-y-4">
+                    <Textarea name="prompt" placeholder="e.g., a futuristic sports car logo" required />
+                    <GenerateAvatarButton />
+                    {avatarGenState.message && avatarGenState.message !== 'success' && <p className="text-sm text-destructive mt-2">{avatarGenState.message}</p>}
+                  </form>
+                  
+                  {avatarGenState.avatarDataUri && (
+                    <div className="mt-4 text-center">
+                      <p className="font-semibold mb-2">Generated Avatar</p>
+                      <Image src={avatarGenState.avatarDataUri} alt="Generated Avatar" width={100} height={100} className="rounded-full mx-auto" />
+                      <Button variant="outline" size="sm" className="mt-2" onClick={handleUseAvatar}>Use this Avatar</Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+        </div>
+
+        <div className="lg:col-span-2 space-y-8">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Personal Information</CardTitle>
+                    <CardDescription>Your contact and address details.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {isEditing ? (
+                        <>
+                            <div className="grid sm:grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="phone">Phone</Label>
+                                    <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleInputChange} />
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="address">Address</Label>
+                                <Textarea id="address" name="address" value={formData.address} onChange={handleInputChange} />
+                            </div>
+                        </>
+                    ) : (
+                        <div className="text-sm space-y-2">
+                           <div className="flex items-center"><Mail className="w-4 h-4 mr-3 text-muted-foreground" /> <span>{currentUser.email}</span></div>
+                           <div className="flex items-center"><Phone className="w-4 h-4 mr-3 text-muted-foreground" /> <span>{currentUser.phone || 'Not provided'}</span></div>
+                           <div className="flex items-start"><MapPin className="w-4 h-4 mr-3 mt-1 text-muted-foreground" /> <span className="whitespace-pre-wrap">{currentUser.address || 'Not provided'}</span></div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {format(reservation.startDate, 'MMM d, yyyy')} - {format(reservation.endDate, 'MMM d, yyyy')}
-                    </TableCell>
-                    <TableCell className="text-right">₹{reservation.totalCost.toFixed(2)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-           ) : (
-            <p className="text-muted-foreground">You have no recent bookings.</p>
-           )}
-        </CardContent>
-      </Card>
+                    )}
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Identity Verification</CardTitle>
+                    <div className="flex items-center justify-between">
+                        <CardDescription>Submit your documents to get verified.</CardDescription>
+                        <Badge variant={currentUser.isVerified ? "secondary" : "destructive"} className={currentUser.isVerified ? 'bg-green-100 text-green-800' : ''}>
+                          {currentUser.isVerified ? <UserCheck className="mr-2 h-4 w-4"/> : <UserX className="mr-2 h-4 w-4"/>}
+                          {currentUser.isVerified ? 'Verified' : 'Not Verified'}
+                        </Badge>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {isEditing ? (
+                        <div className="grid sm:grid-cols-2 gap-4">
+                             <div className="space-y-1">
+                                <Label htmlFor="licenseNumber">Driving License Number</Label>
+                                <Input id="licenseNumber" name="licenseNumber" value={formData.licenseNumber} onChange={handleInputChange} />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="aadhaarNumber">Aadhaar Card Number</Label>
+                                <Input id="aadhaarNumber" name="aadhaarNumber" value={formData.aadhaarNumber} onChange={handleInputChange} />
+                            </div>
+                        </div>
+                    ) : (
+                         <div className="text-sm space-y-2">
+                           <p><strong>Driving License:</strong> {currentUser.licenseNumber ? `**** **** **** ${currentUser.licenseNumber.slice(-4)}` : 'Not Provided'}</p>
+                           <p><strong>Aadhaar Card:</strong> {currentUser.aadhaarNumber ? `**** **** **** ${currentUser.aadhaarNumber.slice(-4)}` : 'Not Provided'}</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Recent Bookings</CardTitle>
+                    <CardDescription>Your past and upcoming reservations.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                {reservations.length > 0 ? (
+                    <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead>Car</TableHead>
+                        <TableHead>Rental Period</TableHead>
+                        <TableHead className="text-right">Total Cost</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {reservations.map((reservation) => (
+                        <TableRow key={reservation.id}>
+                            <TableCell>
+                            <div className="flex items-center gap-4">
+                                <div className="relative w-16 h-12 rounded-md overflow-hidden">
+                                <Image src={reservation.car.images[0]} alt={reservation.car.name} layout="fill" objectFit="cover" data-ai-hint="car" />
+                                </div>
+                                <div>
+                                <div className="font-medium">{reservation.car.name}</div>
+                                <div className="text-sm text-muted-foreground">{reservation.car.type}</div>
+                                </div>
+                            </div>
+                            </TableCell>
+                            <TableCell>
+                            {format(reservation.startDate, 'MMM d, yyyy')} - {format(reservation.endDate, 'MMM d, yyyy')}
+                            </TableCell>
+                            <TableCell className="text-right">₹{reservation.totalCost.toFixed(2)}</TableCell>
+                        </TableRow>
+                        ))}
+                    </TableBody>
+                    </Table>
+                ) : (
+                    <p className="text-muted-foreground text-center py-4">You have no recent bookings.</p>
+                )}
+                </CardContent>
+            </Card>
+        </div>
+      </div>
     </div>
   );
 }

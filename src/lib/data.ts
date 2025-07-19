@@ -241,7 +241,7 @@ export const trucks: Truck[] = [
         size: 'Large',
         pricePerDay: 10000,
         payload: '5 Ton+',
-        description: 'The best choice for large house moves and heavy industrial equipment.',
+        description: 'The best choice for large house moves and a heavy industrial equipment.',
         images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
         driver: { name: 'Karthik Reddy', rating: 4.8 },
     },
@@ -254,6 +254,11 @@ export const busReservations: BusReservation[] = [];
 const defaultUser: User = {
   name: "Guest User",
   email: "guest@example.com",
+  phone: "",
+  address: "",
+  licenseNumber: "",
+  aadhaarNumber: "",
+  isVerified: false,
   avatarUrl: "https://placehold.co/100x100.png",
   memberSince: new Date(),
 };
@@ -279,19 +284,23 @@ export const findBusById = (id: number) => buses.find(bus => bus.id === id);
 export const findTruckById = (id: number) => trucks.find(truck => truck.id === id);
 
 export const findCarReservations = (): CarReservationWithDetails[] => {
-    return carReservations
+  if (typeof window === 'undefined') return [];
+  const storedCarReservations: Reservation[] = JSON.parse(localStorage.getItem('carReservations') || '[]');
+  return storedCarReservations
         .map(r => {
             const car = findCarById(r.carId);
-            return car ? { ...r, car } : null;
+            return car ? { ...r, car, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
         })
         .filter((r): r is CarReservationWithDetails => r !== null);
 };
 
 export const findBusReservations = (): BusReservationWithDetails[] => {
-    return busReservations
+  if (typeof window === 'undefined') return [];
+  const storedBusReservations: BusReservation[] = JSON.parse(localStorage.getItem('busReservations') || '[]');
+  return storedBusReservations
         .map(r => {
             const bus = findBusById(r.busId);
-            return bus ? { ...r, bus } : null;
+            return bus ? { ...r, bus, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
         })
         .filter((r): r is BusReservationWithDetails => r !== null);
 };
@@ -307,6 +316,7 @@ export function getCurrentUser(): User {
       const parsedUser = JSON.parse(storedUser);
       // Dates are not automatically converted, so we need to parse them
       return {
+        ...defaultUser,
         ...parsedUser,
         memberSince: new Date(parsedUser.memberSince),
       };
@@ -314,6 +324,8 @@ export function getCurrentUser(): User {
   } catch (error) {
     console.error("Failed to parse user from localStorage", error);
   }
+  // If no user is in local storage, save the default user first.
+  saveUser(defaultUser);
   return defaultUser;
 };
 

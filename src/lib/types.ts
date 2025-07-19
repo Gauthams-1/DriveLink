@@ -62,6 +62,11 @@ export type Truck = {
 export type User = {
   name: string;
   email: string;
+  phone: string;
+  address: string;
+  licenseNumber: string;
+  aadhaarNumber: string;
+  isVerified: boolean;
   avatarUrl: string;
   memberSince: Date;
 };
