@@ -8,10 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase, CheckCircle, Gauge, GitBranch, MapPin, Users, PersonStanding } from 'lucide-react';
 import { CostCalculator } from '@/components/CostCalculator';
 import { Separator } from '@/components/ui/separator';
-import { useMemo } from 'react';
 
 export default function CarDetailPage({ params }: { params: { id: string } }) {
-  const car = useMemo(() => findCarById(Number(params.id)), [params.id]);
+  const car = findCarById(Number(params.id));
 
   if (!car) {
     notFound();
