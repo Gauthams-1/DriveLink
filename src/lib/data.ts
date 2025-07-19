@@ -362,6 +362,7 @@ const createDefaultPartners = () => {
         isGuest: false,
         isPartner: true,
         partnerType: 'mechanic',
+        specialty: 'General Repair',
         jobs: sampleMechanicJobs,
         partnerStats: { totalRevenue: 48000, avgRating: 4.8, activeJobs: 1, completedJobs: 2 },
     };
@@ -424,6 +425,21 @@ export function getAllAvailableTrucks(): Truck[] {
   return allVehicles.filter(v => 
     v.status === 'Available' && 'payload' in v
   ) as Truck[];
+}
+
+export function getAllRegisteredMechanics(): Mechanic[] {
+    const users = getRegisteredUsers();
+    return users
+        .filter(u => u.isPartner && u.partnerType === 'mechanic')
+        .map((u, index) => ({
+            id: index + 100, // Assign a temporary unique ID
+            name: u.name,
+            location: u.address,
+            phone: u.phone,
+            rating: u.partnerStats?.avgRating || 0,
+            specialty: u.specialty || 'General Repair',
+            avatarUrl: u.avatarUrl,
+        }));
 }
 
 export function findCarById(id: number): Car | undefined {
@@ -627,3 +643,4 @@ export const findOwnerOfVehicle = (vehicleId: number): User | undefined => {
     const users = getRegisteredUsers();
     return users.find(u => u.isPartner && u.vehicles?.some(v => v.id === vehicleId));
 };
+

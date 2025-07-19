@@ -98,6 +98,7 @@ export type User = {
   isGuest?: boolean;
   isPartner?: boolean;
   partnerType?: 'owner' | 'mechanic' | 'driver';
+  specialty?: string; // For mechanics
   vehicles?: PartnerVehicle[];
   jobs?: Job[];
   trips?: Trip[];
@@ -165,3 +166,4 @@ export type Trip = {
 export type CarReservationWithDetails = Reservation & { car: Car };
 export type BusReservationWithDetails = BusReservation & { bus: Bus };
 export type SpecializedVehicleReservationWithDetails = SpecializedVehicleReservation & { vehicle: SpecializedVehicle };
+

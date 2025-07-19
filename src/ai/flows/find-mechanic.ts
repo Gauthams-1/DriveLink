@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -10,7 +11,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { mechanics } from '@/lib/data';
+import { getAllRegisteredMechanics } from '@/lib/data';
 
 const FindMechanicInputSchema = z.object({
   location: z.string().describe('The current location of the user who needs help (e.g., "Andheri, Mumbai").'),
@@ -65,9 +66,9 @@ const findMechanicsFlow = ai.defineFlow(
     outputSchema: FindMechanicOutputSchema,
   },
   async (input) => {
-    // In a real app, you would query a database for mechanics near the user's location.
-    // For this demo, we'll provide the whole list and let the AI figure it out.
-    const availableMechanics = JSON.stringify(mechanics, null, 2);
+    // Fetch registered mechanics from the user data system.
+    const allMechanics = getAllRegisteredMechanics();
+    const availableMechanics = JSON.stringify(allMechanics, null, 2);
 
     const { output } = await prompt({
         ...input,
@@ -77,3 +78,4 @@ const findMechanicsFlow = ai.defineFlow(
     return output!;
   }
 );
+
