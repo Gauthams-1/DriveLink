@@ -176,11 +176,11 @@ export function CarSearchForm() {
                 name="carType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Car Type</FormLabel>
+                    <FormLabel>Vehicle Type</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select car type" />
+                          <SelectValue placeholder="Select vehicle type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -188,8 +188,10 @@ export function CarSearchForm() {
                         <SelectItem value="Sedan">Sedan</SelectItem>
                         <SelectItem value="SUV">SUV</SelectItem>
                         <SelectItem value="Minivan">Minivan</SelectItem>
-                        <SelectItem value="Convertible">Convertible</SelectItem>
                         <SelectItem value="Coupe">Coupe</SelectItem>
+                        <SelectItem value="Convertible">Convertible</SelectItem>
+                        <SelectItem value="Bike">Bike</SelectItem>
+                        <SelectItem value="Scooter">Scooter</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormItem>

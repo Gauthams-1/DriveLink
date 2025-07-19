@@ -113,6 +113,62 @@ export const cars: Car[] = [
     description: 'Travel in style and comfort with this premium luxury sedan. Top-of-the-line features and a smooth ride.',
     features: ['Panoramic Sunroof', 'Virtual Cockpit', 'Advanced Safety Suite'],
   },
+  {
+    id: 9,
+    name: 'Royal Enfield Classic 350',
+    type: 'Bike',
+    pricePerDay: 1500,
+    seats: 2,
+    luggage: 0,
+    transmission: 'Manual',
+    mpg: 40, // kmpl
+    location: 'Goa, GA',
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    description: 'A classic cruiser for exploring scenic routes and coastal roads. Timeless design and a thumping engine.',
+    features: ['Classic Styling', 'Comfortable Riding Posture'],
+  },
+  {
+    id: 10,
+    name: 'Ather 450X',
+    type: 'Scooter',
+    pricePerDay: 1200,
+    seats: 2,
+    luggage: 1, // Under-seat storage
+    transmission: 'Automatic',
+    mpg: 110, // km per charge
+    location: 'Bengaluru, KA',
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    description: 'A smart and stylish electric scooter for zipping through city traffic. Packed with tech features.',
+    features: ['Digital Dashboard', 'Fast Charging', 'Reverse Mode'],
+  },
+  {
+    id: 11,
+    name: 'Honda Activa 6G',
+    type: 'Scooter',
+    pricePerDay: 800,
+    seats: 2,
+    luggage: 1,
+    transmission: 'Automatic',
+    mpg: 50, // kmpl
+    location: 'Delhi, DL',
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    description: 'India\'s favorite scooter, known for its reliability and ease of use. Perfect for daily commutes.',
+    features: ['Silent Start', 'Telescopic Suspension'],
+  },
+  {
+    id: 12,
+    name: 'Bajaj Pulsar NS200',
+    type: 'Bike',
+    pricePerDay: 1800,
+    seats: 2,
+    luggage: 0,
+    transmission: 'Manual',
+    mpg: 35, // kmpl
+    location: 'Pune, MH',
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    description: 'A powerful and agile street bike for an exhilarating riding experience. Great for city and highway.',
+    features: ['Liquid Cooling', 'Perimeter Frame', 'ABS'],
+  },
 ];
 
 export const buses: Bus[] = [

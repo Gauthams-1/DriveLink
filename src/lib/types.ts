@@ -1,12 +1,12 @@
 export type Car = {
   id: number;
   name: string;
-  type: 'Sedan' | 'SUV' | 'Minivan' | 'Convertible' | 'Coupe';
+  type: 'Sedan' | 'SUV' | 'Minivan' | 'Convertible' | 'Coupe' | 'Bike' | 'Scooter';
   pricePerDay: number;
   seats: number;
   luggage: number; // in bags
   transmission: 'Automatic' | 'Manual';
-  mpg: number; // kmpl
+  mpg: number; // kmpl or km/charge
   location: string;
   images: string[];
   description: string;
