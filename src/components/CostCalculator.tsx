@@ -70,7 +70,7 @@ export function CostCalculator({ car }: { car: Car }) {
         addons: selectedAddons.join(','),
     });
 
-    return `/reservations/details?${params.toString()}`;
+    return `/reservations/confirm?${params.toString()}`;
   }
 
   const reservationUrl = user && !user.isGuest ? getReservationUrl() : '/profile';

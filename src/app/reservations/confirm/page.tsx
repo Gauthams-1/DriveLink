@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { findCarById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,8 @@ import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import type { Car } from '@/lib/types';
 import Link from 'next/link';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 
 function ConfirmationContent() {
@@ -25,13 +27,12 @@ function ConfirmationContent() {
   const totalCost = searchParams.get('totalCost');
   const rentalDays = searchParams.get('rentalDays');
   const addons = searchParams.get('addons')?.split(',') || [];
-  const pickup = searchParams.get('pickup');
-  const dropoff = searchParams.get('dropoff');
+  
+  const [pickup, setPickup] = useState('');
+  const [dropoff, setDropoff] = useState('');
 
   const car = findCarById(Number(carId));
   
-  // This is a workaround to make reservations persist across navigations.
-  // In a real app, this would be handled by a database.
   useEffect(() => {
     if (typeof window !== 'undefined') {
         const url = new URL(window.location.href);
@@ -55,10 +56,24 @@ function ConfirmationContent() {
   }
 
   const getPaymentUrl = () => {
+    if (!pickup || !dropoff) return '#';
     const params = new URLSearchParams(searchParams.toString());
+    params.set('pickup', pickup);
+    params.set('dropoff', dropoff);
     return `/reservations/payment?${params.toString()}`;
   }
   
+  const handleProceedToPayment = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!pickup || !dropoff) {
+      e.preventDefault();
+      toast({
+        title: "Missing Information",
+        description: "Please enter both pickup and drop-off locations.",
+        variant: "destructive",
+      });
+    }
+  }
+
   const addonDetails = [
       { id: 'insurance', label: 'Full Insurance' },
       { id: 'gps', label: 'GPS Navigation' },
@@ -76,9 +91,28 @@ function ConfirmationContent() {
               </CardTitle>
               <CardDescription>{car.type}</CardDescription>
           </CardHeader>
-          <CardContent>
-              <p className="text-muted-foreground">Your selected vehicle for the trip.</p>
-          </CardContent>
+        </Card>
+        <Card>
+            <CardHeader>
+                <CardTitle>Route Details</CardTitle>
+                <CardDescription>Where should we pick up and drop off the car?</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="pickup">Pickup Location</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input id="pickup" name="pickup" placeholder="e.g., Chhatrapati Shivaji Maharaj Int'l Airport" required className="pl-10" value={pickup} onChange={(e) => setPickup(e.target.value)} />
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="dropoff">Drop-off Location</Label>
+                     <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input id="dropoff" name="dropoff" placeholder="e.g., The Taj Mahal Palace, Mumbai" required className="pl-10" value={dropoff} onChange={(e) => setDropoff(e.target.value)} />
+                    </div>
+                </div>
+            </CardContent>
         </Card>
       </div>
       <Card>
@@ -95,17 +129,6 @@ function ConfirmationContent() {
                 <span className="flex items-center gap-2 text-muted-foreground"><Calendar className="h-4 w-4"/> Total Days</span>
                 <span className="font-medium">{rentalDays}</span>
             </div>
-            
-            {(pickup || dropoff) && (
-              <div>
-                <Separator className="my-4" />
-                <h3 className="font-semibold mb-2 flex items-center gap-2"><MapPin className="h-4 w-4" />Route Details</h3>
-                <div className="text-sm text-muted-foreground space-y-1">
-                  {pickup && <p><strong>Pickup:</strong> {pickup}</p>}
-                  {dropoff && <p><strong>Drop-off:</strong> {dropoff}</p>}
-                </div>
-              </div>
-            )}
             
             {addons.length > 0 && addons[0] !== '' && (
                 <div>
@@ -128,7 +151,7 @@ function ConfirmationContent() {
         </CardContent>
         <CardFooter>
           <Button className="w-full" size="lg" asChild>
-            <Link href={getPaymentUrl()}>
+            <Link href={getPaymentUrl()} onClick={handleProceedToPayment}>
               <CheckCircle className="mr-2 h-5 w-5" />
               Proceed to Payment
             </Link>
