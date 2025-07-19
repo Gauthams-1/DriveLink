@@ -41,17 +41,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center px-4">
-        <div className="mr-auto flex items-center gap-6">
-          <Link href="/">
-              <Logo />
-          </Link>
-        </div>
-
-        <div className="hidden md:flex items-center gap-6">
+        <Link href="/">
+            <Logo />
+        </Link>
+        
+        <div className="ml-auto hidden md:flex items-center gap-6">
             <NavLinks />
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-4 flex items-center gap-2">
           <Button variant="ghost" size="icon" asChild>
              <Link href="/profile">
                 <User className="h-5 w-5" />
