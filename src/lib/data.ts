@@ -3,7 +3,7 @@ import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck }
 export const cars: Car[] = [
   {
     id: 1,
-    name: 'Swift Rider',
+    name: 'Maruti Suzuki Swift',
     type: 'Sedan',
     pricePerDay: 2500,
     seats: 5,
@@ -12,26 +12,26 @@ export const cars: Car[] = [
     mpg: 22, // kmpl
     location: 'Mumbai, MH',
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    description: 'A reliable and fuel-efficient sedan, perfect for city driving and small families.',
-    features: ['Bluetooth', 'Backup Camera', 'Cruise Control'],
+    description: 'A reliable and fuel-efficient hatchback, perfect for city driving and small families.',
+    features: ['Bluetooth', 'Backup Camera', 'Apple CarPlay'],
   },
   {
     id: 2,
-    name: 'Himalayan Explorer',
+    name: 'Tata Nexon',
     type: 'SUV',
     pricePerDay: 4500,
     seats: 5,
     luggage: 4,
     transmission: 'Automatic',
-    mpg: 15, // kmpl
+    mpg: 17, // kmpl
     location: 'Delhi, DL',
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    description: 'Spacious and versatile, this SUV is ready for any adventure, from mountain roads to city streets.',
-    features: ['All-Wheel Drive', 'Sunroof', 'Apple CarPlay'],
+    description: 'A stylish and safe compact SUV, ready for any adventure, from mountain roads to city streets.',
+    features: ['All-Wheel Drive', 'Sunroof', 'Touchscreen Infotainment'],
   },
   {
     id: 3,
-    name: 'Family Tourer',
+    name: 'Toyota Innova Crysta',
     type: 'Minivan',
     pricePerDay: 5500,
     seats: 7,
@@ -45,39 +45,39 @@ export const cars: Car[] = [
   },
   {
     id: 4,
-    name: 'Goan Breezer',
+    name: 'Mahindra Thar',
     type: 'Convertible',
     pricePerDay: 6000,
     seats: 4,
     luggage: 1,
     transmission: 'Automatic',
-    mpg: 18, // kmpl
+    mpg: 15, // kmpl
     location: 'Goa, GA',
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    description: 'Feel the wind in your hair with this stylish convertible. Ideal for scenic drives along the coast.',
-    features: ['Heated Seats', 'Premium Sound System', 'Power Convertible Top'],
+    description: 'Experience true freedom with this iconic off-roader. Ideal for scenic drives and exploring rough terrains.',
+    features: ['4x4 Capability', 'Removable Roof', 'Touchscreen with Adventure Stats'],
   },
   {
     id: 5,
-    name: 'Urban Sport',
+    name: 'Hyundai i20 N Line',
     type: 'Coupe',
     pricePerDay: 5000,
-    seats: 2,
-    luggage: 1,
+    seats: 5,
+    luggage: 2,
     transmission: 'Automatic',
-    mpg: 16, // kmpl
+    mpg: 20, // kmpl
     location: 'Pune, MH',
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    description: 'A sporty and agile coupe that makes navigating city traffic a breeze. Perfect for couples or solo travelers.',
+    description: 'A sporty and agile hatchback that makes navigating city traffic a breeze. Perfect for enthusiasts.',
     features: ['Sport Mode', 'Leather Seats', 'Navigation System'],
   },
   {
     id: 6,
-    name: 'Metro Mover',
+    name: 'Maruti Suzuki Alto',
     type: 'Sedan',
     pricePerDay: 2000,
-    seats: 5,
-    luggage: 2,
+    seats: 4,
+    luggage: 1,
     transmission: 'Manual',
     mpg: 25, // kmpl
     location: 'Chennai, TN',
@@ -87,21 +87,21 @@ export const cars: Car[] = [
   },
   {
     id: 7,
-    name: 'Ghat Blazer',
+    name: 'Kia Seltos',
     type: 'SUV',
     pricePerDay: 4800,
     seats: 5,
     luggage: 5,
     transmission: 'Automatic',
-    mpg: 14, // kmpl
+    mpg: 16, // kmpl
     location: 'Hyderabad, TS',
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    description: 'A rugged SUV equipped for the great outdoors. Perfect for exploring the Western Ghats.',
-    features: ['4x4', 'Roof Rack', 'Android Auto'],
+    description: 'A feature-packed SUV with a premium interior. Perfect for both city and highway driving.',
+    features: ['Ventilated Seats', 'Bose Sound System', 'Android Auto'],
   },
   {
     id: 8,
-    name: 'Royal Sedan',
+    name: 'Skoda Superb',
     type: 'Sedan',
     pricePerDay: 7500,
     seats: 5,
@@ -111,7 +111,7 @@ export const cars: Car[] = [
     location: 'Mumbai, MH',
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
     description: 'Travel in style and comfort with this premium luxury sedan. Top-of-the-line features and a smooth ride.',
-    features: ['Panoramic Sunroof', 'Massaging Seats', 'Advanced Safety Suite'],
+    features: ['Panoramic Sunroof', 'Virtual Cockpit', 'Advanced Safety Suite'],
   },
 ];
 
@@ -223,11 +223,11 @@ export const partnerStats: PartnerStats = {
 };
 
 export const partnerVehicles: PartnerVehicle[] = [
-  { id: 1, name: "Urban Sport", type: 'Coupe', status: 'Available', pricePerDay: 5000 },
-  { id: 2, name: "Himalayan Explorer", type: 'SUV', status: 'Rented', pricePerDay: 4500 },
-  { id: 3, name: "Royal Sedan", type: 'Sedan', status: 'Available', pricePerDay: 7500 },
-  { id: 4, name: "Ghat Blazer", type: 'SUV', status: 'Maintenance', pricePerDay: 4800 },
-  { id: 5, name: "Swift Rider", type: 'Sedan', status: 'Available', pricePerDay: 2500 },
+  { id: 1, name: "Hyundai i20", type: 'Coupe', status: 'Available', pricePerDay: 5000 },
+  { id: 2, name: "Tata Nexon", type: 'SUV', status: 'Rented', pricePerDay: 4500 },
+  { id: 3, name: "Skoda Superb", type: 'Sedan', status: 'Available', pricePerDay: 7500 },
+  { id: 4, name: "Kia Seltos", type: 'SUV', status: 'Maintenance', pricePerDay: 4800 },
+  { id: 5, name: "Maruti Swift", type: 'Sedan', status: 'Available', pricePerDay: 2500 },
 ];
 
 
