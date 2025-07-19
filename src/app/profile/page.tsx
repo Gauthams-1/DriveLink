@@ -4,6 +4,7 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarInset,
   SidebarMenu,
   SidebarMenuItem,
@@ -17,7 +18,7 @@ import { Home, LogOut, PanelLeft, Shield, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
-import { getCurrentUser, logoutUser } from '@/lib/data';
+import { getCurrentUser, logoutUser, saveUser } from '@/lib/data';
 import type { User as UserType } from '@/lib/types';
 import { AuthPage } from '@/components/AuthPage';
 
