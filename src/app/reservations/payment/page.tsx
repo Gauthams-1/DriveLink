@@ -32,7 +32,7 @@ function CarPaymentContent() {
 
   const car = findCarById(Number(carId));
 
-  if (!car || !startDate || !endDate || !totalCost || !rentalDays) {
+  if (!car || !startDate || !endDate || !totalCost || !rentalDays || !pickup || !dropoff) {
     return (
       <Card>
         <CardHeader>
@@ -68,7 +68,15 @@ function CarPaymentContent() {
         title: "Booking Confirmed!",
         description: `Your trip with the ${car.name} is booked.`,
     });
-    router.push('/reservations');
+    
+    const tripParams = new URLSearchParams({
+        pickup,
+        dropoff,
+        carName: car.name,
+        carImage: car.images[0],
+    });
+
+    router.push(`/reservations/trip-details?${tripParams.toString()}`);
   }
 
   return (
