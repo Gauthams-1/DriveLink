@@ -251,11 +251,11 @@ export const carReservations: Reservation[] = [];
 
 export const busReservations: BusReservation[] = [];
 
-const user: User = {
-  name: "Aarav Sharma",
-  email: "aarav.s@example.com",
+const defaultUser: User = {
+  name: "Guest User",
+  email: "guest@example.com",
   avatarUrl: "https://placehold.co/100x100.png",
-  memberSince: new Date("2022-03-15"),
+  memberSince: new Date(),
 };
 
 export const partnerStats: PartnerStats = {
@@ -298,6 +298,27 @@ export const findBusReservations = (): BusReservationWithDetails[] => {
 
 
 export function getCurrentUser(): User {
-    // In a real app, you'd fetch this from your auth provider or database
-    return user;
+  if (typeof window === 'undefined') {
+    return defaultUser;
+  }
+  try {
+    const storedUser = localStorage.getItem('driveLinkUser');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      // Dates are not automatically converted, so we need to parse them
+      return {
+        ...parsedUser,
+        memberSince: new Date(parsedUser.memberSince),
+      };
+    }
+  } catch (error) {
+    console.error("Failed to parse user from localStorage", error);
+  }
+  return defaultUser;
 };
+
+export function saveUser(user: User) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('driveLinkUser', JSON.stringify(user));
+  }
+}

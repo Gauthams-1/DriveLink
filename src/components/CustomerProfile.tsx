@@ -1,7 +1,7 @@
 
 'use client';
 
-import { getCurrentUser, findCarReservations } from "@/lib/data";
+import { getCurrentUser, findCarReservations, saveUser } from "@/lib/data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "./ui/button";
@@ -62,12 +62,14 @@ export function CustomerProfile() {
   }
 
   const handleSave = () => {
-    setCurrentUser(prevUser => ({
-      ...prevUser,
+    const updatedUser = {
+      ...currentUser,
       name: formData.name,
       email: formData.email,
-      avatarUrl: avatarGenState.avatarDataUri || prevUser.avatarUrl,
-    }));
+      avatarUrl: avatarGenState.avatarDataUri || currentUser.avatarUrl,
+    };
+    setCurrentUser(updatedUser);
+    saveUser(updatedUser); // Save to localStorage
     setIsEditing(false);
     toast({
         title: "Profile Updated",
