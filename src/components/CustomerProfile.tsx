@@ -116,8 +116,7 @@ export function CustomerProfile() {
     <div className="space-y-8">
        <div className="flex items-center justify-between mb-8">
         <div>
-            <h1 className="text-3xl font-bold font-headline">My Profile</h1>
-            <p className="text-muted-foreground">Manage your personal information and booking history.</p>
+            {/* Title moved to parent page */}
         </div>
         {!isEditing ? (
             <Button variant="outline" onClick={() => setIsEditing(true)}><Edit className="mr-2 h-4 w-4"/>Edit Profile</Button>

@@ -8,7 +8,7 @@ import type { User as UserType } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { UserCircle2 } from 'lucide-react';
+import { UserCircle2, LogOut } from 'lucide-react';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -20,6 +20,12 @@ export default function ProfilePage() {
     setUser(currentUser);
     setLoading(false);
   }, []);
+
+  const handleLogout = () => {
+    logoutUser();
+    setUser(getCurrentUser()); // Re-set user to guest
+    router.push('/'); // Redirect to homepage
+  };
 
   if (loading) {
     return (
@@ -46,6 +52,16 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
+       <div className="flex items-center justify-between mb-8">
+            <div>
+                <h1 className="text-3xl font-bold font-headline">My Profile</h1>
+                <p className="text-muted-foreground">Manage your personal information and booking history.</p>
+            </div>
+            <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+            </Button>
+        </div>
       <CustomerProfile />
     </div>
   );
