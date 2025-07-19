@@ -3,7 +3,7 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { findCarById } from '@/lib/data';
+import { findCarById, isCarAvailable } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -25,12 +25,15 @@ function CarPaymentContent() {
   const [dropoff, setDropoff] = useState('');
 
   const carId = searchParams.get('carId');
-  const startDate = searchParams.get('startDate');
-  const endDate = searchParams.get('endDate');
+  const startDateStr = searchParams.get('startDate');
+  const endDateStr = searchParams.get('endDate');
   const totalCost = searchParams.get('totalCost');
   const rentalDays = searchParams.get('rentalDays');
 
   const car = findCarById(Number(carId));
+  
+  const startDate = startDateStr ? new Date(startDateStr) : null;
+  const endDate = endDateStr ? new Date(endDateStr) : null;
 
   if (!car || !startDate || !endDate || !totalCost || !rentalDays) {
     return (
@@ -58,11 +61,22 @@ function CarPaymentContent() {
       return;
     }
     
+    // Final availability check before creating reservation
+    if (!isCarAvailable(car.id, startDate, endDate)) {
+        toast({
+            title: "Booking Conflict",
+            description: "Sorry, this car has just been booked for the selected dates. Please try different dates.",
+            variant: "destructive",
+        });
+        router.push('/cars');
+        return;
+    }
+    
     const newReservation = {
         id: Date.now(),
         carId: car.id,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
+        startDate: startDate,
+        endDate: endDate,
         totalCost: parseFloat(totalCost),
         pickup: pickup,
         dropoff: dropoff,
@@ -80,7 +94,7 @@ function CarPaymentContent() {
         pickup,
         dropoff,
         carName: car.name,
-        carImage: car.images && car.images.length > 0 ? car.images[0] : '',
+        carImage: (car.images && car.images.length > 0) ? car.images[0] : '',
     });
 
     router.push(`/reservations/trip-details?${tripParams.toString()}`);
@@ -105,7 +119,7 @@ function CarPaymentContent() {
                         <div className="flex items-center justify-between">
                             <span className="flex items-center gap-2 text-muted-foreground"><Calendar className="h-4 w-4"/> Travel Dates</span>
                             <span className="font-medium text-right">
-                                {format(new Date(startDate), 'MMM d')} - {format(new Date(endDate), 'MMM d, yyyy')} ({rentalDays} days)
+                                {format(startDate, 'MMM d')} - {format(endDate, 'MMM d, yyyy')} ({rentalDays} days)
                             </span>
                         </div>
                         <div className="flex items-center justify-between text-lg font-bold">

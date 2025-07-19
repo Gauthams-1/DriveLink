@@ -38,8 +38,9 @@ function CarList() {
       const allReservations = findCarReservations();
       
       const isOverlapping = (reservationStart: Date, reservationEnd: Date, searchStart: Date, searchEnd: Date) => {
-        const resStart = startOfDay(reservationStart);
-        const resEnd = startOfDay(reservationEnd);
+        // Normalize all dates to the start of the day to avoid time-related issues
+        const resStart = startOfDay(new Date(reservationStart));
+        const resEnd = startOfDay(new Date(reservationEnd));
         return resStart < searchEnd && resEnd > searchStart;
       }
       
@@ -50,7 +51,7 @@ function CarList() {
           }
 
           const isBookedDuringSearch = carReservations.some(reservation => 
-              isOverlapping(new Date(reservation.startDate), new Date(reservation.endDate), searchFrom, searchTo)
+              isOverlapping(reservation.startDate, reservation.endDate, searchFrom, searchTo)
           );
           
           return !isBookedDuringSearch;

@@ -1,5 +1,6 @@
 
 import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic, Job, Trip } from './types';
+import { startOfDay } from 'date-fns';
 
 // This file now primarily manages user data and provides functions to access vehicle data.
 // The static vehicle arrays are now part of the default partner's data.
@@ -475,6 +476,29 @@ export const findSpecializedVehicleReservations = (): SpecializedVehicleReservat
         })
         .filter((r): r is SpecializedVehicleReservationWithDetails => r !== null);
 };
+
+/**
+ * Checks if a car is available for a given date range.
+ * @param carId The ID of the car to check.
+ * @param startDate The desired start date for the rental.
+ * @param endDate The desired end date for the rental.
+ * @returns `true` if the car is available, `false` otherwise.
+ */
+export function isCarAvailable(carId: number, startDate: Date, endDate: Date): boolean {
+    const reservations = findCarReservations();
+    const carReservations = reservations.filter(r => r.carId === carId);
+
+    const searchStart = startOfDay(startDate);
+    const searchEnd = startOfDay(endDate);
+
+    const isOverlapping = carReservations.some(res => {
+        const resStart = startOfDay(new Date(res.startDate));
+        const resEnd = startOfDay(new Date(res.endDate));
+        return resStart < searchEnd && resEnd > searchStart;
+    });
+
+    return !isOverlapping;
+}
 
 
 export function registerUser(details: Pick<User, 'name' | 'email' | 'password' | 'partnerType' | 'isPartner'>): User {
