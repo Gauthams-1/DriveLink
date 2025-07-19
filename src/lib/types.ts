@@ -1,4 +1,5 @@
 
+
 export type Car = {
   id: number;
   name: string;
@@ -99,12 +100,14 @@ export type PartnerStats = {
   avgRating: number;
 };
 
-export type PartnerVehicle = {
-  id: number;
-  name: string;
-  type: string;
+export type PartnerVehicle = Car & {
   status: 'Available' | 'Rented' | 'Maintenance';
-  pricePerDay: number;
+  renter?: {
+    name: string;
+    email: string;
+    phone: string;
+    rentalPeriod: string;
+  } | null;
 };
 
 export type Mechanic = {

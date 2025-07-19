@@ -1,4 +1,5 @@
 
+
 import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic } from './types';
 
 // Note: All image URLs have been removed as requested.
@@ -326,13 +327,30 @@ export const partnerStats: PartnerStats = {
   avgRating: 4.9,
 };
 
-export const partnerVehicles: PartnerVehicle[] = [
-  { id: 1, name: "Hyundai i20", type: 'Coupe', status: 'Available', pricePerDay: 5000 },
-  { id: 2, name: "Tata Nexon", type: 'SUV', status: 'Rented', pricePerDay: 4500 },
-  { id: 3, name: "Skoda Superb", type: 'Sedan', status: 'Available', pricePerDay: 7500 },
-  { id: 4, name: "Kia Seltos", type: 'SUV', status: 'Maintenance', pricePerDay: 4800 },
-  { id: 5, name: "Maruti Swift", type: 'Sedan', status: 'Available', pricePerDay: 2500 },
+export let partnerVehicles: PartnerVehicle[] = [
+  { ...cars[4], 
+    status: 'Available', 
+    renter: null 
+  },
+  { ...cars[1], 
+    status: 'Rented', 
+    renter: { 
+      name: 'Priya Sharma', 
+      email: 'priya.sharma@example.com', 
+      phone: '9123456789', 
+      rentalPeriod: '15th July - 20th July' 
+    } 
+  },
+  { ...cars[7], 
+    status: 'Maintenance', 
+    renter: null 
+  },
+  { ...cars[2], 
+    status: 'Available', 
+    renter: null 
+  },
 ];
+
 
 export const mechanics: Mechanic[] = [
     {
@@ -494,3 +512,21 @@ export function saveUser(user: User) {
 export function logoutUser() {
   saveUser(defaultUser);
 }
+
+
+// In a real app, these would be API calls.
+export const updatePartnerVehicle = (vehicle: PartnerVehicle) => {
+    const index = partnerVehicles.findIndex(v => v.id === vehicle.id);
+    if (index !== -1) {
+        partnerVehicles[index] = vehicle;
+    }
+    // You might want to persist this to localStorage as well for demo purposes
+};
+
+export const addPartnerVehicle = (vehicle: Omit<PartnerVehicle, 'id'>) => {
+    const newVehicle = {
+        ...vehicle,
+        id: Math.max(...partnerVehicles.map(v => v.id)) + 1, // simple id generation
+    };
+    partnerVehicles.push(newVehicle);
+};

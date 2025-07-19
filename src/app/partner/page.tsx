@@ -14,7 +14,8 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { PartnerDashboard } from '@/components/PartnerDashboard';
-import { Home, LogOut, PanelLeft, DollarSign, Car, BarChart, Settings, LifeBuoy } from 'lucide-react';
+import { FleetManagement } from '@/components/FleetManagement';
+import { LogOut, PanelLeft, DollarSign, Car, BarChart, Settings, LifeBuoy } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
@@ -145,7 +146,7 @@ export default function PartnerPage() {
 
           <main className="flex-1 p-6">
             {activeTab === 'dashboard' && <PartnerDashboard />}
-            {activeTab === 'fleet' && <div>Fleet Management Coming Soon</div>}
+            {activeTab === 'fleet' && <FleetManagement />}
             {activeTab === 'earnings' && <div>Earnings Details Coming Soon</div>}
           </main>
         </SidebarInset>
