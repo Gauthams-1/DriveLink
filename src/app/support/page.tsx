@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { findMechanicAction } from '@/app/actions';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,8 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Wrench, Loader2, User, Star, Phone, MessageSquare, MapPin } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Wrench, Loader2, Star, Phone, MessageSquare, MapPin } from 'lucide-react';
 import Image from 'next/image';
 
 const initialState = {
@@ -40,35 +39,7 @@ function SubmitButton() {
 
 export default function SupportPage() {
   const [state, formAction] = useActionState(findMechanicAction, initialState);
-  const { toast } = useToast();
-  const [location, setLocation] = useState('');
-  const [locationError, setLocationError] = useState('');
-
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // In a real app, you'd use a reverse geocoding service to get the address
-          // from position.coords.latitude and position.coords.longitude.
-          // For this demo, we'll simulate a city name.
-          setLocation('Mumbai, MH');
-          setLocationError('');
-        },
-        () => {
-          setLocationError('Could not get your location. Please enter it manually.');
-          toast({
-            title: 'Location Error',
-            description: 'Could not get your location. Please enter it manually.',
-            variant: 'destructive',
-          });
-        }
-      );
-    } else {
-       setLocationError('Geolocation is not supported by this browser. Please enter your location manually.');
-    }
-  }, [toast]);
   
-
   return (
     <div className="container mx-auto py-12 px-4 max-w-4xl">
       <div className="text-center mb-12">
@@ -91,14 +62,10 @@ export default function SupportPage() {
                 <Label htmlFor="location">Your Current Location</Label>
                 <Input 
                   id="location" 
-                  name="location" 
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Detecting your location..." 
+                  name="location"
+                  placeholder="e.g., Andheri, Mumbai" 
                   required 
-                  disabled={!!location && !locationError}
                 />
-                {locationError && <p className="text-sm text-destructive mt-1">{locationError}</p>}
                 {state.errors?.location && <p className="text-sm text-destructive mt-1">{state.errors.location[0]}</p>}
               </div>
               <div className="space-y-2">
