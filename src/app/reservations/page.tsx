@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
-import { findCarReservations, findBusReservations } from '@/lib/data';
+import { useState, useEffect } from 'react';
+import { findCarById, findBusById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -28,20 +28,48 @@ import { Car, Pencil, Trash2, Bus } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import type { CarReservationWithDetails, BusReservationWithDetails } from '@/lib/types';
+import type { CarReservationWithDetails, BusReservationWithDetails, Reservation, BusReservation } from '@/lib/types';
 
 type UnifiedReservation = (CarReservationWithDetails & { type: 'car' }) | (BusReservationWithDetails & { type: 'bus' });
 
 export default function ReservationsPage() {
-  const initialCarReservations = useMemo(() => findCarReservations().map(r => ({ ...r, type: 'car' as const })), []);
-  const initialBusReservations = useMemo(() => findBusReservations().map(r => ({ ...r, type: 'bus' as const })), []);
-
-  const [reservations, setReservations] = useState<UnifiedReservation[]>([...initialCarReservations, ...initialBusReservations]);
+  const [reservations, setReservations] = useState<UnifiedReservation[]>([]);
   const { toast } = useToast();
 
+  useEffect(() => {
+    // In a real app, this would be an API call.
+    // We're using localStorage to simulate persistence.
+    const storedCarReservations: Reservation[] = JSON.parse(localStorage.getItem('carReservations') || '[]');
+    const storedBusReservations: BusReservation[] = JSON.parse(localStorage.getItem('busReservations') || '[]');
+
+    const carReservationsWithDetails: CarReservationWithDetails[] = storedCarReservations
+      .map(r => {
+        const car = findCarById(r.carId);
+        return car ? { ...r, car, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
+      })
+      .filter((r): r is CarReservationWithDetails => r !== null);
+    
+    const busReservationsWithDetails: BusReservationWithDetails[] = storedBusReservations
+      .map(r => {
+        const bus = findBusById(r.busId);
+        return bus ? { ...r, bus, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
+      })
+      .filter((r): r is BusReservationWithDetails => r !== null);
+
+    const allReservations: UnifiedReservation[] = [
+      ...carReservationsWithDetails.map(r => ({ ...r, type: 'car' as const })),
+      ...busReservationsWithDetails.map(r => ({ ...r, type: 'bus' as const })),
+    ];
+    
+    setReservations(allReservations);
+  }, []);
+
   const handleCancelReservation = (reservationId: number, type: 'car' | 'bus') => {
-    // In a real app, you would make an API call here to delete the reservation.
-    // For this demo, we'll just filter it out from the local state.
+    const storageKey = type === 'car' ? 'carReservations' : 'busReservations';
+    const storedReservations = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    const updatedStoredReservations = storedReservations.filter((r: {id: number}) => r.id !== reservationId);
+    localStorage.setItem(storageKey, JSON.stringify(updatedStoredReservations));
+
     const updatedReservations = reservations.filter(r => !(r.id === reservationId && r.type === type));
     setReservations(updatedReservations);
 
@@ -51,7 +79,7 @@ export default function ReservationsPage() {
     });
   };
   
-  const sortedReservations = reservations.sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
+  const sortedReservations = reservations.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -93,7 +121,7 @@ export default function ReservationsPage() {
                     </Link>
                   </TableCell>
                   <TableCell>
-                    {format(reservation.startDate, 'MMM d, yyyy')} - {format(reservation.endDate, 'MMM d, yyyy')}
+                    {format(new Date(reservation.startDate), 'MMM d, yyyy')} - {format(new Date(reservation.endDate), 'MMM d, yyyy')}
                   </TableCell>
                   <TableCell className="text-right">₹{reservation.totalCost.toFixed(2)}</TableCell>
                   <TableCell className="text-right">

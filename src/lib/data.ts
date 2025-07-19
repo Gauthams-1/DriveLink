@@ -247,34 +247,9 @@ export const trucks: Truck[] = [
     },
 ];
 
-export const carReservations: Reservation[] = [
-    {
-      id: 1,
-      carId: 2,
-      startDate: new Date('2024-08-10'),
-      endDate: new Date('2024-08-15'),
-      totalCost: 22500,
-    },
-    {
-      id: 2,
-      carId: 4,
-      startDate: new Date('2024-09-01'),
-      endDate: new Date('2024-09-04'),
-      totalCost: 18000,
-    },
-];
+export const carReservations: Reservation[] = [];
 
-export const busReservations: BusReservation[] = [
-  {
-    id: 1,
-    busId: 2,
-    groupName: "Corporate Event",
-    contactName: "Priya Singh",
-    startDate: new Date('2024-08-20'),
-    endDate: new Date('2024-08-22'),
-    totalCost: 66000,
-  },
-];
+export const busReservations: BusReservation[] = [];
 
 const user: User = {
   name: "Aarav Sharma",

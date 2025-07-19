@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { findCarById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
@@ -23,12 +23,22 @@ function ConfirmationContent() {
   const startDate = searchParams.get('startDate');
   const endDate = searchParams.get('endDate');
   const totalCost = searchParams.get('totalCost');
-  const rentalDays = searchParams.get('rentalDays');
+  const rentalDays = search-params.get('rentalDays');
   const addons = searchParams.get('addons')?.split(',') || [];
   const pickup = searchParams.get('pickup');
   const dropoff = searchParams.get('dropoff');
 
   const car = findCarById(Number(carId));
+  
+  // This is a workaround to make reservations persist across navigations.
+  // In a real app, this would be handled by a database.
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('confirmed');
+        window.history.replaceState({}, '', url);
+    }
+  }, []);
 
   if (!car || !startDate || !endDate || !totalCost || !rentalDays) {
     return (
@@ -46,6 +56,18 @@ function ConfirmationContent() {
 
   const handleConfirm = () => {
     // In a real app, you would save this to the database.
+    // For this demo, we'll store it in localStorage.
+    const newReservation = {
+        id: Date.now(),
+        carId: car.id,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        totalCost: parseFloat(totalCost),
+    };
+    
+    const existingReservations = JSON.parse(localStorage.getItem('carReservations') || '[]');
+    localStorage.setItem('carReservations', JSON.stringify([...existingReservations, newReservation]));
+
     toast({
         title: "Reservation Confirmed!",
         description: `Your booking for the ${car.name} is complete.`,
@@ -95,7 +117,7 @@ function ConfirmationContent() {
               </div>
             )}
             
-            {addons.length > 0 && (
+            {addons.length > 0 && addons[0] !== '' && (
                 <div>
                     <Separator className="my-4" />
                     <h3 className="font-semibold mb-2 flex items-center gap-2"><Package className="h-4 w-4" />Selected Add-ons</h3>

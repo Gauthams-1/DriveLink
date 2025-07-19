@@ -30,7 +30,7 @@ function BusConfirmationContent() {
   });
   const [totalCost, setTotalCost] = useState(0);
   
-  const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 0;
+  const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) : 0;
 
   useEffect(() => {
     if (bus && rentalDays > 0) {
@@ -56,7 +56,32 @@ function BusConfirmationContent() {
   
   const handleConfirm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    
+    if (!dateRange?.from || !dateRange?.to) {
+        toast({
+            title: "Error",
+            description: "Please select valid travel dates.",
+            variant: "destructive"
+        });
+        return;
+    }
+    
     // In a real app, you would process payment and save the reservation.
+    // For this demo, we'll store it in localStorage.
+    const newReservation = {
+        id: Date.now(),
+        busId: bus.id,
+        startDate: dateRange.from,
+        endDate: dateRange.to,
+        totalCost: totalCost,
+        groupName: formData.get('groupName'),
+        contactName: formData.get('contactName'),
+    };
+    
+    const existingReservations = JSON.parse(localStorage.getItem('busReservations') || '[]');
+    localStorage.setItem('busReservations', JSON.stringify([...existingReservations, newReservation]));
+
     toast({
         title: "Booking Confirmed!",
         description: `Your group trip with the ${bus.name} is booked.`,
@@ -82,7 +107,7 @@ function BusConfirmationContent() {
             <CardContent className="space-y-4">
                  <div className="space-y-2">
                     <Label>Travel Dates</Label>
-                    <DatePickerWithRange className="w-full" />
+                    <DatePickerWithRange onDateChange={setDateRange} initialDateRange={dateRange} className="w-full" />
                  </div>
                  <div className="space-y-2">
                     <Label htmlFor="groupName">Group/Company Name</Label>
@@ -139,10 +164,10 @@ function BusConfirmationContent() {
                 <h3 className="font-semibold mb-2 flex items-center gap-2"><Banknote className="h-4 w-4" />Payment Information</h3>
                 <div className="space-y-2">
                     <Label htmlFor="card-number">Card Number</Label>
-                    <Input id="card-number" placeholder="XXXX XXXX XXXX XXXX" />
+                    <Input id="card-number" placeholder="XXXX XXXX XXXX XXXX" required/>
                     <div className="grid grid-cols-2 gap-4">
-                        <Input placeholder="MM/YY" />
-                        <Input placeholder="CVC" />
+                        <Input placeholder="MM/YY" required/>
+                        <Input placeholder="CVC" required/>
                     </div>
                 </div>
               </div>
