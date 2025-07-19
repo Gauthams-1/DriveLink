@@ -149,7 +149,7 @@ export default function Home() {
          <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
-                 <Image src="https://placehold.co/600x400.png" alt="A partner managing their fleet on a dashboard" layout="fill" objectFit="cover" data-ai-hint="dashboard fleet management" />
+                 <Image src="https://images.unsplash.com/photo-1616401784845-180844d18602?q=80&w=2070&auto=format&fit=crop" alt="A partner managing their fleet on a dashboard" layout="fill" objectFit="cover" data-ai-hint="business meeting" />
                </div>
                <div>
                   <h2 className="text-3xl md:text-4xl font-headline font-bold mb-4">Become a DriveLink Partner</h2>
