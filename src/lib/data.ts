@@ -175,7 +175,7 @@ export const reservations: Reservation[] = [
     },
 ];
 
-export const user: User = {
+const user: User = {
   name: "Alex Johnson",
   email: "alex.j@example.com",
   avatarUrl: "https://placehold.co/100x100.png",
@@ -206,4 +206,8 @@ export const findReservations = () => {
         ...r,
         car: findCarById(r.carId)!,
     }));
+};
+
+export const getCurrentUser = (): User => {
+    return user;
 };

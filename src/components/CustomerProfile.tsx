@@ -1,14 +1,14 @@
 
 'use client';
 
-import { user, findReservations } from "@/lib/data";
+import { getCurrentUser, findReservations } from "@/lib/data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { format } from "date-fns";
 import Image from "next/image";
-import { useState, useActionState } from "react";
+import { useState, useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Separator } from "./ui/separator";
 import { generateAvatarAction } from "@/app/actions";
 import { Loader2, Sparkles } from "lucide-react";
+import type { User } from "@/lib/types";
 
 const initialAvatarState = {
   message: '',
@@ -38,12 +39,22 @@ export function CustomerProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const [avatarGenState, avatarFormAction] = useActionState(generateAvatarAction, initialAvatarState);
-  const [newAvatar, setNewAvatar] = useState<string | null>(null);
+  
+  // Use state to manage the user object
+  const [currentUser, setCurrentUser] = useState<User>(() => getCurrentUser());
 
   const [formData, setFormData] = useState({
-    name: user.name,
-    email: user.email,
+    name: currentUser.name,
+    email: currentUser.email,
   });
+
+  // Effect to update form data if currentUser changes from outside
+  useEffect(() => {
+    setFormData({
+      name: currentUser.name,
+      email: currentUser.email,
+    });
+  }, [currentUser]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -51,12 +62,12 @@ export function CustomerProfile() {
   }
 
   const handleSave = () => {
-    // In a real app, you would save this data to your backend.
-    user.name = formData.name;
-    user.email = formData.email;
-    if (newAvatar) {
-      user.avatarUrl = newAvatar;
-    }
+    setCurrentUser(prevUser => ({
+      ...prevUser,
+      name: formData.name,
+      email: formData.email,
+      avatarUrl: avatarGenState.avatarDataUri || prevUser.avatarUrl,
+    }));
     setIsEditing(false);
     toast({
         title: "Profile Updated",
@@ -65,10 +76,23 @@ export function CustomerProfile() {
   };
 
   const handleCancel = () => {
-    setFormData({ name: user.name, email: user.email });
-    setNewAvatar(null);
+    setFormData({ name: currentUser.name, email: currentUser.email });
     setIsEditing(false);
   }
+
+  const handleUseAvatar = () => {
+    if (avatarGenState.avatarDataUri) {
+      setCurrentUser(prevUser => ({
+        ...prevUser,
+        avatarUrl: avatarGenState.avatarDataUri!,
+      }));
+      toast({
+        title: "Avatar updated!",
+        description: "Click 'Save Changes' to keep it."
+      })
+    }
+  }
+
 
   return (
     <div className="space-y-8">
@@ -82,16 +106,16 @@ export function CustomerProfile() {
             <div className="flex items-center gap-6">
               <div className="relative">
                 <Avatar className="h-24 w-24 border-4 border-background ring-4 ring-primary">
-                  <AvatarImage src={newAvatar || user.avatarUrl} alt={user.name} />
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={isEditing && avatarGenState.avatarDataUri ? avatarGenState.avatarDataUri : currentUser.avatarUrl} alt={currentUser.name} />
+                  <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
                 </Avatar>
               </div>
               
               {!isEditing ? (
                 <div>
-                    <h2 className="text-3xl font-bold">{user.name}</h2>
-                    <p className="text-muted-foreground">{user.email}</p>
-                    <p className="text-sm text-muted-foreground mt-1">Member since {format(user.memberSince, 'MMMM yyyy')}</p>
+                    <h2 className="text-3xl font-bold">{currentUser.name}</h2>
+                    <p className="text-muted-foreground">{currentUser.email}</p>
+                    <p className="text-sm text-muted-foreground mt-1">Member since {format(currentUser.memberSince, 'MMMM yyyy')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -122,10 +146,7 @@ export function CustomerProfile() {
           <>
             <Separator className="my-4" />
             <CardContent>
-              <form action={(formData) => {
-                  avatarFormAction(formData);
-                  setNewAvatar(null);
-              }}>
+              <form action={avatarFormAction}>
                 <CardTitle className="text-lg mb-2">AI Avatar Generator</CardTitle>
                 <CardDescription className="mb-4">Describe the avatar you want, and our AI will create it for you.</CardDescription>
                 <div className="flex gap-2">
@@ -140,7 +161,7 @@ export function CustomerProfile() {
                   <CardTitle className="text-lg mb-4">Generated Avatar</CardTitle>
                   <div className="flex justify-center items-center gap-4">
                     <Image src={avatarGenState.avatarDataUri} alt="Generated Avatar" width={100} height={100} className="rounded-full" />
-                    <Button variant="outline" onClick={() => setNewAvatar(avatarGenState.avatarDataUri)}>Use this Avatar</Button>
+                    <Button variant="outline" onClick={handleUseAvatar}>Use this Avatar</Button>
                   </div>
                 </div>
               )}
