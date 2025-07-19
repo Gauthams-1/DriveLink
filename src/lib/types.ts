@@ -92,6 +92,7 @@ export type User = {
   avatarUrl: string;
   memberSince: Date;
   isGuest?: boolean;
+  isPartner?: boolean;
 };
 
 export type PartnerStats = {

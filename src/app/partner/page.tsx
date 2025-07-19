@@ -19,43 +19,30 @@ import { LogOut, PanelLeft, DollarSign, Car, BarChart, Settings, LifeBuoy } from
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
-import { getCurrentUser, logoutUser, saveUser } from '@/lib/data';
+import { getCurrentUser, logoutUser } from '@/lib/data';
 import type { User as UserType } from '@/lib/types';
-import { AuthPage } from '@/components/AuthPage';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 export default function PartnerPage() {
+  const router = useRouter();
   const [user, setUser] = useState<UserType | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setUser(getCurrentUser());
+    const currentUser = getCurrentUser();
+    setUser(currentUser);
+    setLoading(false);
   }, []);
 
-  const handleLogin = (name: string, email: string) => {
-    const loggedInUser: UserType = {
-      name: name || 'New User',
-      email: email || 'user@example.com',
-      phone: '',
-      address: '',
-      licenseNumber: '',
-      aadhaarNumber: '',
-      isVerified: false,
-      avatarUrl: `https://api.dicebear.com/8.x/initials/svg?seed=${name || 'U'}`,
-      memberSince: new Date(),
-      isGuest: false,
-    };
-    saveUser(loggedInUser);
-    setUser(loggedInUser);
-  };
-  
   const handleLogout = () => {
     logoutUser();
-    setUser(getCurrentUser());
+    router.push('/');
   };
 
-  if (!user) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         Loading...
@@ -63,8 +50,9 @@ export default function PartnerPage() {
     );
   }
 
-  if (user.isGuest) {
-    return <AuthPage onLoginSuccess={handleLogin} />;
+  if (!user || user.isGuest || !user.isPartner) {
+    router.push('/partner/login');
+    return null;
   }
 
   return (

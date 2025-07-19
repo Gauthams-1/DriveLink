@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Logo } from './Logo';
+import { Logo } from '@/components/Logo';
 import { useRef } from 'react';
 import { authenticateUser, registerUser } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
@@ -21,7 +21,8 @@ import { useRouter } from 'next/navigation';
 import type { User as UserType } from '@/lib/types';
 import { saveUser } from '@/lib/data';
 
-export function AuthPage() {
+
+export default function CustomerLoginPage() {
   const router = useRouter();
   const signInEmailRef = useRef<HTMLInputElement>(null);
   const signInPasswordRef = useRef<HTMLInputElement>(null);
@@ -32,8 +33,8 @@ export function AuthPage() {
   const { toast } = useToast();
 
   const handleLoginSuccess = (user: UserType) => {
-    saveUser({ ...user, isPartner: true });
-    router.push('/partner');
+    saveUser(user);
+    router.push('/profile');
   };
 
   const handleSignIn = () => {
@@ -47,7 +48,7 @@ export function AuthPage() {
     } else {
         toast({
             title: "Sign In Failed",
-            description: "Invalid Owner ID or password. Please try again.",
+            description: "Invalid email or password. Please try again.",
             variant: "destructive",
         });
     }
@@ -85,20 +86,20 @@ export function AuthPage() {
             <Logo />
              <Tabs defaultValue="sign-in" className="w-[400px]">
                 <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="sign-in">Partner Sign In</TabsTrigger>
-                    <TabsTrigger value="sign-up">Partner Sign Up</TabsTrigger>
+                    <TabsTrigger value="sign-in">Sign In</TabsTrigger>
+                    <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
                 </TabsList>
                 <TabsContent value="sign-in">
                     <Card>
                     <CardHeader>
-                        <CardTitle>Partner Sign In</CardTitle>
+                        <CardTitle>Welcome Back</CardTitle>
                         <CardDescription>
-                        Enter your credentials to access your partner dashboard.
+                        Enter your credentials to access your account.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2 text-left">
-                        <Label htmlFor="email-signin">Owner Email</Label>
+                        <Label htmlFor="email-signin">Email</Label>
                         <Input id="email-signin" type="email" placeholder="your-email@example.com" ref={signInEmailRef} required />
                         </div>
                         <div className="space-y-2 text-left">
@@ -114,14 +115,14 @@ export function AuthPage() {
                 <TabsContent value="sign-up">
                     <Card>
                     <CardHeader>
-                        <CardTitle>Become a Partner</CardTitle>
+                        <CardTitle>Create an Account</CardTitle>
                         <CardDescription>
-                        Create an account to list your vehicles on DriveLink.
+                        Get started with DriveLink in just a few clicks.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                          <div className="space-y-2 text-left">
-                           <Label htmlFor="name-signup">Full Name or Company</Label>
+                           <Label htmlFor="name-signup">Full Name</Label>
                            <Input id="name-signup" placeholder="Your Name" ref={signUpNameRef} required/>
                          </div>
                         <div className="space-y-2 text-left">
@@ -134,7 +135,7 @@ export function AuthPage() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button className="w-full" onClick={handleSignUp}>Sign Up as Partner</Button>
+                        <Button className="w-full" onClick={handleSignUp}>Sign Up</Button>
                     </CardFooter>
                     </Card>
                 </TabsContent>

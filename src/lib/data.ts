@@ -318,6 +318,7 @@ const defaultUser: User = {
   avatarUrl: "",
   memberSince: new Date(),
   isGuest: true,
+  isPartner: false,
 };
 
 export const partnerStats: PartnerStats = {
@@ -461,7 +462,6 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password'>)
 
     users.push(newUser);
     saveRegisteredUsers(users);
-    saveUser(newUser); // Automatically log in the new user
     return newUser;
 }
 
@@ -472,7 +472,6 @@ export function authenticateUser(email: string, password?: string): User | null 
     const user = users.find(u => u.email === email && u.password === password);
     
     if (user) {
-        saveUser(user);
         return user;
     }
     return null;
@@ -492,6 +491,7 @@ export function getCurrentUser(): User {
         ...defaultUser,
         ...parsedUser,
         isGuest: parsedUser.isGuest,
+        isPartner: parsedUser.isPartner,
         memberSince: new Date(parsedUser.memberSince),
       };
     }
