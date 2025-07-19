@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -11,8 +12,8 @@ import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from './ui/calendar';
 import { Checkbox } from './ui/checkbox';
-import { useToast } from '@/hooks/use-toast';
 import type { DateRange } from 'react-day-picker';
+import Link from 'next/link';
 
 const ADDONS = [
   { id: 'insurance', label: 'Full Insurance', price: 1500 },
@@ -21,7 +22,6 @@ const ADDONS = [
 ];
 
 export function CostCalculator({ car }: { car: Car }) {
-  const { toast } = useToast();
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 4),
@@ -29,9 +29,10 @@ export function CostCalculator({ car }: { car: Car }) {
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [totalCost, setTotalCost] = useState(0);
 
+  const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 0;
+
   useEffect(() => {
     if (dateRange?.from && dateRange?.to) {
-      const rentalDays = differenceInDays(dateRange.to, dateRange.from) + 1;
       const carCost = rentalDays > 0 ? rentalDays * car.pricePerDay : 0;
       
       const addonsCost = selectedAddons.reduce((total, addonId) => {
@@ -43,23 +44,29 @@ export function CostCalculator({ car }: { car: Car }) {
     } else {
       setTotalCost(0);
     }
-  }, [dateRange, selectedAddons, car.pricePerDay]);
+  }, [dateRange, selectedAddons, car.pricePerDay, rentalDays]);
 
   const handleAddonToggle = (addonId: string) => {
     setSelectedAddons(prev => 
       prev.includes(addonId) ? prev.filter(id => id !== addonId) : [...prev, addonId]
     );
   };
-  
-  const handleReserve = () => {
-    toast({
-      title: 'Reservation Successful!',
-      description: `You have reserved the ${car.name}.`,
+
+  const getReservationUrl = () => {
+    if (!dateRange?.from || !dateRange?.to) return '';
+    
+    const params = new URLSearchParams({
+        carId: car.id.toString(),
+        startDate: dateRange.from.toISOString(),
+        endDate: dateRange.to.toISOString(),
+        totalCost: totalCost.toFixed(2),
+        rentalDays: rentalDays.toString(),
+        addons: selectedAddons.join(','),
     });
+
+    return `/reservations/confirm?${params.toString()}`;
   }
-
-  const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 0;
-
+  
   return (
     <Card>
       <CardHeader>
@@ -148,7 +155,9 @@ export function CostCalculator({ car }: { car: Car }) {
           <span>Total Cost</span>
           <span>₹{totalCost.toFixed(2)}</span>
         </div>
-        <Button size="lg" onClick={handleReserve} disabled={!dateRange?.from || !dateRange?.to}>Reserve Now</Button>
+        <Button size="lg" asChild disabled={!dateRange?.from || !dateRange?.to}>
+          <Link href={getReservationUrl()}>Reserve Now</Link>
+        </Button>
       </CardFooter>
     </Card>
   );
