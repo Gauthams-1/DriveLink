@@ -23,7 +23,7 @@ function ConfirmationContent() {
   const startDate = searchParams.get('startDate');
   const endDate = searchParams.get('endDate');
   const totalCost = searchParams.get('totalCost');
-  const rentalDays = search-params.get('rentalDays');
+  const rentalDays = searchParams.get('rentalDays');
   const addons = searchParams.get('addons')?.split(',') || [];
   const pickup = searchParams.get('pickup');
   const dropoff = searchParams.get('dropoff');
