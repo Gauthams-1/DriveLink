@@ -2,10 +2,8 @@
 'use client';
 
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import { findCarById } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase, CheckCircle, Gauge, GitBranch, MapPin, Users } from 'lucide-react';
 import { CostCalculator } from '@/components/CostCalculator';
