@@ -19,6 +19,8 @@ export type Reservation = {
   startDate: Date;
   endDate: Date;
   totalCost: number;
+  pickup: string;
+  dropoff: string;
 };
 
 export type BusReservation = {
