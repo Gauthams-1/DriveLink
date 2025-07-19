@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Edit, Car, Users, Gauge, GitBranch, Briefcase, User, Phone, Calendar, DollarSign, Info } from 'lucide-react';
+import { PlusCircle, Edit, Car, Users, Gauge, GitBranch, Briefcase, User, Phone, Calendar, DollarSign, Info, Route } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 function VehicleForm({ vehicle, onSave, onCancel }: { vehicle: Partial<PartnerVehicle> | null, onSave: (v: PartnerVehicle) => void, onCancel: () => void }) {
@@ -20,6 +20,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: { vehicle: Partial<PartnerVe
         name: '',
         type: 'Sedan',
         pricePerDay: 0,
+        pricePerKm: 0,
         seats: 4,
         luggage: 2,
         transmission: 'Automatic',
@@ -31,8 +32,9 @@ function VehicleForm({ vehicle, onSave, onCancel }: { vehicle: Partial<PartnerVe
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type } = e.target;
+        const isNumber = type === 'number';
+        setFormData(prev => ({ ...prev, [name]: isNumber ? Number(value) : value }));
     };
     
     const handleSelectChange = (name: string, value: string) => {
@@ -76,9 +78,15 @@ function VehicleForm({ vehicle, onSave, onCancel }: { vehicle: Partial<PartnerVe
                     </Select>
                 </div>
             </div>
-             <div className="space-y-1">
-                <Label htmlFor="pricePerDay">Price Per Day (₹)</Label>
-                <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay} onChange={handleChange} required />
+             <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                    <Label htmlFor="pricePerDay">Price Per Day (₹)</Label>
+                    <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay} onChange={handleChange} required />
+                </div>
+                <div className="space-y-1">
+                    <Label htmlFor="pricePerKm">Price Per Km (₹)</Label>
+                    <Input id="pricePerKm" name="pricePerKm" type="number" value={formData.pricePerKm || ''} onChange={handleChange} placeholder="Optional" />
+                </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                  <div className="space-y-1">
@@ -216,8 +224,18 @@ export function FleetManagement() {
                     </CardHeader>
                     <CardContent className="space-y-4 flex-grow">
                         <div className="flex items-center justify-between text-sm p-3 bg-muted rounded-md">
-                            <span className="font-bold text-lg">₹{vehicle.pricePerDay}</span>
-                            <span className="text-muted-foreground">per day</span>
+                            <div className="flex items-center gap-2">
+                                <DollarSign className="w-4 h-4 text-muted-foreground" />
+                                <span className="font-bold text-lg">₹{vehicle.pricePerDay}</span>
+                                <span className="text-muted-foreground">/day</span>
+                            </div>
+                             {vehicle.pricePerKm && (
+                               <div className="flex items-center gap-2">
+                                <Route className="w-4 h-4 text-muted-foreground" />
+                                <span className="font-bold text-lg">₹{vehicle.pricePerKm}</span>
+                                <span className="text-muted-foreground">/km</span>
+                            </div>
+                            )}
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                             <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>

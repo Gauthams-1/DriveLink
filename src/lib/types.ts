@@ -5,6 +5,7 @@ export type Car = {
   name: string;
   type: 'Sedan' | 'SUV' | 'Minivan' | 'Convertible' | 'Coupe' | 'Bike' | 'Scooter';
   pricePerDay: number;
+  pricePerKm?: number;
   seats: number;
   luggage: number; // in bags
   transmission: 'Automatic' | 'Manual';
