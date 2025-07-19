@@ -7,7 +7,7 @@ import { findSpecializedVehicleById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Users, Briefcase, User, Mail, Phone, Banknote } from 'lucide-react';
+import { CheckCircle, Calendar, Users, Briefcase, User, Mail, Phone, Banknote, CreditCard } from 'lucide-react';
 import { addDays, differenceInDays, format } from 'date-fns';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
@@ -15,6 +15,7 @@ import { DatePickerWithRange } from '@/components/DatePickerWithRange';
 import type { DateRange } from 'react-day-picker';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 function SpecializedVehicleConfirmationContent() {
   const router = useRouter();
@@ -29,6 +30,7 @@ function SpecializedVehicleConfirmationContent() {
     to: addDays(new Date(), 2),
   });
   const [totalCost, setTotalCost] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState('card');
   
   const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) : 0;
 
@@ -156,15 +158,68 @@ function SpecializedVehicleConfirmationContent() {
               </div>
 
               <div className="pt-4">
-                <h3 className="font-semibold mb-2 flex items-center gap-2"><Banknote className="h-4 w-4" />Payment Information</h3>
-                <div className="space-y-2">
-                    <Label htmlFor="card-number">Card Number</Label>
-                    <Input id="card-number" placeholder="XXXX XXXX XXXX XXXX" required/>
-                    <div className="grid grid-cols-2 gap-4">
-                        <Input placeholder="MM/YY" required/>
-                        <Input placeholder="CVC" required/>
+                <h3 className="font-semibold mb-4 flex items-center gap-2"><Banknote className="h-4 w-4" />Payment Information</h3>
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="grid grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <RadioGroupItem value="card" id="card" className="peer sr-only" />
+                        <Label htmlFor="card" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                            <CreditCard className="mb-3 h-6 w-6" />
+                            Card
+                        </Label>
                     </div>
-                </div>
+                    <div>
+                        <RadioGroupItem value="upi" id="upi" className="peer sr-only" />
+                        <Label htmlFor="upi" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                             <div className="mb-3 h-6 w-6 flex items-center justify-center">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 6.34C7.83935 5.2323 9.07625 4.43384 10.5 4.07C11.9237 3.70616 13.4137 3.80587 14.77 4.35C16.1263 4.89413 17.2905 5.8569 18.11 7.1C18.9295 8.3431 19.375 9.80392 19.375 11.3C19.375 12.7961 18.9295 14.2569 18.11 15.5C17.2905 16.7431 16.1263 17.7059 14.77 18.25C13.4137 18.7941 11.9237 18.8938 10.5 18.53C9.07625 18.1662 7.83935 17.3677 7 16.26M10.5 12.4L13.5 15.4M4.625 11.3C4.625 9.80392 5.07054 8.3431 5.89 7.1C6.70946 5.8569 7.87368 4.89413 9.23 4.35C9.89512 4.0905 10.592 3.93172 11.3 3.88M11.3 18.72C10.592 18.6683 9.89512 18.5095 9.23 18.25C7.87368 17.7059 6.70946 16.7431 5.89 15.5C5.07054 14.2569 4.625 12.7961 4.625 11.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            </div>
+                            UPI/QR
+                        </Label>
+                    </div>
+                    <div>
+                        <RadioGroupItem value="netbanking" id="netbanking" className="peer sr-only" />
+                        <Label htmlFor="netbanking" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                            <Banknote className="mb-3 h-6 w-6" />
+                            Netbanking
+                        </Label>
+                    </div>
+                </RadioGroup>
+                
+                {paymentMethod === 'card' && (
+                  <div className="space-y-2">
+                      <Label htmlFor="card-number">Card Number</Label>
+                      <Input id="card-number" placeholder="XXXX XXXX XXXX XXXX" required/>
+                      <div className="grid grid-cols-2 gap-4">
+                          <Input placeholder="MM/YY" required/>
+                          <Input placeholder="CVC" required/>
+                      </div>
+                  </div>
+                )}
+                 {paymentMethod === 'upi' && (
+                  <div className="space-y-2">
+                      <Label htmlFor="upi-id">UPI ID</Label>
+                      <Input id="upi-id" placeholder="yourname@bank" required/>
+                       <div className='flex items-center justify-center flex-col pt-4'>
+                         <p className="text-muted-foreground text-sm mb-2">or scan QR code</p>
+                          <div className='bg-white p-2 rounded-md w-32 h-32'>
+                            <Image src="https://placehold.co/128x128.png" alt="QR Code" width={128} height={128} data-ai-hint="qr code" />
+                          </div>
+                       </div>
+                  </div>
+                )}
+                {paymentMethod === 'netbanking' && (
+                  <div className="space-y-2">
+                      <Label htmlFor="bank">Select Bank</Label>
+                      <select id="bank" className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" required>
+                        <option>Select your bank</option>
+                        <option>State Bank of India</option>
+                        <option>HDFC Bank</option>
+                        <option>ICICI Bank</option>
+                        <option>Axis Bank</option>
+                        <option>Kotak Mahindra Bank</option>
+                      </select>
+                  </div>
+                )}
               </div>
           </CardContent>
           <CardFooter>
