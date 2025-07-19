@@ -30,19 +30,17 @@ export default function ProfilePage() {
     setUser(getCurrentUser());
   }, []);
 
-  const handleLogin = () => {
-    // In a real app, this would be the result of a successful login API call.
-    // For now, we'll simulate it by creating a non-guest user.
-    const loggedInUser = {
-      name: 'Radhika Sharma',
-      email: 'radhika.sharma@example.com',
-      phone: '+91 98765 43210',
-      address: '123, Lotus Boulevard, Mumbai, MH, 400001',
-      licenseNumber: 'MH1220230045678',
-      aadhaarNumber: '123456789012',
-      isVerified: true,
-      avatarUrl: 'https://placehold.co/100x100.png',
-      memberSince: new Date('2022-08-15T00:00:00Z'),
+  const handleLogin = (name: string, email: string) => {
+    const loggedInUser: UserType = {
+      name: name || 'New User',
+      email: email || 'user@example.com',
+      phone: '',
+      address: '',
+      licenseNumber: '',
+      aadhaarNumber: '',
+      isVerified: false,
+      avatarUrl: `https://api.dicebear.com/8.x/initials/svg?seed=${name || 'U'}`,
+      memberSince: new Date(),
       isGuest: false,
     };
     saveUser(loggedInUser);

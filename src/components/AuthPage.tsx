@@ -14,17 +14,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Logo } from './Logo';
+import { useRef } from 'react';
 
-export function AuthPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
-  // In a real app, these handlers would call your authentication service
+export function AuthPage({ onLoginSuccess }: { onLoginSuccess: (name: string, email: string) => void }) {
+  const signInEmailRef = useRef<HTMLInputElement>(null);
+  const signUpNameRef = useRef<HTMLInputElement>(null);
+  const signUpEmailRef = useRef<HTMLInputElement>(null);
+
   const handleSignIn = () => {
-    // For this demo, we'll just call the success handler directly.
-    onLoginSuccess();
+    const email = signInEmailRef.current?.value || 'user@example.com';
+    const name = email.split('@')[0] || 'User';
+    onLoginSuccess(name, email);
   };
 
   const handleSignUp = () => {
-    // For this demo, we'll simulate a successful sign-up by logging the user in.
-    onLoginSuccess();
+    const name = signUpNameRef.current?.value || '';
+    const email = signUpEmailRef.current?.value || '';
+    onLoginSuccess(name, email);
   };
 
   return (
@@ -47,7 +53,7 @@ export function AuthPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
                     <CardContent className="space-y-4">
                         <div className="space-y-2 text-left">
                         <Label htmlFor="email-signin">Email</Label>
-                        <Input id="email-signin" type="email" placeholder="m@example.com" />
+                        <Input id="email-signin" type="email" placeholder="m@example.com" ref={signInEmailRef} />
                         </div>
                         <div className="space-y-2 text-left">
                         <Label htmlFor="password-signin">Password</Label>
@@ -70,11 +76,11 @@ export function AuthPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
                     <CardContent className="space-y-4">
                          <div className="space-y-2 text-left">
                            <Label htmlFor="name-signup">Name</Label>
-                           <Input id="name-signup" placeholder="Your Name" />
+                           <Input id="name-signup" placeholder="Your Name" ref={signUpNameRef} />
                          </div>
                         <div className="space-y-2 text-left">
                            <Label htmlFor="email-signup">Email</Label>
-                           <Input id="email-signup" type="email" placeholder="m@example.com" />
+                           <Input id="email-signup" type="email" placeholder="m@example.com" ref={signUpEmailRef} />
                         </div>
                         <div className="space-y-2 text-left">
                            <Label htmlFor="password-signup">Password</Label>
