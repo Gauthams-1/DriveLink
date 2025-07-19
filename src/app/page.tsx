@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Car, Bus, Truck, Wrench, Bike, Ambulance, Users, Package } from "lucide-react";
+import { Car, Bus, Truck, Wrench, Bike, Ambulance, Users, Package, ShieldCheck, Route, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -49,6 +49,24 @@ const services = [
   }
 ];
 
+const aboutFeatures = [
+    {
+        icon: ShieldCheck,
+        title: "Safety First",
+        description: "Verified partners, real-time tracking, and 24/7 support ensure your peace of mind on every journey."
+    },
+    {
+        icon: Route,
+        title: "Seamless Experience",
+        description: "From booking to destination, our app provides a smooth, intuitive, and hassle-free experience."
+    },
+    {
+        icon: Wallet,
+        title: "Transparent Pricing",
+        description: "No hidden fees. Get clear, upfront pricing for all services before you book."
+    }
+]
+
 export default function Home() {
   return (
     <div className="flex flex-col">
@@ -70,8 +88,30 @@ export default function Home() {
             From cars and bikes to buses and trucks, we've got your journey covered.
           </p>
           <Button size="lg" asChild>
-            <Link href="#services">Explore Services</Link>
+            <Link href="#about">Learn More</Link>
           </Button>
+        </div>
+      </section>
+
+      <section id="about" className="py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-headline font-bold">About DriveLink</h2>
+            <p className="text-muted-foreground mt-4 text-lg">
+              DriveLink is your all-in-one transportation partner, designed to simplify your life. Whether you need a quick ride across town, a bus for a group getaway, or a truck for a major move, we connect you with reliable, safe, and affordable options. Our mission is to make mobility seamless for everyone, everywhere.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 mt-12">
+            {aboutFeatures.map(feature => (
+                <div key={feature.title} className="text-center">
+                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
+                        <feature.icon className="h-10 w-10 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold font-headline mb-2">{feature.title}</h3>
+                    <p className="text-muted-foreground">{feature.description}</p>
+                </div>
+            ))}
+          </div>
         </div>
       </section>
 
