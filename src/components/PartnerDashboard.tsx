@@ -56,14 +56,11 @@ export function PartnerDashboard() {
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader>
           <div>
             <CardTitle>Your Fleet</CardTitle>
             <CardDescription>Manage your vehicles and view their status.</CardDescription>
           </div>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Vehicle
-          </Button>
         </CardHeader>
         <CardContent>
           <Table>
