@@ -7,7 +7,7 @@ import { findCarById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Shield, Package, MapPin, Car as CarIcon } from 'lucide-react';
+import { CheckCircle, Calendar, Shield, Package, MapPin, Car as CarIcon, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import type { Car } from '@/lib/types';
@@ -21,6 +21,8 @@ function ConfirmationContent() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
 
+  const [car, setCar] = useState<Car | null | undefined>(undefined);
+  
   const carId = searchParams.get('carId');
   const startDate = searchParams.get('startDate');
   const endDate = searchParams.get('endDate');
@@ -28,15 +30,20 @@ function ConfirmationContent() {
   const rentalDays = searchParams.get('rentalDays');
   const addons = searchParams.get('addons')?.split(',') || [];
   
-  const car = findCarById(Number(carId));
-  
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-        const url = new URL(window.location.href);
-        url.searchParams.delete('confirmed');
-        window.history.replaceState({}, '', url);
+    if (carId) {
+      const foundCar = findCarById(Number(carId));
+      setCar(foundCar);
     }
-  }, []);
+  }, [carId]);
+
+  if (car === undefined) {
+    return (
+        <div className="flex justify-center items-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    );
+  }
 
   if (!car || !startDate || !endDate || !totalCost || !rentalDays) {
     return (
