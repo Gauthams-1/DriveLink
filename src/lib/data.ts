@@ -26,7 +26,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 17, // kmpl
     location: 'Delhi, DL',
-    images: ['https://images.unsplash.com/photo-1555353540-64580b53c258?q=80&w=600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1555353540-64580b53c258?q=80&w=600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1555353540-64580b53c258?q=80&w=600&auto=format&fit=crop'],
+    images: ['https://images.unsplash.com/photo-1628102923232-939fb853e34b?q=80&w=600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1628102923232-939fb853e34b?q=80&w=600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1628102923232-939fb853e34b?q=80&w=600&auto=format&fit=crop'],
     description: 'A stylish and safe compact SUV, ready for any adventure, from mountain roads to city streets.',
     features: ['All-Wheel Drive', 'Sunroof', 'Touchscreen Infotainment'],
   },
