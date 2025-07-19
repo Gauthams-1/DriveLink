@@ -8,7 +8,7 @@ import { useEffect, useState, Suspense } from "react";
 import { CarSearchForm } from "@/components/CarSearchForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams } from "next/navigation";
-import { parseISO } from "date-fns";
+import { parseISO, startOfDay } from "date-fns";
 
 function CarList() {
   const searchParams = useSearchParams();
@@ -33,28 +33,27 @@ function CarList() {
     }
     
     if (pickupDateStr && dropoffDateStr) {
-      const searchFrom = parseISO(pickupDateStr);
-      const searchTo = parseISO(dropoffDateStr);
+      const searchFrom = startOfDay(parseISO(pickupDateStr));
+      const searchTo = startOfDay(parseISO(dropoffDateStr));
       const allReservations = findCarReservations();
       
-      // A car is unavailable if a reservation's start is before the search's end,
-      // AND the reservation's end is after the search's start.
       const isOverlapping = (reservationStart: Date, reservationEnd: Date, searchStart: Date, searchEnd: Date) => {
-        return reservationStart < searchEnd && reservationEnd > searchStart;
+        const resStart = startOfDay(reservationStart);
+        const resEnd = startOfDay(reservationEnd);
+        return resStart < searchEnd && resEnd > searchStart;
       }
       
       filteredCars = filteredCars.filter(car => {
           const carReservations = allReservations.filter(r => r.carId === car.id);
           if (carReservations.length === 0) {
-              return true; // No reservations, so it's available
+              return true; 
           }
 
-          // Check if ANY reservation for this car overlaps with the search dates
           const isBookedDuringSearch = carReservations.some(reservation => 
               isOverlapping(new Date(reservation.startDate), new Date(reservation.endDate), searchFrom, searchTo)
           );
           
-          return !isBookedDuringSearch; // The car is available if it's NOT booked during the search period
+          return !isBookedDuringSearch;
       });
     }
 
