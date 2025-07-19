@@ -1,6 +1,9 @@
 
 import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic } from './types';
 
+// Note: All image URLs have been removed as requested.
+// They are kept as empty strings in the array for data structure consistency.
+
 export const cars: Car[] = [
   {
     id: 1,
@@ -12,7 +15,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 22, // kmpl
     location: 'Mumbai, MH',
-    images: ["https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop"],
+    images: [""],
     description: 'A reliable and fuel-efficient hatchback, perfect for city driving and small families.',
     features: ['Bluetooth', 'Backup Camera', 'Apple CarPlay'],
   },
@@ -26,7 +29,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 17, // kmpl
     location: 'Delhi, DL',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'A stylish and safe compact SUV, ready for any adventure, from mountain roads to city streets.',
     features: ['All-Wheel Drive', 'Sunroof', 'Touchscreen Infotainment'],
   },
@@ -40,7 +43,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 12, // kmpl
     location: 'Bengaluru, KA',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'The ultimate family vehicle with ample space for passengers and luggage. Perfect for long road trips.',
     features: ['Rear Entertainment System', 'Captain Seats', 'Power Sliding Doors'],
   },
@@ -54,7 +57,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 15, // kmpl
     location: 'Goa, GA',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'Experience true freedom with this iconic off-roader. Ideal for scenic drives and exploring rough terrains.',
     features: ['4x4 Capability', 'Removable Roof', 'Touchscreen with Adventure Stats'],
   },
@@ -68,7 +71,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 20, // kmpl
     location: 'Pune, MH',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'A sporty and agile hatchback that makes navigating city traffic a breeze. Perfect for enthusiasts.',
     features: ['Sport Mode', 'Leather Seats', 'Navigation System'],
   },
@@ -82,7 +85,7 @@ export const cars: Car[] = [
     transmission: 'Manual',
     mpg: 25, // kmpl
     location: 'Chennai, TN',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'An affordable and efficient choice for budget-conscious travelers. Great fuel economy.',
     features: ['Aux Input', 'Air Conditioning'],
   },
@@ -96,7 +99,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 16, // kmpl
     location: 'Hyderabad, TS',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'A feature-packed SUV with a premium interior. Perfect for both city and highway driving.',
     features: ['Ventilated Seats', 'Bose Sound System', 'Android Auto'],
   },
@@ -110,7 +113,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 15, // kmpl
     location: 'Mumbai, MH',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'Travel in style and comfort with this premium luxury sedan. Top-of-the-line features and a smooth ride.',
     features: ['Panoramic Sunroof', 'Virtual Cockpit', 'Advanced Safety Suite'],
   },
@@ -124,7 +127,7 @@ export const cars: Car[] = [
     transmission: 'Manual',
     mpg: 40, // kmpl
     location: 'Goa, GA',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'A classic cruiser for exploring scenic routes and coastal roads. Timeless design and a thumping engine.',
     features: ['Classic Styling', 'Comfortable Riding Posture'],
   },
@@ -138,7 +141,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 110, // km per charge
     location: 'Bengaluru, KA',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'A smart and stylish electric scooter for zipping through city traffic. Packed with tech features.',
     features: ['Digital Dashboard', 'Fast Charging', 'Reverse Mode'],
   },
@@ -152,7 +155,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 50, // kmpl
     location: 'Delhi, DL',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'India\'s favorite scooter, known for its reliability and ease of use. Perfect for daily commutes.',
     features: ['Silent Start', 'Telescopic Suspension'],
   },
@@ -166,7 +169,7 @@ export const cars: Car[] = [
     transmission: 'Manual',
     mpg: 35, // kmpl
     location: 'Pune, MH',
-    images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=600&auto=format&fit=crop'],
+    images: [""],
     description: 'A powerful and agile street bike for an exhilarating riding experience. Great for city and highway.',
     features: ['Liquid Cooling', 'Perimeter Frame', 'ABS'],
   },
@@ -180,7 +183,7 @@ export const buses: Bus[] = [
     seats: 45,
     pricePerDay: 15000,
     amenities: ['Air Conditioning', 'Wi-Fi', 'Reading Lights'],
-    images: ['https://placehold.co/600x400.png'],
+    images: [''],
     driverRating: 4.8,
   },
   {
@@ -190,7 +193,7 @@ export const buses: Bus[] = [
     seats: 30,
     pricePerDay: 22000,
     amenities: ['Air Conditioning', 'Wi-Fi', 'Personal TV', 'Blankets'],
-    images: ['https://placehold.co/600x400.png'],
+    images: [''],
     driverRating: 4.9,
   },
   {
@@ -200,7 +203,7 @@ export const buses: Bus[] = [
     seats: 20,
     pricePerDay: 12000,
     amenities: ['Air Conditioning', 'Wi-Fi'],
-    images: ['https://placehold.co/600x400.png'],
+    images: [''],
     driverRating: 4.7,
   },
   {
@@ -210,7 +213,7 @@ export const buses: Bus[] = [
     seats: 50,
     pricePerDay: 18000,
     amenities: ['Air Conditioning', 'Wi-Fi', 'Restroom', 'Snack Bar'],
-    images: ['https://placehold.co/600x400.png'],
+    images: [''],
     driverRating: 4.8,
   },
 ];
@@ -223,7 +226,7 @@ export const trucks: Truck[] = [
         pricePerDay: 4000,
         payload: '1 Ton',
         description: 'Perfect for small apartment moves and single-item delivery in the city.',
-        images: ['https://placehold.co/600x400.png'],
+        images: [''],
         driverRating: 4.7,
     },
     {
@@ -233,7 +236,7 @@ export const trucks: Truck[] = [
         pricePerDay: 7000,
         payload: '3 Ton',
         description: 'Ideal for 2-3 BHK house shifting and commercial equipment.',
-        images: ['https://placehold.co/600x400.png'],
+        images: [''],
         driverRating: 4.9,
     },
     {
@@ -243,7 +246,7 @@ export const trucks: Truck[] = [
         pricePerDay: 10000,
         payload: '5 Ton+',
         description: 'The best choice for large house moves and a heavy industrial equipment.',
-        images: ['https://placehold.co/600x400.png'],
+        images: [''],
         driverRating: 4.8,
     },
 ];
@@ -257,7 +260,7 @@ export const specializedVehicles: SpecializedVehicle[] = [
     pricePerDay: 7000,
     capacity: '1 Wheelchair + 4 Passengers',
     features: ['Hydraulic Ramp', 'Wheelchair Locks', 'High Roof', 'Spacious Interior'],
-    images: ['https://placehold.co/600x400.png'],
+    images: [''],
     driverRating: 4.9,
   },
   {
@@ -268,7 +271,7 @@ export const specializedVehicles: SpecializedVehicle[] = [
     pricePerDay: 5500,
     capacity: '2 Pets + 3 Passengers',
     features: ['Pet Seat Covers', 'Safety Harness', 'Air Purification', 'Spill-proof Water Bowl'],
-    images: ['https://placehold.co/600x400.png'],
+    images: [''],
     driverRating: 4.8,
   },
   {
@@ -279,7 +282,7 @@ export const specializedVehicles: SpecializedVehicle[] = [
     pricePerDay: 4000,
     capacity: '4 Passengers',
     features: ['Easy Entry/Exit', 'Extra Legroom', 'Comfort-tuned Suspension', 'First-Aid Kit'],
-    images: ['https://placehold.co/600x400.png'],
+    images: [''],
     driverRating: 5.0,
   },
   {
@@ -290,7 +293,7 @@ export const specializedVehicles: SpecializedVehicle[] = [
     pricePerDay: 6000,
     capacity: '3 Passengers',
     features: ['AI Surround Description', 'Braille Controls', 'Voice Commands', 'Priority Assistance'],
-    images: ['https://placehold.co/600x400.png'],
+    images: [''],
     driverRating: 4.9,
   },
 ];
@@ -311,7 +314,7 @@ const defaultUser: User = {
   licenseNumber: "",
   aadhaarNumber: "",
   isVerified: false,
-  avatarUrl: "https://placehold.co/100x100.png",
+  avatarUrl: "",
   memberSince: new Date(),
   isGuest: true,
 };
@@ -339,7 +342,7 @@ export const mechanics: Mechanic[] = [
         phone: '9876543210',
         rating: 4.8,
         specialty: 'General Car Repair & Maintenance',
-        avatarUrl: 'https://placehold.co/100x100.png',
+        avatarUrl: '',
     },
     {
         id: 2,
@@ -348,7 +351,7 @@ export const mechanics: Mechanic[] = [
         phone: '9876543211',
         rating: 4.9,
         specialty: 'Engine & Transmission Expert',
-        avatarUrl: 'https://placehold.co/100x100.png',
+        avatarUrl: '',
     },
     {
         id: 3,
@@ -357,7 +360,7 @@ export const mechanics: Mechanic[] = [
         phone: '9876543212',
         rating: 4.7,
         specialty: 'Tire & Brakes Specialist',
-        avatarUrl: 'https://placehold.co/100x100.png',
+        avatarUrl: '',
     },
     {
         id: 4,
@@ -366,7 +369,7 @@ export const mechanics: Mechanic[] = [
         phone: '9876543213',
         rating: 4.9,
         specialty: 'Luxury Car Specialist',
-        avatarUrl: 'https://placehold.co/100x100.png',
+        avatarUrl: '',
     },
 ];
 
@@ -435,7 +438,7 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password'>)
         ...details,
         isGuest: false,
         memberSince: new Date(),
-        avatarUrl: `https://api.dicebear.com/8.x/initials/svg?seed=${details.name || 'U'}`
+        avatarUrl: ""
     };
 
     users.push(newUser);

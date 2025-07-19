@@ -2,12 +2,10 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { findBusById, getCurrentUser } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Users, Star, Wifi, Thermometer, Tv, Sofa } from 'lucide-react';
+import { CheckCircle, Users, Star, Wifi, Thermometer, Tv, Sofa, Bus as BusIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@/lib/types';
@@ -47,19 +45,9 @@ export default function BusDetailPage({ params }: { params: { id: string } }) {
     <div className="container mx-auto py-8 px-4">
       <div className="grid lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
-          <Carousel className="w-full mb-8 rounded-lg overflow-hidden shadow-lg">
-            <CarouselContent>
-              {bus.images.map((src, index) => (
-                <CarouselItem key={index}>
-                  <div className="relative h-[400px]">
-                    <Image src={src} alt={`${bus.name} view ${index + 1}`} layout="fill" objectFit="cover" data-ai-hint="bus" />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="ml-16" />
-            <CarouselNext className="mr-16" />
-          </Carousel>
+          <div className="bg-muted rounded-lg p-8 flex items-center justify-center mb-8">
+            <BusIcon className="w-32 h-32 text-muted-foreground" />
+          </div>
           
           <div className="flex justify-between items-start">
             <div>

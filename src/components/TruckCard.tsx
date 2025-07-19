@@ -1,5 +1,5 @@
+
 import Link from 'next/link';
-import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Truck } from '@/lib/types';
@@ -14,16 +14,9 @@ export function TruckCard({ truck }: TruckCardProps) {
   return (
     <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <CardHeader className="p-0">
-        <div className="relative h-56 w-full">
-          <Image
-            src={truck.images[0]}
-            alt={`Image of ${truck.name}`}
-            layout="fill"
-            objectFit="cover"
-            className="transition-transform duration-300 group-hover:scale-105"
-            data-ai-hint="truck"
-          />
-          <Badge className="absolute top-2 right-2" variant="secondary">{truck.size}</Badge>
+        <div className="relative h-56 w-full bg-muted flex items-center justify-center">
+            <TruckIcon className="w-24 h-24 text-muted-foreground" />
+            <Badge className="absolute top-2 right-2" variant="secondary">{truck.size}</Badge>
         </div>
       </CardHeader>
       <CardContent className="p-4 flex-grow">

@@ -2,10 +2,8 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { findTruckById, getCurrentUser } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Truck as TruckIcon, Weight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -38,19 +36,9 @@ export default function TruckDetailPage({ params }: { params: { id: string } }) 
     <div className="container mx-auto py-8 px-4">
       <div className="grid lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
-          <Carousel className="w-full mb-8 rounded-lg overflow-hidden shadow-lg">
-            <CarouselContent>
-              {truck.images.map((src, index) => (
-                <CarouselItem key={index}>
-                  <div className="relative h-[400px]">
-                    <Image src={src} alt={`${truck.name} view ${index + 1}`} layout="fill" objectFit="cover" data-ai-hint="truck" />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="ml-16" />
-            <CarouselNext className="mr-16" />
-          </Carousel>
+          <div className="bg-muted rounded-lg p-8 flex items-center justify-center mb-8">
+            <TruckIcon className="w-32 h-32 text-muted-foreground" />
+          </div>
           
           <div className="flex justify-between items-start mb-6">
             <div>

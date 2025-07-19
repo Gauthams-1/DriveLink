@@ -7,9 +7,8 @@ import { findSpecializedVehicleById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Users, Briefcase, User, Mail, Phone, Banknote, CreditCard, HeartHandshake } from 'lucide-react';
+import { CheckCircle, Calendar, Users, Briefcase, User, Mail, Phone, Banknote, CreditCard, HeartHandshake, Accessibility } from 'lucide-react';
 import { addDays, differenceInDays, format } from 'date-fns';
-import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { DatePickerWithRange } from '@/components/DatePickerWithRange';
 import type { DateRange } from 'react-day-picker';
@@ -17,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
+import Image from 'next/image';
 
 const CARETAKER_PRICE_PER_DAY = 2000;
 
@@ -102,13 +102,17 @@ function SpecializedVehicleConfirmationContent() {
     <form onSubmit={handleConfirm}>
       <div className="grid md:grid-cols-2 gap-8">
         <div>
-          <div className="relative h-64 w-full rounded-lg overflow-hidden mb-4 shadow-lg">
-              <Image src={vehicle.images[0]} alt={vehicle.name} layout="fill" objectFit="cover" data-ai-hint="accessible vehicle" />
-          </div>
-          <h2 className="text-3xl font-bold font-headline">{vehicle.name}</h2>
-          <p className="text-muted-foreground flex items-center gap-2 mt-2"><Users className="h-4 w-4"/> {vehicle.capacity}</p>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Accessibility className="w-6 h-6" />
+                <span>{vehicle.name}</span>
+              </CardTitle>
+              <CardDescription>{vehicle.capacity}</CardDescription>
+            </CardHeader>
+          </Card>
           
-          <Card className="mt-6">
+          <Card>
             <CardHeader>
                 <CardTitle>Booking Details</CardTitle>
                 <CardDescription>Enter the details for your booking.</CardDescription>

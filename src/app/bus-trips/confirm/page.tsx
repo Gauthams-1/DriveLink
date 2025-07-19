@@ -7,15 +7,15 @@ import { findBusById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Users, Briefcase, User, Mail, Phone, Banknote, CreditCard } from 'lucide-react';
+import { CheckCircle, Calendar, Users, Briefcase, User, Mail, Phone, Banknote, CreditCard, Bus as BusIcon } from 'lucide-react';
 import { addDays, differenceInDays, format } from 'date-fns';
-import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { DatePickerWithRange } from '@/components/DatePickerWithRange';
 import type { DateRange } from 'react-day-picker';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import Image from 'next/image';
 
 function BusConfirmationContent() {
   const router = useRouter();
@@ -95,11 +95,15 @@ function BusConfirmationContent() {
     <form onSubmit={handleConfirm}>
       <div className="grid md:grid-cols-2 gap-8">
         <div>
-          <div className="relative h-64 w-full rounded-lg overflow-hidden mb-4 shadow-lg">
-              <Image src={bus.images[0]} alt={bus.name} layout="fill" objectFit="cover" data-ai-hint="bus" />
-          </div>
-          <h2 className="text-3xl font-bold font-headline">{bus.name}</h2>
-          <p className="text-muted-foreground flex items-center gap-2 mt-2"><Users className="h-4 w-4"/> Up to {bus.seats} passengers</p>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BusIcon className="w-6 h-6" />
+                <span>{bus.name}</span>
+              </CardTitle>
+              <CardDescription>Up to {bus.seats} passengers</CardDescription>
+            </CardHeader>
+          </Card>
           
           <Card className="mt-6">
             <CardHeader>

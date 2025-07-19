@@ -7,9 +7,8 @@ import { findCarById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Shield, Package, MapPin } from 'lucide-react';
+import { CheckCircle, Calendar, Shield, Package, MapPin, Car as CarIcon } from 'lucide-react';
 import { format } from 'date-fns';
-import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import type { Car } from '@/lib/types';
 import Link from 'next/link';
@@ -69,11 +68,18 @@ function ConfirmationContent() {
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <div>
-        <div className="relative h-64 w-full rounded-lg overflow-hidden mb-4">
-            <Image src={car.images[0]} alt={car.name} layout="fill" objectFit="cover" data-ai-hint="car" />
-        </div>
-        <h2 className="text-2xl font-bold font-headline">{car.name}</h2>
-        <p className="text-muted-foreground">Your selected vehicle for the trip.</p>
+        <Card className="mb-6">
+          <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CarIcon className="w-6 h-6" />
+                <span>{car.name}</span>
+              </CardTitle>
+              <CardDescription>{car.type}</CardDescription>
+          </CardHeader>
+          <CardContent>
+              <p className="text-muted-foreground">Your selected vehicle for the trip.</p>
+          </CardContent>
+        </Card>
       </div>
       <Card>
         <CardHeader>

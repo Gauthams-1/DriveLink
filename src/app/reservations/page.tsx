@@ -23,7 +23,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import Image from 'next/image';
 import { Car, Pencil, Trash2, Bus, Accessibility, HeartHandshake } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -125,22 +124,19 @@ export default function ReservationsPage() {
           </TableHeader>
           <TableBody>
             {sortedReservations.map((reservation) => {
-              let vehicle, vehicleUrl, aiHint, icon;
+              let vehicle, vehicleUrl, icon;
               
               if (reservation.type === 'car') {
                 vehicle = reservation.car;
                 vehicleUrl = `/cars/${vehicle.id}`;
-                aiHint = vehicle.type === 'Bike' || vehicle.type === 'Scooter' ? 'motorcycle scooter' : 'car';
                 icon = <Car className="h-5 w-5 mr-2 text-muted-foreground" />;
               } else if (reservation.type === 'bus') {
                 vehicle = reservation.bus;
                 vehicleUrl = `/bus-trips/${vehicle.id}`;
-                aiHint = 'bus';
                 icon = <Bus className="h-5 w-5 mr-2 text-muted-foreground" />;
               } else { // specialized
                 vehicle = reservation.vehicle;
                 vehicleUrl = `/specialized/${vehicle.id}`;
-                aiHint = 'accessible van';
                 icon = <Accessibility className="h-5 w-5 mr-2 text-muted-foreground" />;
               }
 
@@ -148,9 +144,6 @@ export default function ReservationsPage() {
                 <TableRow key={`${reservation.type}-${reservation.id}`}>
                   <TableCell>
                     <Link href={vehicleUrl} className="flex items-center gap-4 group">
-                      <div className="relative w-24 h-16 rounded-md overflow-hidden">
-                        <Image src={vehicle.images[0]} alt={vehicle.name} layout="fill" objectFit="cover" data-ai-hint={aiHint} />
-                      </div>
                       <div>
                         <div className="font-medium group-hover:underline flex items-center">{icon} {vehicle.name}</div>
                         <div className="text-sm text-muted-foreground ml-7">{vehicle.type}</div>

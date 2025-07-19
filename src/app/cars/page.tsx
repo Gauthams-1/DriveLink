@@ -3,9 +3,10 @@ import { CarCard } from "@/components/CarCard";
 import { cars } from "@/lib/data";
 import { Car } from "@/lib/types";
 import { MapPin } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 type SearchParams = {
   location?: string;
@@ -63,21 +64,22 @@ export default function CarsPage({ searchParams }: { searchParams: SearchParams 
         </div>
         <aside className="lg:w-1/3">
           <div className="sticky top-24">
-            <h2 className="text-2xl font-bold mb-4">Pickup Locations</h2>
-            <div className="relative h-[400px] w-full rounded-lg overflow-hidden shadow-lg">
-                <Image src="https://images.unsplash.com/photo-1542379369-955a40a5a415?q=80&w=600&auto=format&fit=crop" alt="Satellite map of a city" layout="fill" objectFit="cover" data-ai-hint="satellite map" />
-                <div className="absolute inset-0 bg-black/10"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <MapPin className="w-8 h-8 text-primary animate-pulse" />
-                </div>
-                 <div className="absolute top-1/4 left-1/3 -translate-x-1/2 -translate-y-1/2">
-                    <MapPin className="w-6 h-6 text-primary" />
-                </div>
-                 <div className="absolute bottom-1/4 right-1/4 -translate-x-1/2 -translate-y-1/2">
-                    <MapPin className="w-6 h-6 text-primary" />
-                </div>
-            </div>
-            <p className="text-sm text-muted-foreground mt-2">Interactive map coming soon.</p>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Pickup Locations</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground mb-4">We have pickup locations across all major cities. Enter your route to find the nearest one.</p>
+                    <div className="flex flex-col gap-2">
+                        <Button variant="outline" asChild>
+                            <Link href="/locations">View All Locations</Link>
+                        </Button>
+                         <Button asChild>
+                            <Link href="/recommendations">Get AI Recommendation</Link>
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
           </div>
         </aside>
       </div>

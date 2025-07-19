@@ -2,12 +2,10 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { findSpecializedVehicleById, getCurrentUser } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Users, Star } from 'lucide-react';
+import { CheckCircle, Users, Star, Accessibility } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@/lib/types';
@@ -38,19 +36,9 @@ export default function SpecializedVehicleDetailPage({ params }: { params: { id:
     <div className="container mx-auto py-8 px-4">
       <div className="grid lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
-          <Carousel className="w-full mb-8 rounded-lg overflow-hidden shadow-lg">
-            <CarouselContent>
-              {vehicle.images.map((src, index) => (
-                <CarouselItem key={index}>
-                  <div className="relative h-[400px]">
-                    <Image src={src} alt={`${vehicle.name} view ${index + 1}`} layout="fill" objectFit="cover" data-ai-hint="accessible van" />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="ml-16" />
-            <CarouselNext className="mr-16" />
-          </Carousel>
+           <div className="bg-muted rounded-lg p-8 flex items-center justify-center mb-8">
+            <Accessibility className="w-32 h-32 text-muted-foreground" />
+          </div>
           
           <div className="flex justify-between items-start">
             <div>

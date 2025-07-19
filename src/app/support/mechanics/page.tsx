@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -6,8 +7,7 @@ import { findMechanics } from '@/ai/flows/find-mechanic';
 import type { Mechanic } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Star, Phone, MessageSquare, MapPin } from 'lucide-react';
-import Image from 'next/image';
+import { Loader2, Star, Phone, MessageSquare, MapPin, User } from 'lucide-react';
 
 function MechanicsList() {
     const searchParams = useSearchParams();
@@ -65,7 +65,9 @@ function MechanicsList() {
                      <CardHeader className="text-center sm:text-left">
                         <div className="flex flex-col items-center sm:flex-row gap-6">
                             <div className="relative">
-                                <Image src={mechanic.avatarUrl} alt={mechanic.name} width={100} height={100} className="rounded-full border-4 border-background ring-4 ring-primary" data-ai-hint="mechanic person" />
+                                <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center ring-4 ring-primary">
+                                    <User className="w-12 h-12 text-muted-foreground" />
+                                </div>
                                 <div className="absolute -bottom-2 -right-1 bg-primary text-primary-foreground rounded-full px-2 py-0.5 flex items-center gap-1 text-sm">
                                     <Star className="w-3 h-3 fill-current" /> {mechanic.rating}
                                 </div>

@@ -7,15 +7,15 @@ import { findTruckById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Banknote, CreditCard, MapPin } from 'lucide-react';
+import { CheckCircle, Calendar, Banknote, CreditCard, MapPin, Truck as TruckIcon } from 'lucide-react';
 import { addDays, differenceInDays, format } from 'date-fns';
-import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { DatePickerWithRange } from '@/components/DatePickerWithRange';
 import type { DateRange } from 'react-day-picker';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import Image from 'next/image';
 
 function TruckConfirmationContent() {
   const router = useRouter();
@@ -81,13 +81,17 @@ function TruckConfirmationContent() {
     <form onSubmit={handleConfirm}>
       <div className="grid md:grid-cols-2 gap-8">
         <div>
-          <div className="relative h-64 w-full rounded-lg overflow-hidden mb-4 shadow-lg">
-              <Image src={truck.images[0]} alt={truck.name} layout="fill" objectFit="cover" data-ai-hint="truck" />
-          </div>
-          <h2 className="text-3xl font-bold font-headline">{truck.name}</h2>
-          <p className="text-muted-foreground mt-2">{truck.size} - Up to {truck.payload} payload</p>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TruckIcon className="w-6 h-6" />
+                <span>{truck.name}</span>
+              </CardTitle>
+              <CardDescription>{truck.size} - Up to {truck.payload} payload</CardDescription>
+            </CardHeader>
+          </Card>
           
-          <Card className="mt-6">
+          <Card>
             <CardHeader>
                 <CardTitle>Booking Details</CardTitle>
                 <CardDescription>Enter the details for your booking.</CardDescription>

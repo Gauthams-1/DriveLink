@@ -2,20 +2,18 @@
 'use client';
 
 import { getCurrentUser, findCarReservations, saveUser } from "@/lib/data";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { format } from "date-fns";
-import Image from "next/image";
 import { useState, useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Separator } from "./ui/separator";
 import { generateAvatarAction } from "@/app/actions";
-import { Loader2, Sparkles, UserCheck, UserX, ShieldCheck, Mail, Phone, MapPin, Edit, X, Upload } from "lucide-react";
+import { Loader2, Sparkles, UserCheck, UserX, ShieldCheck, Mail, Phone, MapPin, Edit, X, Upload, Car } from "lucide-react";
 import type { User } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { Textarea } from "./ui/textarea";
@@ -136,7 +134,6 @@ export function CustomerProfile() {
             <Card>
                 <CardHeader className="text-center">
                     <Avatar className="h-24 w-24 border-4 border-background ring-4 ring-primary mx-auto">
-                      <AvatarImage src={isEditing ? formData.avatarUrl : currentUser.avatarUrl} alt={currentUser.name} />
                       <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <CardTitle className="pt-4">{isEditing ? formData.name : currentUser.name}</CardTitle>
@@ -168,7 +165,9 @@ export function CustomerProfile() {
                   {avatarGenState.avatarDataUri && (
                     <div className="mt-4 text-center">
                       <p className="font-semibold mb-2">Generated Avatar</p>
-                      <Image src={avatarGenState.avatarDataUri} alt="Generated Avatar" width={100} height={100} className="rounded-full mx-auto" />
+                      <div className="w-24 h-24 rounded-full mx-auto bg-muted flex items-center justify-center">
+                        <Sparkles className="w-12 h-12 text-muted-foreground" />
+                      </div>
                       <Button variant="outline" size="sm" className="mt-2" onClick={handleUseAvatar}>Use this Avatar</Button>
                     </div>
                   )}
@@ -269,8 +268,8 @@ export function CustomerProfile() {
                         <TableRow key={reservation.id}>
                             <TableCell>
                             <div className="flex items-center gap-4">
-                                <div className="relative w-16 h-12 rounded-md overflow-hidden">
-                                <Image src={reservation.car.images[0]} alt={reservation.car.name} layout="fill" objectFit="cover" data-ai-hint="car" />
+                                <div className="w-16 h-12 rounded-md bg-muted flex items-center justify-center">
+                                    <Car className="w-6 h-6 text-muted-foreground" />
                                 </div>
                                 <div>
                                 <div className="font-medium">{reservation.car.name}</div>

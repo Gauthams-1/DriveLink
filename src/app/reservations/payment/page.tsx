@@ -7,13 +7,13 @@ import { findCarById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Banknote, CreditCard, MapPin } from 'lucide-react';
+import { CheckCircle, Calendar, Banknote, CreditCard, MapPin, Car as CarIcon } from 'lucide-react';
 import { format } from 'date-fns';
-import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import Image from 'next/image';
 
 function CarPaymentContent() {
   const router = useRouter();
@@ -86,10 +86,8 @@ function CarPaymentContent() {
            <h2 className="text-2xl font-bold font-headline mb-4">Your Booking Summary</h2>
            <Card className="mb-6">
                 <CardContent className="p-4">
-                    <div className="flex gap-4">
-                        <div className="relative h-24 w-24 rounded-lg overflow-hidden">
-                          <Image src={car.images[0]} alt={car.name} layout="fill" objectFit="cover" data-ai-hint="car" />
-                        </div>
+                    <div className="flex gap-4 items-center">
+                        <CarIcon className="h-10 w-10 text-primary" />
                         <div>
                             <h3 className="font-bold text-lg">{car.name}</h3>
                             <p className="text-muted-foreground">{car.type}</p>

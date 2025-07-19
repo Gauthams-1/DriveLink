@@ -6,8 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { getRouteDetails, type GetRouteDetailsOutput } from '@/ai/flows/get-route-details';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Route, Fuel, Utensils, Construction } from 'lucide-react';
-import Image from 'next/image';
+import { Loader2, Route, Fuel, Utensils, Construction, Car } from 'lucide-react';
 import Link from 'next/link';
 
 function TripDetailsContent() {
@@ -19,8 +18,7 @@ function TripDetailsContent() {
     const pickup = searchParams.get('pickup');
     const dropoff = searchParams.get('dropoff');
     const carName = searchParams.get('carName');
-    const carImage = searchParams.get('carImage');
-
+    
     useEffect(() => {
         if (pickup && dropoff) {
             setLoading(true);
@@ -55,17 +53,15 @@ function TripDetailsContent() {
     return (
         <div className="space-y-8">
             <Card className="overflow-hidden">
-                <div className="grid md:grid-cols-3">
-                    <div className="md:col-span-1 relative h-48 md:h-full">
-                        <Image src={carImage || 'https://placehold.co/600x400.png'} alt={carName || 'Car'} layout="fill" objectFit="cover" data-ai-hint="car" />
-                    </div>
-                    <div className="md:col-span-2 p-6">
-                        <CardTitle className="text-2xl font-headline">Your Trip with the {carName}</CardTitle>
-                        <p className="text-muted-foreground mt-2">From <span className="font-semibold text-primary">{pickup}</span> to <span className="font-semibold text-primary">{dropoff}</span></p>
-                        <div className="mt-6 flex gap-4">
-                            <Button asChild><Link href="/reservations">View All Bookings</Link></Button>
-                            <Button variant="outline">Share Trip Details</Button>
-                        </div>
+                <div className="p-6">
+                    <CardTitle className="text-2xl font-headline flex items-center gap-4">
+                        <Car className="h-8 w-8 text-primary" />
+                        <span>Your Trip with the {carName}</span>
+                    </CardTitle>
+                    <p className="text-muted-foreground mt-2">From <span className="font-semibold text-primary">{pickup}</span> to <span className="font-semibold text-primary">{dropoff}</span></p>
+                    <div className="mt-6 flex gap-4">
+                        <Button asChild><Link href="/reservations">View All Bookings</Link></Button>
+                        <Button variant="outline">Share Trip Details</Button>
                     </div>
                 </div>
             </Card>

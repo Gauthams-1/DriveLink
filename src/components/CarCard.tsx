@@ -1,9 +1,9 @@
+
 import Link from 'next/link';
-import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Car as CarType } from '@/lib/types';
-import { Users, Briefcase, Gauge, GitBranch, Zap, Fuel, PersonStanding } from 'lucide-react';
+import { Users, Briefcase, Gauge, GitBranch, Zap, Fuel, PersonStanding, Car as CarIcon } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface CarCardProps {
@@ -17,15 +17,8 @@ export function CarCard({ car }: CarCardProps) {
     <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
         <Link href={`/cars/${car.id}`} className="flex flex-col h-full">
             <CardHeader className="p-0">
-            <div className="relative h-56 w-full">
-                <Image
-                src={car.images[0]}
-                alt={`Image of ${car.name}`}
-                layout="fill"
-                objectFit="cover"
-                className="transition-transform duration-300 group-hover:scale-105"
-                data-ai-hint={isTwoWheeler ? 'motorcycle scooter' : 'car'}
-                />
+            <div className="relative h-56 w-full bg-muted flex items-center justify-center">
+                <CarIcon className="w-24 h-24 text-muted-foreground" />
                 <Badge className="absolute top-2 right-2" variant="secondary">{car.type}</Badge>
             </div>
             </CardHeader>

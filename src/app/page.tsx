@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Car, Bus, Truck, Wrench, Users, Ambulance, ShieldCheck, Route, Wallet } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 const services = [
@@ -71,24 +70,15 @@ const aboutFeatures = [
 export default function Home() {
   return (
     <div className="flex flex-col">
-      <section className="relative w-full h-[70vh] md:h-[80vh]">
-        <Image
-          src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1800&auto=format&fit=crop"
-          alt="A modern white sports car on a scenic road"
-          layout="fill"
-          objectFit="cover"
-          className="z-0"
-          data-ai-hint="modern car"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
-        <div className="relative z-20 flex flex-col items-center justify-end h-full text-center text-white px-4 pb-20">
+      <section className="relative w-full py-20 md:py-32 bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4 flex flex-col items-center justify-center h-full text-center">
           <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4 drop-shadow-lg">
             Your Complete Transportation Solution
           </h1>
           <p className="text-lg md:text-2xl mb-8 max-w-3xl drop-shadow-md">
             From cars and bikes to buses and trucks, we've got your journey covered.
           </p>
-          <Button size="lg" asChild>
+          <Button size="lg" asChild variant="secondary">
             <Link href="#about">Learn More</Link>
           </Button>
         </div>
@@ -148,15 +138,15 @@ export default function Home() {
       <section className="py-16 md:py-24">
          <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
-                 <Image src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?q=80&w=2070&auto=format&fit=crop" alt="Two modern cars in a showroom" layout="fill" objectFit="cover" data-ai-hint="two cars" />
-               </div>
-               <div>
+               <div className="p-8 bg-muted rounded-lg">
                   <h2 className="text-3xl md:text-4xl font-headline font-bold mb-4">Become a DriveLink Partner</h2>
                   <p className="text-lg text-muted-foreground mb-6">Have a vehicle? Join our network and start earning. We provide the tools and support you need to manage your fleet, track bookings, and grow your business.</p>
                   <Button asChild size="lg">
                      <Link href="/partner">Learn More</Link>
                   </Button>
+               </div>
+               <div className="relative h-[400px] rounded-lg bg-primary/5 flex items-center justify-center">
+                  <Car className="h-32 w-32 text-primary/20" />
                </div>
             </div>
          </div>
