@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { findCarById, findBusById, findSpecializedVehicleById } from '@/lib/data';
+import { findCarById, findBusById, findSpecializedVehicleById, getCurrentUser, saveUser } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -27,8 +27,9 @@ import { Car, Pencil, Trash2, Bus, Accessibility, HeartHandshake } from 'lucide-
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import type { CarReservationWithDetails, BusReservationWithDetails, Reservation, BusReservation, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails } from '@/lib/types';
+import type { CarReservationWithDetails, BusReservationWithDetails, Reservation, BusReservation, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, User } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
+import { findOwnerOfVehicle } from '@/lib/data';
 
 type UnifiedReservation = (CarReservationWithDetails & { type: 'car' }) | (BusReservationWithDetails & { type: 'bus' }) | (SpecializedVehicleReservationWithDetails & { type: 'specialized' });
 
@@ -73,30 +74,48 @@ export default function ReservationsPage() {
     setReservations(allReservations);
   }, []);
 
-  const handleCancelReservation = (reservationId: number, type: 'car' | 'bus' | 'specialized') => {
+  const handleCancelReservation = (reservation: UnifiedReservation) => {
     let storageKey = '';
-    switch (type) {
+    let vehicleId: number;
+
+    switch (reservation.type) {
       case 'car':
         storageKey = 'carReservations';
+        vehicleId = reservation.carId;
         break;
       case 'bus':
         storageKey = 'busReservations';
+        vehicleId = reservation.busId;
         break;
       case 'specialized':
         storageKey = 'specializedVehicleReservations';
+        vehicleId = reservation.vehicleId;
         break;
     }
     
+    // Remove the reservation from localStorage
     const storedReservations = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    const updatedStoredReservations = storedReservations.filter((r: {id: number}) => r.id !== reservationId);
+    const updatedStoredReservations = storedReservations.filter((r: {id: number}) => r.id !== reservation.id);
     localStorage.setItem(storageKey, JSON.stringify(updatedStoredReservations));
 
-    const updatedReservations = reservations.filter(r => !(r.id === reservationId && r.type === type));
+    // Update the vehicle status to 'Available' in the owner's fleet
+    const owner = findOwnerOfVehicle(vehicleId);
+    if (owner && owner.vehicles) {
+        const vehicleIndex = owner.vehicles.findIndex(v => v.id === vehicleId);
+        if (vehicleIndex > -1) {
+            owner.vehicles[vehicleIndex].status = 'Available';
+            owner.vehicles[vehicleIndex].renter = null;
+            saveUser(owner); // This will update the user in the main user list as well
+        }
+    }
+
+    // Update the UI state
+    const updatedReservations = reservations.filter(r => r.id !== reservation.id || r.type !== reservation.type);
     setReservations(updatedReservations);
 
     toast({
       title: "Reservation Cancelled",
-      description: "Your booking has been successfully cancelled.",
+      description: "Your booking has been successfully cancelled and the vehicle is now available.",
     });
   };
   
@@ -186,7 +205,7 @@ export default function ReservationsPage() {
                             <AlertDialogCancel>Keep Reservation</AlertDialogCancel>
                             <AlertDialogAction 
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              onClick={() => handleCancelReservation(reservation.id, reservation.type)}
+                              onClick={() => handleCancelReservation(reservation)}
                             >
                               Yes, Cancel
                             </AlertDialogAction>

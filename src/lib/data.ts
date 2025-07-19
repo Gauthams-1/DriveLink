@@ -598,3 +598,8 @@ export const addPartnerVehicle = (vehicle: Omit<PartnerVehicle, 'id'>): User => 
     saveUser(currentUser);
     return currentUser;
 };
+
+export const findOwnerOfVehicle = (vehicleId: number): User | undefined => {
+    const users = getRegisteredUsers();
+    return users.find(u => u.isPartner && u.vehicles?.some(v => v.id === vehicleId));
+};
