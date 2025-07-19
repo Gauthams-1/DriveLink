@@ -22,20 +22,6 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
     <div className="container mx-auto py-8 px-4">
       <div className="grid lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
-          <Carousel className="w-full mb-8 rounded-lg overflow-hidden shadow-lg">
-            <CarouselContent>
-              {car.images.map((src, index) => (
-                <CarouselItem key={index}>
-                  <div className="relative h-[400px]">
-                    <Image src={src} alt={`${car.name} view ${index + 1}`} layout="fill" objectFit="cover" data-ai-hint="car" />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="ml-16" />
-            <CarouselNext className="mr-16" />
-          </Carousel>
-          
           <h1 className="text-4xl font-bold font-headline mb-2">{car.name}</h1>
           <div className="flex items-center gap-2 mb-6">
             <MapPin className="w-5 h-5 text-muted-foreground" />
