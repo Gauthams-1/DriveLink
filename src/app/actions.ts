@@ -2,7 +2,8 @@
 
 import { recommendCars, type CarRecommendationInput } from '@/ai/flows/car-recommendation';
 import { generateAvatar, type GenerateAvatarInput } from '@/ai/flows/generate-avatar';
-import { findMechanic, type FindMechanicInput } from '@/ai/flows/find-mechanic';
+import { findMechanics } from '@/ai/flows/find-mechanic';
+import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const CarRecommendationSchema = z.object({
@@ -96,27 +97,15 @@ export async function findMechanicAction(prevState: any, formData: FormData) {
 
   if (!validatedFields.success) {
     return {
-      message: 'Invalid input',
       errors: validatedFields.error.flatten().fieldErrors,
-      mechanic: null,
     }
   }
 
-  const input: FindMechanicInput = validatedFields.data;
+  const { location, problemDescription } = validatedFields.data;
+  const queryParams = new URLSearchParams({
+    location,
+    problemDescription,
+  });
 
-  try {
-    const result = await findMechanic(input);
-    return {
-      message: 'success',
-      errors: null,
-      mechanic: result,
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      message: 'An error occurred while finding a mechanic.',
-      errors: null,
-      mechanic: null,
-    };
-  }
+  redirect(`/support/mechanics?${queryParams.toString()}`);
 }
