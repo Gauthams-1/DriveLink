@@ -1,21 +1,41 @@
 
-import { notFound } from 'next/navigation';
+'use client';
+
+import { notFound, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { findTruckById } from '@/lib/data';
+import { findTruckById, getCurrentUser } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Truck as TruckIcon, Weight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
+import { useEffect, useState } from 'react';
+import type { User } from '@/lib/types';
 
 export default function TruckDetailPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const truck = findTruckById(Number(params.id));
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
 
   if (!truck) {
     notFound();
   }
+
+  const handleBooking = () => {
+    if (user && !user.isGuest) {
+      // In a real app, this would go to a truck booking confirmation page.
+      // For now, we can show an alert or redirect to a placeholder.
+      alert('Truck booking flow not implemented yet. Redirecting to profile.');
+      router.push('/profile');
+    } else {
+      router.push('/profile');
+    }
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -69,13 +89,13 @@ export default function TruckDetailPage({ params }: { params: { id: string } }) 
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground flex items-center gap-2"><Star className="w-4 h-4" /> Driver Rating</span>
-                  <span className="font-medium">{truck.driver.rating}/5</span>
+                  <span className="font-medium">{truck.driverRating}/5</span>
                 </div>
               </CardContent>
             </Card>
 
-            <Button size="lg" className="w-full" asChild>
-                <Link href="#">Book This Truck</Link>
+            <Button size="lg" className="w-full" onClick={handleBooking}>
+                Book This Truck
             </Button>
           </div>
         </div>

@@ -1,20 +1,38 @@
 
-import { notFound } from 'next/navigation';
+'use client';
+
+import { notFound, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { findSpecializedVehicleById } from '@/lib/data';
+import { findSpecializedVehicleById, getCurrentUser } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Users, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import type { User } from '@/lib/types';
+
 
 export default function SpecializedVehicleDetailPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const vehicle = findSpecializedVehicleById(Number(params.id));
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
 
   if (!vehicle) {
     notFound();
   }
+
+  const handleBooking = () => {
+    if (user && !user.isGuest) {
+      router.push(`/specialized/confirm?vehicleId=${vehicle.id}`);
+    } else {
+      router.push('/profile');
+    }
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -60,7 +78,7 @@ export default function SpecializedVehicleDetailPage({ params }: { params: { id:
                 </div>
                  <div className="flex justify-between items-center">
                   <span className="text-muted-foreground flex items-center gap-2"><Star className="w-4 h-4" /> Driver Rating</span>
-                  <span className="font-medium">{vehicle.driver.rating}/5</span>
+                  <span className="font-medium">{vehicle.driverRating}/5</span>
                 </div>
               </CardContent>
             </Card>
@@ -81,8 +99,8 @@ export default function SpecializedVehicleDetailPage({ params }: { params: { id:
               </CardContent>
             </Card>
 
-            <Button size="lg" className="w-full" asChild>
-                <Link href={`/specialized/confirm?vehicleId=${vehicle.id}`}>Book Now</Link>
+            <Button size="lg" className="w-full" onClick={handleBooking}>
+                Book Now
             </Button>
 
           </div>

@@ -1,13 +1,17 @@
 
-import { notFound } from 'next/navigation';
+'use client';
+
+import { notFound, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { findBusById } from '@/lib/data';
+import { findBusById, getCurrentUser } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Users, Star, Wifi, Thermometer, Tv, Sofa } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import type { User } from '@/lib/types';
 
 const amenityIcons: { [key: string]: React.ReactNode } = {
   'air conditioning': <Thermometer className="w-5 h-5 text-accent" />,
@@ -20,11 +24,25 @@ const amenityIcons: { [key: string]: React.ReactNode } = {
 };
 
 export default function BusDetailPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const bus = findBusById(Number(params.id));
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
 
   if (!bus) {
     notFound();
   }
+  
+  const handleBooking = () => {
+    if (user && !user.isGuest) {
+      router.push(`/bus-trips/confirm?busId=${bus.id}`);
+    } else {
+      router.push('/profile');
+    }
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -69,7 +87,7 @@ export default function BusDetailPage({ params }: { params: { id: string } }) {
                 </div>
                  <div className="flex justify-between items-center">
                   <span className="text-muted-foreground flex items-center gap-2"><Star className="w-4 h-4" /> Driver Rating</span>
-                  <span className="font-medium">{bus.driver.rating}/5</span>
+                  <span className="font-medium">{bus.driverRating}/5</span>
                 </div>
               </CardContent>
             </Card>
@@ -90,8 +108,8 @@ export default function BusDetailPage({ params }: { params: { id: string } }) {
               </CardContent>
             </Card>
 
-            <Button size="lg" className="w-full" asChild>
-                <Link href={`/bus-trips/confirm?busId=${bus.id}`}>Book Now</Link>
+            <Button size="lg" className="w-full" onClick={handleBooking}>
+                Book Now
             </Button>
 
           </div>

@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { addDays, differenceInDays, format } from 'date-fns';
-import type { Car } from '@/lib/types';
+import type { Car, User } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Label } from './ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -14,6 +14,7 @@ import { Calendar } from './ui/calendar';
 import { Checkbox } from './ui/checkbox';
 import type { DateRange } from 'react-day-picker';
 import Link from 'next/link';
+import { getCurrentUser } from '@/lib/data';
 
 const ADDONS = [
   { id: 'insurance', label: 'Full Insurance', price: 1500 },
@@ -28,6 +29,11 @@ export function CostCalculator({ car }: { car: Car }) {
   });
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [totalCost, setTotalCost] = useState(0);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
 
   const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 0;
 
@@ -66,6 +72,8 @@ export function CostCalculator({ car }: { car: Car }) {
 
     return `/reservations/details?${params.toString()}`;
   }
+
+  const reservationUrl = user && !user.isGuest ? getReservationUrl() : '/profile';
   
   return (
     <Card>
@@ -156,7 +164,7 @@ export function CostCalculator({ car }: { car: Car }) {
           <span>₹{totalCost.toFixed(2)}</span>
         </div>
         <Button size="lg" asChild disabled={!dateRange?.from || !dateRange?.to}>
-          <Link href={getReservationUrl()}>Reserve Now</Link>
+          <Link href={reservationUrl}>Reserve Now</Link>
         </Button>
       </CardFooter>
     </Card>
