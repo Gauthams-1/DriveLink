@@ -65,7 +65,7 @@ export default function CarsPage({ searchParams }: { searchParams: SearchParams 
           <div className="sticky top-24">
             <h2 className="text-2xl font-bold mb-4">Pickup Locations</h2>
             <div className="relative h-[400px] w-full rounded-lg overflow-hidden shadow-lg">
-                <Image src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?q=80&w=600&auto=format&fit=crop" alt="Map of pickup locations" layout="fill" objectFit="cover" data-ai-hint="city map" />
+                <Image src="https://images.unsplash.com/photo-1542379369-955a40a5a415?q=80&w=600&auto=format&fit=crop" alt="Satellite map of a city" layout="fill" objectFit="cover" data-ai-hint="satellite map" />
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                     <MapPin className="w-8 h-8 text-primary animate-pulse" />
