@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Menu, Car, Bus, Truck, Wrench, User } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { cn } from '@/lib/utils';
-import { CarSearchForm } from './CarSearchForm';
 
 const navLinks = [
   { href: '/cars', label: 'Rentals', icon: Car },
@@ -42,13 +41,14 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center px-4">
-        <div className="flex items-center gap-6">
+        <div className="mr-auto flex items-center gap-6">
           <Link href="/">
               <Logo />
           </Link>
-          <div className="hidden md:flex">
+        </div>
+
+        <div className="hidden md:flex items-center gap-6">
             <NavLinks />
-          </div>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
