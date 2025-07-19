@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useActionState } from 'react';
@@ -9,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Wrench, Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const initialState = {
   errors: null,
@@ -33,6 +35,46 @@ function SubmitButton() {
   );
 }
 
+const indianStates = [
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+  "Andaman and Nicobar Islands",
+  "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Lakshadweep",
+  "Puducherry",
+];
+
+
 export default function SupportPage() {
   const [state, formAction] = useActionState(findMechanicAction, initialState);
   
@@ -55,12 +97,16 @@ export default function SupportPage() {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="location">Your Current Location</Label>
-                <Input 
-                  id="location" 
-                  name="location"
-                  placeholder="e.g., Andheri, Mumbai" 
-                  required 
-                />
+                <Select name="location" required>
+                    <SelectTrigger id="location">
+                        <SelectValue placeholder="Select your state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {indianStates.map((state) => (
+                            <SelectItem key={state} value={state}>{state}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 {state.errors?.location && <p className="text-sm text-destructive mt-1">{state.errors.location[0]}</p>}
               </div>
               <div className="space-y-2">
