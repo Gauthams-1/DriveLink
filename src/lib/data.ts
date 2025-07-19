@@ -1,5 +1,5 @@
 
-import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic, Job } from './types';
+import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic, Job, Trip } from './types';
 
 // Note: All image URLs have been removed as requested.
 // They are kept as empty strings in the array for data structure consistency.
@@ -320,7 +320,7 @@ const defaultUser: User = {
   isPartner: false,
   partnerType: 'owner',
   vehicles: [],
-  partnerStats: { totalRevenue: 0, activeBookings: 0, totalVehicles: 0, avgRating: 0 },
+  partnerStats: { totalRevenue: 0, avgRating: 0 },
 };
 
 export const samplePartnerVehicles: PartnerVehicle[] = [
@@ -390,6 +390,36 @@ export const sampleMechanicJobs: Job[] = [
         date: new Date('2024-07-18T11:00:00Z'),
         mechanicId: 2,
         invoiceAmount: 3500
+    }
+];
+
+export const sampleDriverTrips: Trip[] = [
+    {
+        id: 1,
+        customerName: 'Ananya Verma',
+        route: 'Mumbai Airport to Taj Mahal Palace',
+        vehicle: 'Skoda Superb',
+        date: new Date('2024-07-21T14:00:00Z'),
+        payout: 2500,
+        driverId: 3,
+    },
+    {
+        id: 2,
+        customerName: 'Ravi Kumar',
+        route: 'Pune City to Lonavala',
+        vehicle: 'Tata Nexon',
+        date: new Date('2024-07-20T09:30:00Z'),
+        payout: 3200,
+        driverId: 3,
+    },
+    {
+        id: 3,
+        customerName: 'Meera Desai',
+        route: 'Goa Airport to Calangute Beach',
+        vehicle: 'Mahindra Thar',
+        date: new Date('2024-07-18T11:00:00Z'),
+        payout: 1800,
+        driverId: 3,
     }
 ];
 
@@ -515,7 +545,24 @@ const getRegisteredUsers = (): User[] => {
             jobs: sampleMechanicJobs,
             partnerStats: { totalRevenue: 48000, avgRating: 4.8, activeJobs: 1, completedJobs: 2 },
         };
-        const users = [defaultOwnerPartner, defaultMechanicPartner];
+        const defaultDriverPartner: User = {
+            name: "Default Driver Partner",
+            email: "driver@example.com",
+            password: "password",
+            phone: "9988776655",
+            address: "789 Driver's Quarters, Delhi",
+            licenseNumber: "DL987654321",
+            aadhaarNumber: "567890123456",
+            isVerified: true,
+            avatarUrl: "",
+            memberSince: new Date(),
+            isGuest: false,
+            isPartner: true,
+            partnerType: 'driver',
+            trips: sampleDriverTrips,
+            partnerStats: { totalRevenue: 155000, avgRating: 4.9, totalTrips: 25 },
+        };
+        const users = [defaultOwnerPartner, defaultMechanicPartner, defaultDriverPartner];
         usersJson = JSON.stringify(users);
         localStorage.setItem('driveLinkRegisteredUsers', usersJson);
         return users;
@@ -548,13 +595,15 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password' |
         avatarUrl: "",
         vehicles: details.partnerType === 'owner' ? [] : undefined,
         jobs: details.partnerType === 'mechanic' ? [] : undefined,
+        trips: details.partnerType === 'driver' ? [] : undefined,
         partnerStats: {
           totalRevenue: 0,
           avgRating: 0,
           activeBookings: details.partnerType === 'owner' ? 0 : undefined,
           totalVehicles: details.partnerType === 'owner' ? 0 : undefined,
-          activeJobs: details.partnerType === 'mechanic' || details.partnerType === 'driver' ? 0 : undefined,
-          completedJobs: details.partnerType === 'mechanic' || details.partnerType === 'driver' ? 0 : undefined,
+          activeJobs: details.partnerType === 'mechanic' ? 0 : undefined,
+          completedJobs: details.partnerType === 'mechanic' ? 0 : undefined,
+          totalTrips: details.partnerType === 'driver' ? 0 : undefined,
         },
     };
 

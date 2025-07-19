@@ -99,6 +99,7 @@ export type User = {
   partnerType?: 'owner' | 'mechanic' | 'driver';
   vehicles?: PartnerVehicle[];
   jobs?: Job[];
+  trips?: Trip[];
   partnerStats?: PartnerStats;
 };
 
@@ -111,6 +112,8 @@ export type PartnerStats = {
   // Mechanic stats
   activeJobs?: number;
   completedJobs?: number;
+  // Driver stats
+  totalTrips?: number;
 };
 
 export type PartnerVehicle = (Car | Bus) & {
@@ -144,6 +147,16 @@ export type Job = {
     date: Date;
     mechanicId: number;
     invoiceAmount?: number;
+};
+
+export type Trip = {
+    id: number;
+    customerName: string;
+    route: string; // e.g., "Mumbai to Pune"
+    vehicle: string; // e.g., "Tata Nexon"
+    date: Date;
+    payout: number;
+    driverId: number;
 };
 
 

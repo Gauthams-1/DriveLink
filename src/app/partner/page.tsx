@@ -16,6 +16,7 @@ import {
 import { PartnerDashboard } from '@/components/PartnerDashboard';
 import { FleetManagement } from '@/components/FleetManagement';
 import { MechanicDashboard } from '@/components/MechanicDashboard';
+import { DriverDashboard } from '@/components/DriverDashboard';
 import { MyJobs } from '@/components/MyJobs';
 import { LogOut, PanelLeft, DollarSign, Car, BarChart, LifeBuoy, Wrench, Briefcase } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -58,7 +59,45 @@ export default function PartnerPage() {
     );
   }
   
-  const isMechanic = user.partnerType === 'mechanic';
+  const partnerType = user.partnerType;
+
+  const renderDashboard = () => {
+    switch(partnerType) {
+      case 'owner':
+        return <PartnerDashboard user={user} />;
+      case 'mechanic':
+        return <MechanicDashboard user={user} />;
+      case 'driver':
+        return <DriverDashboard user={user} />;
+      default:
+        return <div>Invalid partner type.</div>;
+    }
+  }
+
+  const renderContent = () => {
+    if (activeTab === 'dashboard') {
+        return renderDashboard();
+    }
+    switch(partnerType) {
+        case 'owner':
+            if (activeTab === 'fleet') return <FleetManagement user={user} onFleetUpdate={setUser} />;
+            if (activeTab === 'earnings') return <div>Earnings Details Coming Soon</div>;
+            break;
+        case 'mechanic':
+            if (activeTab === 'jobs') return <MyJobs user={user} />;
+            if (activeTab === 'earnings') return <div>Earnings Details Coming Soon</div>;
+            break;
+        case 'driver':
+            // Driver dashboard is all-in-one, no other tabs needed
+            return renderDashboard();
+    }
+    return renderDashboard();
+  }
+  
+  const getSidebarTitle = () => {
+     if (partnerType === 'driver') return 'Driver Dashboard';
+     return activeTab.replace('-', ' ');
+  }
 
   return (
     <SidebarProvider>
@@ -82,18 +121,7 @@ export default function PartnerPage() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     
-                    {isMechanic ? (
-                       <SidebarMenuItem>
-                        <SidebarMenuButton
-                        onClick={() => setActiveTab('jobs')}
-                        isActive={activeTab === 'jobs'}
-                        tooltip={{ children: 'My Jobs' }}
-                        >
-                        <Briefcase />
-                        <span>My Jobs</span>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    ) : (
+                    {partnerType === 'owner' && (
                        <SidebarMenuItem>
                         <SidebarMenuButton
                         onClick={() => setActiveTab('fleet')}
@@ -105,17 +133,32 @@ export default function PartnerPage() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     )}
-                   
-                     <SidebarMenuItem>
+                    
+                    {partnerType === 'mechanic' && (
+                       <SidebarMenuItem>
                         <SidebarMenuButton
-                        onClick={() => setActiveTab('earnings')}
-                        isActive={activeTab === 'earnings'}
-                        tooltip={{ children: 'Earnings' }}
+                        onClick={() => setActiveTab('jobs')}
+                        isActive={activeTab === 'jobs'}
+                        tooltip={{ children: 'My Jobs' }}
                         >
-                        <DollarSign />
-                        <span>Earnings</span>
+                        <Briefcase />
+                        <span>My Jobs</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
+                    )}
+
+                    {partnerType !== 'driver' && (
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                            onClick={() => setActiveTab('earnings')}
+                            isActive={activeTab === 'earnings'}
+                            tooltip={{ children: 'Earnings' }}
+                            >
+                            <DollarSign />
+                            <span>Earnings</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    )}
                 </SidebarMenu>
             </SidebarContent>
              <SidebarFooter>
@@ -142,7 +185,7 @@ export default function PartnerPage() {
           <header className="flex h-16 items-center gap-4 border-b bg-background px-6">
              <SidebarTrigger className="md:hidden"/>
             <div className="flex-1">
-                <h1 className="text-lg font-semibold md:text-2xl capitalize">{activeTab.replace('-', ' ')}</h1>
+                <h1 className="text-lg font-semibold md:text-2xl capitalize">{getSidebarTitle()}</h1>
             </div>
              <div className="flex items-center gap-4">
                 <Button variant="outline" asChild><Link href="/profile">View My Profile</Link></Button>
@@ -153,10 +196,7 @@ export default function PartnerPage() {
           </header>
 
           <main className="flex-1 p-6">
-            {activeTab === 'dashboard' && (isMechanic ? <MechanicDashboard user={user} /> : <PartnerDashboard user={user} />)}
-            {activeTab === 'fleet' && !isMechanic && <FleetManagement user={user} onFleetUpdate={setUser} />}
-            {activeTab === 'jobs' && isMechanic && <MyJobs user={user} />}
-            {activeTab === 'earnings' && <div>Earnings Details Coming Soon</div>}
+            {renderContent()}
           </main>
         </SidebarInset>
       </div>
