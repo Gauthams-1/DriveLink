@@ -281,6 +281,17 @@ export const specializedVehicles: SpecializedVehicle[] = [
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
     driver: { name: 'Rajeshwari Iyer', rating: 5.0 },
   },
+  {
+    id: 4,
+    name: 'Sensory Explorer Sedan',
+    type: 'Visually Impaired Support',
+    description: 'A comfortable sedan equipped with an advanced AI audio system that provides real-time descriptions of the surroundings for visually impaired passengers.',
+    pricePerDay: 6000,
+    capacity: '3 Passengers',
+    features: ['AI Surround Description', 'Braille Controls', 'Voice Commands', 'Priority Assistance'],
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    driver: { name: 'Vikram Singh', rating: 4.9 },
+  },
 ];
 
 

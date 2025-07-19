@@ -5,11 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Accessibility, PawPrint, PersonStanding } from "lucide-react";
+import { Accessibility, PawPrint, PersonStanding, EyeOff } from "lucide-react";
 import type { SpecializedVehicle } from "@/lib/types";
 
 type SearchParams = {
-  'service-type'?: 'wheelchair' | 'pet' | 'senior';
+  'service-type'?: 'wheelchair' | 'pet' | 'senior' | 'visual';
 }
 
 function SpecializedVehicleList({ searchParams }: { searchParams: SearchParams }) {
@@ -23,6 +23,7 @@ function SpecializedVehicleList({ searchParams }: { searchParams: SearchParams }
       if (serviceType === 'wheelchair' && vehicleType.includes('wheelchair')) return true;
       if (serviceType === 'pet' && vehicleType.includes('pet')) return true;
       if (serviceType === 'senior' && vehicleType.includes('senior')) return true;
+      if (serviceType === 'visual' && vehicleType.includes('visually impaired')) return true;
       return false;
     });
   }
@@ -53,6 +54,7 @@ export default function SpecializedVehiclesPage({ searchParams }: { searchParams
             <Accessibility className="h-10 w-10 text-primary" />
             <PawPrint className="h-10 w-10 text-primary" />
             <PersonStanding className="h-10 w-10 text-primary" />
+            <EyeOff className="h-10 w-10 text-primary" />
         </div>
         <h1 className="text-4xl font-bold font-headline">Specialized Vehicle Services</h1>
         <p className="text-muted-foreground mt-2 text-lg">
@@ -73,6 +75,7 @@ export default function SpecializedVehiclesPage({ searchParams }: { searchParams
                     <SelectItem value="wheelchair">Wheelchair Accessible</SelectItem>
                     <SelectItem value="pet">Pet Friendly</SelectItem>
                     <SelectItem value="senior">Senior Citizen Support</SelectItem>
+                    <SelectItem value="visual">Visually Impaired Support</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

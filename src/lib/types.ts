@@ -62,7 +62,7 @@ export type Truck = {
 export type SpecializedVehicle = {
   id: number;
   name: string;
-  type: 'Wheelchair Accessible Van' | 'Pet-Friendly SUV' | 'Senior-Friendly Sedan';
+  type: 'Wheelchair Accessible Van' | 'Pet-Friendly SUV' | 'Senior-Friendly Sedan' | 'Visually Impaired Support';
   description: string;
   pricePerDay: number;
   capacity: string;
