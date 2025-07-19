@@ -10,12 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Truck as TruckIcon, Weight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@/lib/types';
 
 export default function TruckDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const truck = findTruckById(Number(params.id));
+  const truck = useMemo(() => findTruckById(Number(params.id)), [params.id]);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {

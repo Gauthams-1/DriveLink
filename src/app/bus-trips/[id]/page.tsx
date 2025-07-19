@@ -9,7 +9,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Users, Star, Wifi, Thermometer, Tv, Sofa } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@/lib/types';
 
 const amenityIcons: { [key: string]: React.ReactNode } = {
@@ -24,7 +24,7 @@ const amenityIcons: { [key: string]: React.ReactNode } = {
 
 export default function BusDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const bus = findBusById(Number(params.id));
+  const bus = useMemo(() => findBusById(Number(params.id)), [params.id]);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {

@@ -9,13 +9,13 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Users, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@/lib/types';
 
 
 export default function SpecializedVehicleDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const vehicle = findSpecializedVehicleById(Number(params.id));
+  const vehicle = useMemo(() => findSpecializedVehicleById(Number(params.id)), [params.id]);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
