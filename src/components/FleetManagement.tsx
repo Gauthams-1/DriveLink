@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { addPartnerVehicle, updatePartnerVehicle } from '@/lib/data';
-import type { PartnerVehicle, User, Car, Bus } from '@/lib/types';
+import type { PartnerVehicle, User, Car, Bus, Truck } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,10 +13,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Edit, Car as CarIcon, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route, Bus as BusIcon, Wifi, Thermometer, Tv, UserCircle } from 'lucide-react';
+import { PlusCircle, Edit, Car as CarIcon, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route, Bus as BusIcon, Truck as TruckIcon, Weight, UserCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
-import { cn } from '@/lib/utils';
 
 type VehicleFormProps = { 
     vehicle: Partial<PartnerVehicle> | null, 
@@ -26,39 +25,40 @@ type VehicleFormProps = {
 
 function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
     const isEditing = !!vehicle?.id;
-    const initialVehicleCategory = vehicle && 'amenities' in vehicle ? 'Bus' : 'Car/Bike';
-    const [vehicleCategory, setVehicleCategory] = useState<'Car/Bike' | 'Bus'>(initialVehicleCategory);
     
-    const getDefaultStateForCategory = (category: 'Car/Bike' | 'Bus'): Partial<PartnerVehicle> => {
+    const getInitialCategory = (): 'Car/Bike' | 'Bus' | 'Truck' => {
+        if (!vehicle) return 'Car/Bike';
+        if ('amenities' in vehicle) return 'Bus';
+        if ('payload' in vehicle) return 'Truck';
+        return 'Car/Bike';
+    }
+
+    const [vehicleCategory, setVehicleCategory] = useState<'Car/Bike' | 'Bus' | 'Truck'>(getInitialCategory());
+    
+    const getDefaultStateForCategory = (category: 'Car/Bike' | 'Bus' | 'Truck'): Partial<PartnerVehicle> => {
         if (category === 'Bus') {
             return {
-                name: '',
-                type: 'Seater',
-                seats: 45,
-                pricePerDay: 15000,
+                name: '', type: 'Seater', seats: 45, pricePerDay: 15000,
                 amenities: ['Air Conditioning', 'Wi-Fi'],
-                driver: { name: '', phone: '' },
-                status: 'Available',
+                driver: { name: '', phone: '' }, status: 'Available',
             };
         }
+        if (category === 'Truck') {
+            return {
+                name: '', size: 'Medium', pricePerDay: 7000, payload: '3 Ton',
+                description: '', status: 'Available',
+            }
+        }
         return {
-            name: '',
-            type: 'Sedan',
-            pricePerDay: 2500,
-            pricePerKm: 12,
-            seats: 4,
-            luggage: 2,
-            transmission: 'Automatic',
-            mpg: 20,
-            description: '',
-            features: [],
-            status: 'Available',
+            name: '', type: 'Sedan', pricePerDay: 2500, pricePerKm: 12, seats: 4,
+            luggage: 2, transmission: 'Automatic', mpg: 20, description: '',
+            features: [], status: 'Available',
         };
     };
 
     const [formData, setFormData] = useState<Partial<PartnerVehicle>>(vehicle || getDefaultStateForCategory(vehicleCategory));
 
-    const handleCategoryChange = (value: 'Car/Bike' | 'Bus') => {
+    const handleCategoryChange = (value: 'Car/Bike' | 'Bus' | 'Truck') => {
         setVehicleCategory(value);
         if (!isEditing) {
             setFormData(getDefaultStateForCategory(value));
@@ -87,7 +87,9 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
     };
 
     const handleFeatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const key = 'amenities' in formData ? 'amenities' : 'features';
+        let key: 'features' | 'amenities' = 'features';
+        if (vehicleCategory === 'Bus') key = 'amenities';
+
         setFormData(prev => ({ ...prev, [key]: e.target.value.split(',').map(f => f.trim()) }));
     }
 
@@ -106,7 +108,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
             {!isEditing && (
                  <div className="space-y-2">
                     <Label>Vehicle Category</Label>
-                    <RadioGroup defaultValue={vehicleCategory} onValueChange={handleCategoryChange} className="grid grid-cols-2 gap-4">
+                    <RadioGroup defaultValue={vehicleCategory} onValueChange={handleCategoryChange as any} className="grid grid-cols-3 gap-4">
                         <div>
                             <RadioGroupItem value="Car/Bike" id="Car/Bike" className="peer sr-only" />
                             <Label htmlFor="Car/Bike" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
@@ -121,6 +123,13 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                                 Bus
                             </Label>
                         </div>
+                        <div>
+                            <RadioGroupItem value="Truck" id="Truck" className="peer sr-only" />
+                            <Label htmlFor="Truck" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                <TruckIcon className="mb-3 h-6 w-6" />
+                                Truck
+                            </Label>
+                        </div>
                     </RadioGroup>
                 </div>
             )}
@@ -130,7 +139,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                 <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
             </div>
 
-            {vehicleCategory === 'Car/Bike' ? (
+            {vehicleCategory === 'Car/Bike' && (
                 <>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
@@ -190,7 +199,9 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                         <Input id="features" name="features" value={(formData as Car).features?.join(', ')} onChange={handleFeatureChange} />
                     </div>
                 </>
-            ) : ( // Bus Form
+            )}
+            
+            {vehicleCategory === 'Bus' && (
                 <>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
@@ -239,6 +250,41 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                 </>
             )}
 
+            {vehicleCategory === 'Truck' && (
+                <>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <Label htmlFor="size">Size</Label>
+                            <Select name="size" value={(formData as Truck).size} onValueChange={(val) => handleSelectChange('size', val)}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Mini">Mini (e.g., Tata Ace)</SelectItem>
+                                    <SelectItem value="Medium">Medium (e.g., Eicher 19ft)</SelectItem>
+                                    <SelectItem value="Large">Large (e.g., Tata 22ft)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="pricePerDay">Price Per Day (₹)</Label>
+                            <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay} onChange={handleChange} required />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <Label htmlFor="payload">Payload</Label>
+                            <Input id="payload" name="payload" value={(formData as Truck).payload || ''} onChange={handleChange} placeholder="e.g., 1 Ton, 5 Ton+" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="driverRating">Driver Rating</Label>
+                            <Input id="driverRating" name="driverRating" type="number" step="0.1" max="5" value={(formData as Truck).driverRating || ''} onChange={handleChange} />
+                        </div>
+                    </div>
+                     <div className="space-y-1">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea id="description" name="description" value={(formData as Truck).description} onChange={handleChange} />
+                    </div>
+                </>
+            )}
 
              <div className="space-y-1">
                 <Label htmlFor="status">Status</Label>
@@ -276,14 +322,27 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
   }
 
   const isBus = 'amenities' in vehicle;
+  const isTruck = 'payload' in vehicle;
+  const isCar = !isBus && !isTruck;
+  
+  const getVehicleIcon = () => {
+    if (isBus) return <BusIcon className="w-5 h-5 mr-2"/>;
+    if (isTruck) return <TruckIcon className="w-5 h-5 mr-2"/>;
+    return <CarIcon className="w-5 h-5 mr-2"/>;
+  }
+  
+  const getVehicleType = () => {
+    if (isTruck) return vehicle.size;
+    return vehicle.type;
+  }
 
   return (
     <Card className="flex flex-col">
         <CardHeader>
             <div className="flex justify-between items-start">
             <div>
-                <CardTitle>{vehicle.name}</CardTitle>
-                <CardDescription>{vehicle.type}</CardDescription>
+                <CardTitle className="flex items-center">{getVehicleIcon()} {vehicle.name}</CardTitle>
+                <CardDescription>{getVehicleType()}</CardDescription>
             </div>
             <Badge className={getStatusBadge(vehicle.status)}>{vehicle.status}</Badge>
             </div>
@@ -295,7 +354,7 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
                     <span className="font-bold text-lg">₹{vehicle.pricePerDay}</span>
                     <span className="text-muted-foreground">/day</span>
                 </div>
-                {!isBus && vehicle.pricePerKm && (
+                {isCar && vehicle.pricePerKm && (
                 <div className="flex items-center gap-2">
                     <Route className="w-4 h-4 text-muted-foreground" />
                     <span className="font-bold text-lg">₹{vehicle.pricePerKm}</span>
@@ -304,7 +363,16 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
                 )}
             </div>
             
-            {isBus ? (
+            {isCar && (
+                <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>
+                    <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> {vehicle.luggage} Bags</div>
+                    <div className="flex items-center gap-2"><Gauge className="w-4 h-4 text-primary" /> {vehicle.mpg} KMPL</div>
+                    <div className="flex items-center gap-2"><GitBranch className="w-4 h-4 text-primary" /> {vehicle.transmission}</div>
+                </div>
+            )}
+            
+            {isBus && (
                 <>
                     <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>
@@ -320,13 +388,13 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
                         </div>
                     )}
                 </>
-            ) : (
-                <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>
-                    <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> {vehicle.luggage} Bags</div>
-                    <div className="flex items-center gap-2"><Gauge className="w-4 h-4 text-primary" /> {vehicle.mpg} KMPL</div>
-                    <div className="flex items-center gap-2"><GitBranch className="w-4 h-4 text-primary" /> {vehicle.transmission}</div>
-                </div>
+            )}
+
+            {isTruck && (
+                 <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2"><TruckIcon className="w-4 h-4 text-primary" /> {vehicle.size}</div>
+                    <div className="flex items-center gap-2"><Weight className="w-4 h-4 text-primary" /> {vehicle.payload}</div>
+                 </div>
             )}
             
             {vehicle.status === 'Rented' && vehicle.renter && (
@@ -344,7 +412,7 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
         </CardContent>
         <CardFooter>
             <Button variant="outline" className="w-full" onClick={() => onEdit(vehicle)}>
-                <Edit className="mr-2" /> Edit Vehicle
+                <Edit className="mr-2 h-4 w-4" /> Edit Vehicle
             </Button>
         </CardFooter>
     </Card>
@@ -388,12 +456,12 @@ export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUp
         <div className="flex justify-between items-center">
             <div>
                 <h1 className="text-3xl font-bold font-headline">My Fleet</h1>
-                <p className="text-muted-foreground">An overview of all your vehicles and buses.</p>
+                <p className="text-muted-foreground">An overview of all your vehicles, buses, and trucks.</p>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                     <Button onClick={handleAddNew}>
-                        <PlusCircle className="mr-2" /> Add New Vehicle
+                        <PlusCircle className="mr-2 h-4 w-4" /> Add New Vehicle
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
@@ -419,9 +487,9 @@ export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUp
             <Card className="text-center py-16 border-2 border-dashed">
                 <CarIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 <h2 className="text-2xl font-bold font-headline">Your fleet is empty</h2>
-                <p className="text-muted-foreground mt-2">Get started by adding your first car, bike, or bus.</p>
+                <p className="text-muted-foreground mt-2">Get started by adding your first car, bike, bus, or truck.</p>
                 <Button onClick={handleAddNew} className="mt-6">
-                    <PlusCircle className="mr-2" /> Add Your First Vehicle
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add Your First Vehicle
                 </Button>
             </Card>
         )}

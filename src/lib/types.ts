@@ -116,7 +116,7 @@ export type PartnerStats = {
   totalTrips?: number;
 };
 
-export type PartnerVehicle = (Car | Bus) & {
+export type PartnerVehicle = (Car | Bus | Truck) & {
   id: number; // Ensure id is always present and a number
   status: 'Available' | 'Rented' | 'Maintenance';
   renter?: {

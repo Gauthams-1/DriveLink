@@ -195,6 +195,7 @@ export const buses: Bus[] = [
     amenities: ['Air Conditioning', 'Wi-Fi', 'Personal TV', 'Blankets'],
     images: [''],
     driverRating: 4.9,
+    driver: { name: 'Suresh Patil', phone: '9012345678' },
   },
   {
     id: 3,
@@ -357,7 +358,11 @@ export const samplePartnerVehicles: PartnerVehicle[] = [
     id: 5,
     status: 'Available',
     renter: null,
-    driver: { name: 'Suresh Patil', phone: '9012345678' },
+  },
+  { ...trucks[1],
+    id: 6,
+    status: 'Available',
+    renter: null,
   }
 ];
 
