@@ -6,18 +6,46 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Accessibility, PawPrint, PersonStanding } from "lucide-react";
+import type { SpecializedVehicle } from "@/lib/types";
 
-function SpecializedVehicleList() {
+type SearchParams = {
+  'service-type'?: 'wheelchair' | 'pet' | 'senior';
+}
+
+function SpecializedVehicleList({ searchParams }: { searchParams: SearchParams }) {
+  let filteredVehicles: SpecializedVehicle[] = specializedVehicles;
+
+  const serviceType = searchParams['service-type'];
+
+  if (serviceType) {
+    filteredVehicles = specializedVehicles.filter(vehicle => {
+      const vehicleType = vehicle.type.toLowerCase();
+      if (serviceType === 'wheelchair' && vehicleType.includes('wheelchair')) return true;
+      if (serviceType === 'pet' && vehicleType.includes('pet')) return true;
+      if (serviceType === 'senior' && vehicleType.includes('senior')) return true;
+      return false;
+    });
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {specializedVehicles.map(vehicle => (
-        <SpecializedVehicleCard key={vehicle.id} vehicle={vehicle} />
-      ))}
-    </div>
+    <>
+      {filteredVehicles.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredVehicles.map(vehicle => (
+            <SpecializedVehicleCard key={vehicle.id} vehicle={vehicle} />
+          ))}
+        </div>
+      ) : (
+         <div className="text-center col-span-full py-16">
+          <h2 className="text-2xl font-semibold mb-2">No vehicles found</h2>
+          <p className="text-muted-foreground">Try adjusting your search filters or check back later.</p>
+        </div>
+      )}
+    </>
   );
 }
 
-export default function SpecializedVehiclesPage() {
+export default function SpecializedVehiclesPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="text-center mb-12">
@@ -37,7 +65,7 @@ export default function SpecializedVehiclesPage() {
            <form className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
               <div className="md:col-span-3 space-y-2">
                 <Label htmlFor="service-type">What service are you looking for?</Label>
-                <Select name="service-type">
+                <Select name="service-type" defaultValue={searchParams['service-type']}>
                   <SelectTrigger id="service-type">
                     <SelectValue placeholder="Select a service type" />
                   </SelectTrigger>
@@ -57,11 +85,13 @@ export default function SpecializedVehiclesPage() {
 
       <div className="mb-8">
         <h2 className="text-3xl font-bold font-headline">Available Vehicles</h2>
-        <p className="text-muted-foreground">Choose from our fleet of specially equipped vehicles.</p>
+        <p className="text-muted-foreground">
+          {searchParams['service-type'] ? `Showing results for ${searchParams['service-type']} friendly vehicles` : 'Choose from our fleet of specially equipped vehicles.'}
+        </p>
       </div>
       
       <Suspense fallback={<div>Loading vehicles...</div>}>
-        <SpecializedVehicleList />
+        <SpecializedVehicleList searchParams={searchParams} />
       </Suspense>
     </div>
   );
