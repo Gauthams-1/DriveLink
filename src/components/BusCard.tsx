@@ -36,7 +36,7 @@ export function BusCard({ bus }: BusCardProps) {
         <CardTitle className="text-xl mb-2 font-headline">{bus.name}</CardTitle>
         <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {bus.seats} Seats</div>
-          <div className="flex items-center gap-2"><Star className="w-4 h-4 text-primary" /> {bus.driver.rating} Rated Driver</div>
+          <div className="flex items-center gap-2"><Star className="w-4 h-4 text-primary" /> {bus.driverRating} Rated Driver</div>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
             {bus.amenities.slice(0, 3).map(amenity => (

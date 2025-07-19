@@ -49,10 +49,7 @@ export type Bus = {
   pricePerDay: number;
   amenities: string[];
   images: string[];
-  driver: {
-    name: string;
-    rating: number;
-  };
+  driverRating: number;
 };
 
 export type Truck = {
@@ -63,10 +60,7 @@ export type Truck = {
   payload: string;
   description: string;
   images: string[];
-  driver: {
-    name:string;
-    rating: number;
-  };
+  driverRating: number;
 };
 
 export type SpecializedVehicle = {
@@ -78,10 +72,7 @@ export type SpecializedVehicle = {
   capacity: string;
   features: string[];
   images: string[];
-  driver: {
-    name: string;
-    rating: number;
-  };
+  driverRating: number;
 };
 
 export type User = {

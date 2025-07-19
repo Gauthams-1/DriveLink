@@ -31,7 +31,7 @@ export function TruckCard({ truck }: TruckCardProps) {
         <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-2"><TruckIcon className="w-4 h-4 text-primary" /> {truck.size}</div>
           <div className="flex items-center gap-2"><Weight className="w-4 h-4 text-primary" /> {truck.payload} Payload</div>
-          <div className="flex items-center gap-2 col-span-2"><Star className="w-4 h-4 text-primary" /> {truck.driver.rating} Rated Driver</div>
+          <div className="flex items-center gap-2 col-span-2"><Star className="w-4 h-4 text-primary" /> {truck.driverRating} Rated Driver</div>
         </div>
         <p className="text-sm text-muted-foreground mt-4">{truck.description}</p>
       </CardContent>

@@ -180,7 +180,7 @@ export const buses: Bus[] = [
     pricePerDay: 15000,
     amenities: ['Air Conditioning', 'Wi-Fi', 'Reading Lights'],
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    driver: { name: 'Ramesh Kumar', rating: 4.8 },
+    driverRating: 4.8,
   },
   {
     id: 2,
@@ -190,7 +190,7 @@ export const buses: Bus[] = [
     pricePerDay: 22000,
     amenities: ['Air Conditioning', 'Wi-Fi', 'Personal TV', 'Blankets'],
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    driver: { name: 'Sunita Devi', rating: 4.9 },
+    driverRating: 4.9,
   },
   {
     id: 3,
@@ -200,7 +200,7 @@ export const buses: Bus[] = [
     pricePerDay: 12000,
     amenities: ['Air Conditioning', 'Wi-Fi'],
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    driver: { name: 'Anil Patel', rating: 4.7 },
+    driverRating: 4.7,
   },
   {
     id: 4,
@@ -210,7 +210,7 @@ export const buses: Bus[] = [
     pricePerDay: 18000,
     amenities: ['Air Conditioning', 'Wi-Fi', 'Restroom', 'Snack Bar'],
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    driver: { name: 'Priya Sharma', rating: 4.8 },
+    driverRating: 4.8,
   },
 ];
 
@@ -223,7 +223,7 @@ export const trucks: Truck[] = [
         payload: '1 Ton',
         description: 'Perfect for small apartment moves and single-item delivery in the city.',
         images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-        driver: { name: 'Manoj Singh', rating: 4.7 },
+        driverRating: 4.7,
     },
     {
         id: 2,
@@ -233,7 +233,7 @@ export const trucks: Truck[] = [
         payload: '3 Ton',
         description: 'Ideal for 2-3 BHK house shifting and commercial equipment.',
         images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-        driver: { name: 'David Dsouza', rating: 4.9 },
+        driverRating: 4.9,
     },
     {
         id: 3,
@@ -243,7 +243,7 @@ export const trucks: Truck[] = [
         payload: '5 Ton+',
         description: 'The best choice for large house moves and a heavy industrial equipment.',
         images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-        driver: { name: 'Karthik Reddy', rating: 4.8 },
+        driverRating: 4.8,
     },
 ];
 
@@ -257,7 +257,7 @@ export const specializedVehicles: SpecializedVehicle[] = [
     capacity: '1 Wheelchair + 4 Passengers',
     features: ['Hydraulic Ramp', 'Wheelchair Locks', 'High Roof', 'Spacious Interior'],
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    driver: { name: 'Sunita Pawar', rating: 4.9 },
+    driverRating: 4.9,
   },
   {
     id: 2,
@@ -268,7 +268,7 @@ export const specializedVehicles: SpecializedVehicle[] = [
     capacity: '2 Pets + 3 Passengers',
     features: ['Pet Seat Covers', 'Safety Harness', 'Air Purification', 'Spill-proof Water Bowl'],
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    driver: { name: 'Amit Sharma', rating: 4.8 },
+    driverRating: 4.8,
   },
   {
     id: 3,
@@ -279,7 +279,7 @@ export const specializedVehicles: SpecializedVehicle[] = [
     capacity: '4 Passengers',
     features: ['Easy Entry/Exit', 'Extra Legroom', 'Comfort-tuned Suspension', 'First-Aid Kit'],
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    driver: { name: 'Rajeshwari Iyer', rating: 5.0 },
+    driverRating: 5.0,
   },
   {
     id: 4,
@@ -290,7 +290,7 @@ export const specializedVehicles: SpecializedVehicle[] = [
     capacity: '3 Passengers',
     features: ['AI Surround Description', 'Braille Controls', 'Voice Commands', 'Priority Assistance'],
     images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
-    driver: { name: 'Vikram Singh', rating: 4.9 },
+    driverRating: 4.9,
   },
 ];
 
