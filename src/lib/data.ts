@@ -1,5 +1,6 @@
 
 
+
 import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic } from './types';
 
 // Note: All image URLs have been removed as requested.
@@ -319,6 +320,7 @@ const defaultUser: User = {
   memberSince: new Date(),
   isGuest: true,
   isPartner: false,
+  vehicles: [],
 };
 
 export const partnerStats: PartnerStats = {
@@ -457,7 +459,8 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password'>)
         ...details,
         isGuest: false,
         memberSince: new Date(),
-        avatarUrl: ""
+        avatarUrl: "",
+        vehicles: [],
     };
 
     users.push(newUser);
@@ -493,6 +496,7 @@ export function getCurrentUser(): User {
         isGuest: parsedUser.isGuest,
         isPartner: parsedUser.isPartner,
         memberSince: new Date(parsedUser.memberSince),
+        vehicles: parsedUser.vehicles || [],
       };
     }
   } catch (error) {
@@ -506,6 +510,16 @@ export function getCurrentUser(): User {
 export function saveUser(user: User) {
   if (typeof window !== 'undefined') {
     localStorage.setItem('driveLinkUser', JSON.stringify(user));
+
+    // Also update the user in the registered users list if they are not a guest
+    if (!user.isGuest) {
+      const users = getRegisteredUsers();
+      const userIndex = users.findIndex(u => u.email === user.email);
+      if (userIndex !== -1) {
+        users[userIndex] = user;
+        saveRegisteredUsers(users);
+      }
+    }
   }
 }
 
@@ -514,19 +528,38 @@ export function logoutUser() {
 }
 
 
-// In a real app, these would be API calls.
-export const updatePartnerVehicle = (vehicle: PartnerVehicle) => {
-    const index = partnerVehicles.findIndex(v => v.id === vehicle.id);
-    if (index !== -1) {
-        partnerVehicles[index] = vehicle;
+// --- Partner Vehicle Management ---
+
+export const updatePartnerVehicle = (vehicle: PartnerVehicle): User => {
+    const currentUser = getCurrentUser();
+    if (!currentUser.isPartner || !currentUser.vehicles) {
+      throw new Error("User is not a partner or has no vehicles.");
     }
-    // You might want to persist this to localStorage as well for demo purposes
+
+    const vehicleIndex = currentUser.vehicles.findIndex(v => v.id === vehicle.id);
+    if (vehicleIndex !== -1) {
+        currentUser.vehicles[vehicleIndex] = vehicle;
+    }
+    
+    saveUser(currentUser);
+    return currentUser;
 };
 
-export const addPartnerVehicle = (vehicle: Omit<PartnerVehicle, 'id'>) => {
+export const addPartnerVehicle = (vehicle: Omit<PartnerVehicle, 'id'>): User => {
+    const currentUser = getCurrentUser();
+    if (!currentUser.isPartner) {
+        throw new Error("User is not a partner.");
+    }
+
+    const currentVehicles = currentUser.vehicles || [];
+
     const newVehicle = {
         ...vehicle,
-        id: Math.max(...partnerVehicles.map(v => v.id)) + 1, // simple id generation
+        // Generate a new ID based on existing vehicles for this user only
+        id: currentVehicles.length > 0 ? Math.max(...currentVehicles.map(v => v.id)) + 1 : 1, 
     };
-    partnerVehicles.push(newVehicle);
+    
+    currentUser.vehicles = [...currentVehicles, newVehicle];
+    saveUser(currentUser);
+    return currentUser;
 };

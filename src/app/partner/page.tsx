@@ -134,8 +134,8 @@ export default function PartnerPage() {
           </header>
 
           <main className="flex-1 p-6">
-            {activeTab === 'dashboard' && <PartnerDashboard />}
-            {activeTab === 'fleet' && <FleetManagement />}
+            {activeTab === 'dashboard' && <PartnerDashboard user={user} />}
+            {activeTab === 'fleet' && <FleetManagement user={user} onFleetUpdate={setUser} />}
             {activeTab === 'earnings' && <div>Earnings Details Coming Soon</div>}
           </main>
         </SidebarInset>

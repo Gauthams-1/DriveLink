@@ -2,8 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { partnerVehicles as initialVehicles, addPartnerVehicle, updatePartnerVehicle } from '@/lib/data';
-import type { PartnerVehicle } from '@/lib/types';
+import { addPartnerVehicle, updatePartnerVehicle } from '@/lib/data';
+import type { PartnerVehicle, User } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Edit, Car, Users, Gauge, GitBranch, Briefcase, User, Phone, Calendar, DollarSign, Info, Route } from 'lucide-react';
+import { PlusCircle, Edit, Car, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 function VehicleForm({ vehicle, onSave, onCancel }: { vehicle: Partial<PartnerVehicle> | null, onSave: (v: PartnerVehicle) => void, onCancel: () => void }) {
@@ -142,11 +142,12 @@ function VehicleForm({ vehicle, onSave, onCancel }: { vehicle: Partial<PartnerVe
 }
 
 
-export function FleetManagement() {
-  const [vehicles, setVehicles] = useState<PartnerVehicle[]>(initialVehicles);
+export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUpdate: (user: User) => void }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<PartnerVehicle | null>(null);
   const { toast } = useToast();
+  
+  const vehicles = user.vehicles || [];
 
   const handleEdit = (vehicle: PartnerVehicle) => {
     setEditingVehicle(vehicle);
@@ -159,15 +160,15 @@ export function FleetManagement() {
   };
 
   const handleSave = (vehicleData: PartnerVehicle) => {
+    let updatedUser;
     if (vehicleData.id) { // Editing existing
-      updatePartnerVehicle(vehicleData);
-      setVehicles(prev => prev.map(v => v.id === vehicleData.id ? vehicleData : v));
-       toast({ title: "Vehicle Updated!", description: `${vehicleData.name} has been updated.` });
+      updatedUser = updatePartnerVehicle(vehicleData);
+      toast({ title: "Vehicle Updated!", description: `${vehicleData.name} has been updated.` });
     } else { // Adding new
-      addPartnerVehicle(vehicleData);
-      setVehicles([...initialVehicles]); // Re-fetch from data source to get new vehicle with ID
+      updatedUser = addPartnerVehicle(vehicleData);
       toast({ title: "Vehicle Added!", description: `${vehicleData.name} has been added to your fleet.` });
     }
+    onFleetUpdate(updatedUser);
     setIsDialogOpen(false);
     setEditingVehicle(null);
   };
@@ -210,61 +211,72 @@ export function FleetManagement() {
             </Dialog>
         </div>
         
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {vehicles.map(vehicle => (
-                <Card key={vehicle.id} className="flex flex-col">
-                    <CardHeader>
-                        <div className="flex justify-between items-start">
-                           <div>
-                            <CardTitle>{vehicle.name}</CardTitle>
-                            <CardDescription>{vehicle.type}</CardDescription>
-                           </div>
-                           <Badge className={getStatusBadge(vehicle.status)}>{vehicle.status}</Badge>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4 flex-grow">
-                        <div className="flex items-center justify-between text-sm p-3 bg-muted rounded-md">
-                            <div className="flex items-center gap-2">
-                                <DollarSign className="w-4 h-4 text-muted-foreground" />
-                                <span className="font-bold text-lg">₹{vehicle.pricePerDay}</span>
-                                <span className="text-muted-foreground">/day</span>
+        {vehicles.length > 0 ? (
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {vehicles.map(vehicle => (
+                    <Card key={vehicle.id} className="flex flex-col">
+                        <CardHeader>
+                            <div className="flex justify-between items-start">
+                            <div>
+                                <CardTitle>{vehicle.name}</CardTitle>
+                                <CardDescription>{vehicle.type}</CardDescription>
                             </div>
-                             {vehicle.pricePerKm && (
-                               <div className="flex items-center gap-2">
-                                <Route className="w-4 h-4 text-muted-foreground" />
-                                <span className="font-bold text-lg">₹{vehicle.pricePerKm}</span>
-                                <span className="text-muted-foreground">/km</span>
+                            <Badge className={getStatusBadge(vehicle.status)}>{vehicle.status}</Badge>
                             </div>
-                            )}
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>
-                            <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> {vehicle.luggage} Bags</div>
-                            <div className="flex items-center gap-2"><Gauge className="w-4 h-4 text-primary" /> {vehicle.mpg} KMPL</div>
-                            <div className="flex items-center gap-2"><GitBranch className="w-4 h-4 text-primary" /> {vehicle.transmission}</div>
-                        </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4 flex-grow">
+                            <div className="flex items-center justify-between text-sm p-3 bg-muted rounded-md">
+                                <div className="flex items-center gap-2">
+                                    <DollarSign className="w-4 h-4 text-muted-foreground" />
+                                    <span className="font-bold text-lg">₹{vehicle.pricePerDay}</span>
+                                    <span className="text-muted-foreground">/day</span>
+                                </div>
+                                {vehicle.pricePerKm && (
+                                <div className="flex items-center gap-2">
+                                    <Route className="w-4 h-4 text-muted-foreground" />
+                                    <span className="font-bold text-lg">₹{vehicle.pricePerKm}</span>
+                                    <span className="text-muted-foreground">/km</span>
+                                </div>
+                                )}
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                                <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>
+                                <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> {vehicle.luggage} Bags</div>
+                                <div className="flex items-center gap-2"><Gauge className="w-4 h-4 text-primary" /> {vehicle.mpg} KMPL</div>
+                                <div className="flex items-center gap-2"><GitBranch className="w-4 h-4 text-primary" /> {vehicle.transmission}</div>
+                            </div>
 
-                        {vehicle.status === 'Rented' && vehicle.renter && (
-                             <Card className="bg-orange-50 border-orange-200">
-                                <CardHeader className="p-3">
-                                    <CardTitle className="text-sm flex items-center gap-2"><Info className="w-4 h-4"/> Renter Information</CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-3 pt-0 text-sm space-y-1">
-                                    <div className="flex items-center gap-2"><User className="w-3 h-3 text-muted-foreground"/> {vehicle.renter.name}</div>
-                                    <div className="flex items-center gap-2"><Phone className="w-3 h-3 text-muted-foreground"/> {vehicle.renter.phone}</div>
-                                    <div className="flex items-center gap-2"><Calendar className="w-3 h-3 text-muted-foreground"/> {vehicle.renter.rentalPeriod}</div>
-                                </CardContent>
-                            </Card>
-                        )}
-                    </CardContent>
-                    <CardFooter>
-                         <Button variant="outline" className="w-full" onClick={() => handleEdit(vehicle)}>
-                            <Edit className="mr-2" /> Edit Vehicle
-                        </Button>
-                    </CardFooter>
-                </Card>
-            ))}
-        </div>
+                            {vehicle.status === 'Rented' && vehicle.renter && (
+                                <Card className="bg-orange-50 border-orange-200">
+                                    <CardHeader className="p-3">
+                                        <CardTitle className="text-sm flex items-center gap-2"><Info className="w-4 h-4"/> Renter Information</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-3 pt-0 text-sm space-y-1">
+                                        <div className="flex items-center gap-2"><UserIcon className="w-3 h-3 text-muted-foreground"/> {vehicle.renter.name}</div>
+                                        <div className="flex items-center gap-2"><Phone className="w-3 h-3 text-muted-foreground"/> {vehicle.renter.phone}</div>
+                                        <div className="flex items-center gap-2"><Calendar className="w-3 h-3 text-muted-foreground"/> {vehicle.renter.rentalPeriod}</div>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </CardContent>
+                        <CardFooter>
+                            <Button variant="outline" className="w-full" onClick={() => handleEdit(vehicle)}>
+                                <Edit className="mr-2" /> Edit Vehicle
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                ))}
+            </div>
+        ) : (
+            <Card className="text-center py-16 border-2 border-dashed">
+                <Car className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <h2 className="text-2xl font-bold font-headline">Your fleet is empty</h2>
+                <p className="text-muted-foreground mt-2">Get started by adding your first vehicle.</p>
+                <Button onClick={handleAddNew} className="mt-6">
+                    <PlusCircle className="mr-2" /> Add Your First Vehicle
+                </Button>
+            </Card>
+        )}
     </div>
   );
 }

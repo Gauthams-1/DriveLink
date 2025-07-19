@@ -1,11 +1,15 @@
-import { partnerStats, partnerVehicles } from "@/lib/data";
+
+import { partnerStats } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Badge } from "./ui/badge";
-import { Car, Star, PlusCircle } from "lucide-react";
+import { Car, Star } from "lucide-react";
+import type { User } from "@/lib/types";
 
-export function PartnerDashboard() {
+export function PartnerDashboard({ user }: { user: User }) {
+  const fleet = user.vehicles || [];
+  const activeBookings = fleet.filter(v => v.status === 'Rented').length;
+
   return (
     <div className="space-y-8">
        <div className="mb-8">
@@ -29,8 +33,8 @@ export function PartnerDashboard() {
             <Car className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{partnerStats.activeBookings}</div>
-            <p className="text-xs text-muted-foreground">3 currently on rent</p>
+            <div className="text-2xl font-bold">{activeBookings}</div>
+            <p className="text-xs text-muted-foreground">{activeBookings} currently on rent</p>
           </CardContent>
         </Card>
         <Card>
@@ -39,7 +43,7 @@ export function PartnerDashboard() {
             <Car className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{partnerVehicles.length}</div>
+            <div className="text-2xl font-bold">{fleet.length}</div>
             <p className="text-xs text-muted-foreground">Vehicles listed</p>
           </CardContent>
         </Card>
@@ -58,35 +62,39 @@ export function PartnerDashboard() {
       <Card>
         <CardHeader>
           <div>
-            <CardTitle>Your Fleet</CardTitle>
-            <CardDescription>Manage your vehicles and view their status.</CardDescription>
+            <CardTitle>Your Fleet Overview</CardTitle>
+            <CardDescription>A quick look at your vehicles and their status.</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Vehicle</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Price/Day</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {partnerVehicles.map((vehicle) => (
-                <TableRow key={vehicle.id}>
-                  <TableCell className="font-medium">{vehicle.name}</TableCell>
-                  <TableCell>{vehicle.type}</TableCell>
-                  <TableCell>
-                    <Badge variant={vehicle.status === 'Available' ? 'secondary' : 'default'} className={vehicle.status === 'Rented' ? 'bg-orange-500' : 'bg-green-500'}>
-                      {vehicle.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">₹{vehicle.pricePerDay}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+            {fleet.length > 0 ? (
+                <Table>
+                    <TableHeader>
+                    <TableRow>
+                        <TableHead>Vehicle</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Price/Day</TableHead>
+                    </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                    {fleet.slice(0, 5).map((vehicle) => (
+                        <TableRow key={vehicle.id}>
+                        <TableCell className="font-medium">{vehicle.name}</TableCell>
+                        <TableCell>{vehicle.type}</TableCell>
+                        <TableCell>
+                            <Badge variant={vehicle.status === 'Available' ? 'secondary' : 'default'} className={vehicle.status === 'Rented' ? 'bg-orange-500' : 'bg-green-500'}>
+                            {vehicle.status}
+                            </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">₹{vehicle.pricePerDay}</TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
+            ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">Your fleet is empty. Add a vehicle in the 'My Fleet' tab to get started.</p>
+            )}
         </CardContent>
       </Card>
     </div>
