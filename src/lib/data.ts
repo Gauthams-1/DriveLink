@@ -2,6 +2,7 @@
 
 
 
+
 import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic } from './types';
 
 // Note: All image URLs have been removed as requested.
@@ -325,19 +326,14 @@ const defaultUser: User = {
   partnerStats: { totalRevenue: 0, activeBookings: 0, totalVehicles: 0, avgRating: 0 },
 };
 
-export const partnerStats: PartnerStats = {
-  totalRevenue: 850000,
-  activeBookings: 5,
-  totalVehicles: 8,
-  avgRating: 4.9,
-};
-
-export let partnerVehicles: PartnerVehicle[] = [
+export const samplePartnerVehicles: PartnerVehicle[] = [
   { ...cars[4], 
+    id: 1,
     status: 'Available', 
     renter: null 
   },
   { ...cars[1], 
+    id: 2,
     status: 'Rented', 
     renter: { 
       name: 'Priya Sharma', 
@@ -347,10 +343,12 @@ export let partnerVehicles: PartnerVehicle[] = [
     } 
   },
   { ...cars[7], 
+    id: 3,
     status: 'Maintenance', 
     renter: null 
   },
   { ...cars[2], 
+    id: 4,
     status: 'Available', 
     renter: null 
   },
@@ -440,8 +438,33 @@ export const findSpecializedVehicleReservations = (): SpecializedVehicleReservat
 
 const getRegisteredUsers = (): User[] => {
     if (typeof window === 'undefined') return [];
-    const users = localStorage.getItem('driveLinkRegisteredUsers');
-    return users ? JSON.parse(users) : [];
+    let usersJson = localStorage.getItem('driveLinkRegisteredUsers');
+    
+    // If no users exist, create a default partner and save them.
+    if (!usersJson) {
+        const defaultPartner: User = {
+            name: "Default Partner",
+            email: "partner@example.com",
+            password: "password",
+            phone: "1234567890",
+            address: "123 Partner Lane, Mumbai",
+            licenseNumber: "MH123456789",
+            aadhaarNumber: "123456789012",
+            isVerified: true,
+            avatarUrl: "",
+            memberSince: new Date(),
+            isGuest: false,
+            isPartner: true,
+            vehicles: samplePartnerVehicles,
+            partnerStats: { totalRevenue: 850000, activeBookings: 5, totalVehicles: 4, avgRating: 4.9 },
+        };
+        const users = [defaultPartner];
+        usersJson = JSON.stringify(users);
+        localStorage.setItem('driveLinkRegisteredUsers', usersJson);
+        return users;
+    }
+
+    return JSON.parse(usersJson);
 }
 
 const saveRegisteredUsers = (users: User[]) => {
