@@ -22,7 +22,7 @@ const services = [
   { 
     icon: Truck, 
     title: "Container Truck Booking",
-    description: "Move anything, anywhere. Reliable trucks for house shifting or business logistics.",
+    description: "Reliable trucks for house shifting or moving large equipment. We handle the heavy lifting.",
     href: "/trucks",
     cta: "Book a Truck"
   },
