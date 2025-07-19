@@ -1,4 +1,4 @@
-import type { Car, Reservation } from './types';
+import type { Car, Reservation, Bus } from './types';
 
 export const cars: Car[] = [
   {
@@ -115,6 +115,49 @@ export const cars: Car[] = [
   },
 ];
 
+export const buses: Bus[] = [
+  {
+    id: 1,
+    name: 'Intercity Express',
+    type: 'Seater',
+    seats: 45,
+    pricePerDay: 350,
+    amenities: ['Air Conditioning', 'Wi-Fi', 'Reading Lights'],
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    driver: { name: 'John Doe', rating: 4.8 },
+  },
+  {
+    id: 2,
+    name: 'Luxury Sleeper Coach',
+    type: 'Sleeper',
+    seats: 30,
+    pricePerDay: 500,
+    amenities: ['Air Conditioning', 'Wi-Fi', 'Personal TV', 'Blankets'],
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    driver: { name: 'Jane Smith', rating: 4.9 },
+  },
+  {
+    id: 3,
+    name: 'Corporate Commuter',
+    type: 'MiniBus',
+    seats: 20,
+    pricePerDay: 250,
+    amenities: ['Air Conditioning', 'Wi-Fi'],
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    driver: { name: 'Peter Jones', rating: 4.7 },
+  },
+  {
+    id: 4,
+    name: 'Cross-Country Voyager',
+    type: 'Seater',
+    seats: 50,
+    pricePerDay: 400,
+    amenities: ['Air Conditioning', 'Wi-Fi', 'Restroom', 'Snack Bar'],
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    driver: { name: 'Emily Williams', rating: 4.8 },
+  },
+];
+
 export const reservations: Reservation[] = [
     {
       id: 1,
@@ -133,6 +176,7 @@ export const reservations: Reservation[] = [
 ];
 
 export const findCarById = (id: number) => cars.find(car => car.id === id);
+export const findBusById = (id: number) => buses.find(bus => bus.id === id);
 
 export const findReservations = () => {
     return reservations.map(r => ({

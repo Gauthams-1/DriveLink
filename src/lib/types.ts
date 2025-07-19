@@ -20,3 +20,17 @@ export type Reservation = {
   endDate: Date;
   totalCost: number;
 };
+
+export type Bus = {
+  id: number;
+  name: string;
+  type: 'Sleeper' | 'Seater' | 'MiniBus';
+  seats: number;
+  pricePerDay: number;
+  amenities: string[];
+  images: string[];
+  driver: {
+    name: string;
+    rating: number;
+  };
+};
