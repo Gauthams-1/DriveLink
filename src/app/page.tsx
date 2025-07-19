@@ -155,8 +155,8 @@ export default function Home() {
                      <Link href="/partner">Learn More</Link>
                   </Button>
                </div>
-               <div className="relative h-[400px] rounded-lg bg-primary/5 flex items-center justify-center">
-                  <Car className="h-32 w-32 text-primary/20" />
+               <div className="relative h-[400px] rounded-lg overflow-hidden">
+                  <Image src="https://images.unsplash.com/photo-1568605117036-5fe5e7185743?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Partner driving a car" layout="fill" objectFit="cover" data-ai-hint="person driving" />
                </div>
             </div>
          </div>
