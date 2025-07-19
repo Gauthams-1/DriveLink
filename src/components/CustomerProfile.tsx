@@ -40,20 +40,32 @@ export function CustomerProfile() {
   const { toast } = useToast();
   const [avatarGenState, avatarFormAction] = useActionState(generateAvatarAction, initialAvatarState);
   
-  // Use state to manage the user object
-  const [currentUser, setCurrentUser] = useState<User>(() => getCurrentUser());
+  // Use state to manage the user object, initializing with a default or loading state.
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const [formData, setFormData] = useState({
-    name: currentUser.name,
-    email: currentUser.email,
+    name: '',
+    email: '',
   });
+
+  // Effect to load user from localStorage on the client side after mount.
+  useEffect(() => {
+    const user = getCurrentUser();
+    setCurrentUser(user);
+    setFormData({
+      name: user.name,
+      email: user.email,
+    });
+  }, []);
 
   // Effect to update form data if currentUser changes from outside
   useEffect(() => {
-    setFormData({
-      name: currentUser.name,
-      email: currentUser.email,
-    });
+    if (currentUser) {
+        setFormData({
+          name: currentUser.name,
+          email: currentUser.email,
+        });
+    }
   }, [currentUser]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,6 +74,7 @@ export function CustomerProfile() {
   }
 
   const handleSave = () => {
+    if (!currentUser) return;
     const updatedUser = {
       ...currentUser,
       name: formData.name,
@@ -78,14 +91,16 @@ export function CustomerProfile() {
   };
 
   const handleCancel = () => {
-    setFormData({ name: currentUser.name, email: currentUser.email });
+    if (currentUser) {
+        setFormData({ name: currentUser.name, email: currentUser.email });
+    }
     setIsEditing(false);
   }
 
   const handleUseAvatar = () => {
-    if (avatarGenState.avatarDataUri) {
+    if (avatarGenState.avatarDataUri && currentUser) {
       setCurrentUser(prevUser => ({
-        ...prevUser,
+        ...prevUser!,
         avatarUrl: avatarGenState.avatarDataUri!,
       }));
       toast({
@@ -93,6 +108,19 @@ export function CustomerProfile() {
         description: "Click 'Save Changes' to keep it."
       })
     }
+  }
+
+  if (!currentUser) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Loading Profile...</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            </CardContent>
+        </Card>
+    )
   }
 
 
