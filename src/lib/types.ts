@@ -21,6 +21,16 @@ export type Reservation = {
   totalCost: number;
 };
 
+export type BusReservation = {
+    id: number;
+    busId: number;
+    groupName: string;
+    contactName: string;
+    startDate: Date;
+    endDate: Date;
+    totalCost: number;
+}
+
 export type Bus = {
   id: number;
   name: string;
@@ -44,7 +54,7 @@ export type Truck = {
   description: string;
   images: string[];
   driver: {
-    name: string;
+    name:string;
     rating: number;
   };
 };

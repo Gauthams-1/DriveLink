@@ -95,7 +95,7 @@ export default function BusDetailPage({ params }: { params: { id: string } }) {
             </Card>
 
             <Button size="lg" className="w-full" asChild>
-                <Link href="#">Book Now</Link>
+                <Link href={`/bus-trips/confirm?busId=${bus.id}`}>Book Now</Link>
             </Button>
 
           </div>

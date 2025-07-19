@@ -292,10 +292,12 @@ export const findBusById = (id: number) => buses.find(bus => bus.id === id);
 export const findTruckById = (id: number) => trucks.find(truck => truck.id === id);
 
 export const findReservations = () => {
-    return reservations.map(r => ({
-        ...r,
-        car: findCarById(r.carId)!,
-    }));
+    return reservations
+        .map(r => ({
+            ...r,
+            car: findCarById(r.carId),
+        }))
+        .filter(r => r.car); // Filter out reservations where car is not found
 };
 
 export function getCurrentUser(): User {
