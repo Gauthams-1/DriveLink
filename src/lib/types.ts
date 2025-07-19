@@ -104,6 +104,17 @@ export type PartnerVehicle = {
   pricePerDay: number;
 };
 
+export type Mechanic = {
+    id: number;
+    name: string;
+    location: string;
+    phone: string;
+    rating: number;
+    specialty: string;
+    avatarUrl: string;
+    reasoning?: string;
+};
+
 
 // Types with joined details
 export type CarReservationWithDetails = Reservation & { car: Car };

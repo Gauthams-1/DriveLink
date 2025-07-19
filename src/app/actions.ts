@@ -2,6 +2,7 @@
 
 import { recommendCars, type CarRecommendationInput } from '@/ai/flows/car-recommendation';
 import { generateAvatar, type GenerateAvatarInput } from '@/ai/flows/generate-avatar';
+import { findMechanic, type FindMechanicInput } from '@/ai/flows/find-mechanic';
 import { z } from 'zod';
 
 const CarRecommendationSchema = z.object({
@@ -77,6 +78,45 @@ export async function generateAvatarAction(prevState: any, formData: FormData) {
     return {
       message: 'An error occurred during image generation.',
       avatarDataUri: null,
+    };
+  }
+}
+
+
+const FindMechanicSchema = z.object({
+  location: z.string().min(3, 'Location is required.'),
+  problemDescription: z.string().min(10, 'Please describe the problem in more detail.'),
+});
+
+export async function findMechanicAction(prevState: any, formData: FormData) {
+  const validatedFields = FindMechanicSchema.safeParse({
+    location: formData.get('location'),
+    problemDescription: formData.get('problemDescription'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: 'Invalid input',
+      errors: validatedFields.error.flatten().fieldErrors,
+      mechanic: null,
+    }
+  }
+
+  const input: FindMechanicInput = validatedFields.data;
+
+  try {
+    const result = await findMechanic(input);
+    return {
+      message: 'success',
+      errors: null,
+      mechanic: result,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: 'An error occurred while finding a mechanic.',
+      errors: null,
+      mechanic: null,
     };
   }
 }

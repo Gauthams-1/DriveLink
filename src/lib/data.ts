@@ -1,4 +1,4 @@
-import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails } from './types';
+import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic } from './types';
 
 export const cars: Car[] = [
   {
@@ -328,6 +328,45 @@ export const partnerVehicles: PartnerVehicle[] = [
   { id: 3, name: "Skoda Superb", type: 'Sedan', status: 'Available', pricePerDay: 7500 },
   { id: 4, name: "Kia Seltos", type: 'SUV', status: 'Maintenance', pricePerDay: 4800 },
   { id: 5, name: "Maruti Swift", type: 'Sedan', status: 'Available', pricePerDay: 2500 },
+];
+
+export const mechanics: Mechanic[] = [
+    {
+        id: 1,
+        name: 'Rajesh Kumar',
+        location: 'Andheri, Mumbai, MH',
+        phone: '9876543210',
+        rating: 4.8,
+        specialty: 'General Car Repair & Maintenance',
+        avatarUrl: 'https://placehold.co/100x100.png',
+    },
+    {
+        id: 2,
+        name: 'Suresh Singh',
+        location: 'Dadar, Mumbai, MH',
+        phone: '9876543211',
+        rating: 4.9,
+        specialty: 'Engine & Transmission Expert',
+        avatarUrl: 'https://placehold.co/100x100.png',
+    },
+    {
+        id: 3,
+        name: 'Anil Patel',
+        location: 'Bandra, Mumbai, MH',
+        phone: '9876543212',
+        rating: 4.7,
+        specialty: 'Tire & Brakes Specialist',
+        avatarUrl: 'https://placehold.co/100x100.png',
+    },
+    {
+        id: 4,
+        name: 'Vikas Sharma',
+        location: 'Connaught Place, Delhi, DL',
+        phone: '9876543213',
+        rating: 4.9,
+        specialty: 'Luxury Car Specialist',
+        avatarUrl: 'https://placehold.co/100x100.png',
+    },
 ];
 
 
