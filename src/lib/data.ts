@@ -3,6 +3,7 @@
 
 
 
+
 import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic } from './types';
 
 // Note: All image URLs have been removed as requested.
@@ -330,7 +331,8 @@ export const samplePartnerVehicles: PartnerVehicle[] = [
   { ...cars[4], 
     id: 1,
     status: 'Available', 
-    renter: null 
+    renter: null,
+    pricePerKm: 15,
   },
   { ...cars[1], 
     id: 2,
@@ -340,18 +342,26 @@ export const samplePartnerVehicles: PartnerVehicle[] = [
       email: 'priya.sharma@example.com', 
       phone: '9123456789', 
       rentalPeriod: '15th July - 20th July' 
-    } 
+    },
+    pricePerKm: 12,
   },
   { ...cars[7], 
     id: 3,
     status: 'Maintenance', 
-    renter: null 
+    renter: null,
+    pricePerKm: 14,
   },
   { ...cars[2], 
     id: 4,
     status: 'Available', 
-    renter: null 
+    renter: null,
+    pricePerKm: 18,
   },
+   { ...buses[1],
+    id: 5,
+    status: 'Available',
+    renter: null,
+  }
 ];
 
 
@@ -586,7 +596,7 @@ export const addPartnerVehicle = (vehicle: Omit<PartnerVehicle, 'id'>): User => 
         id: currentVehicles.length > 0 ? Math.max(...currentVehicles.map(v => v.id)) + 1 : 1, 
     };
     
-    currentUser.vehicles = [...currentVehicles, newVehicle];
+    currentUser.vehicles = [...currentVehicles, newVehicle as PartnerVehicle];
     saveUser(currentUser);
     return currentUser;
 };

@@ -2,6 +2,7 @@
 
 
 
+
 export type Car = {
   id: number;
   name: string;
@@ -12,7 +13,7 @@ export type Car = {
   luggage: number; // in bags
   transmission: 'Automatic' | 'Manual';
   mpg: number; // kmpl or km/charge
-  location: string;
+  location?: string;
   images: string[];
   description: string;
   features: string[];
@@ -106,7 +107,8 @@ export type PartnerStats = {
   avgRating: number;
 };
 
-export type PartnerVehicle = Car & {
+export type PartnerVehicle = (Car | Bus) & {
+  id: number; // Ensure id is always present and a number
   status: 'Available' | 'Rented' | 'Maintenance';
   renter?: {
     name: string;
