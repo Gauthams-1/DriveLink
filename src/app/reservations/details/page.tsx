@@ -1,8 +1,7 @@
-
 'use client';
 
-import { useRouter, useSearchParams, Suspense } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, Suspense } from "react";
 
 function Redirector() {
     const router = useRouter();
