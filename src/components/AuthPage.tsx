@@ -14,12 +14,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Logo } from './Logo';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { authenticateUser, registerUser } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import type { User as UserType } from '@/lib/types';
 import { saveUser } from '@/lib/data';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { Car, Wrench } from 'lucide-react';
 
 export function AuthPage() {
   const router = useRouter();
@@ -28,6 +30,7 @@ export function AuthPage() {
   const signUpNameRef = useRef<HTMLInputElement>(null);
   const signUpEmailRef = useRef<HTMLInputElement>(null);
   const signUpPasswordRef = useRef<HTMLInputElement>(null);
+  const [partnerType, setPartnerType] = useState<'owner' | 'mechanic'>('owner');
   
   const { toast } = useToast();
 
@@ -42,12 +45,12 @@ export function AuthPage() {
     
     const user = authenticateUser(email, password);
 
-    if (user) {
+    if (user && user.isPartner) {
       handleLoginSuccess(user);
     } else {
         toast({
             title: "Sign In Failed",
-            description: "Invalid Owner ID or password. Please try again.",
+            description: "Invalid Partner ID or password. Please try again.",
             variant: "destructive",
         });
     }
@@ -68,7 +71,7 @@ export function AuthPage() {
     }
     
     try {
-        const newUser = registerUser({ name, email, password });
+        const newUser = registerUser({ name, email, password, partnerType });
         handleLoginSuccess(newUser);
     } catch (error: any) {
         toast({
@@ -98,7 +101,7 @@ export function AuthPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2 text-left">
-                        <Label htmlFor="email-signin">Owner Email</Label>
+                        <Label htmlFor="email-signin">Partner Email</Label>
                         <Input id="email-signin" type="email" placeholder="your-email@example.com" ref={signInEmailRef} required />
                         </div>
                         <div className="space-y-2 text-left">
@@ -116,10 +119,29 @@ export function AuthPage() {
                     <CardHeader>
                         <CardTitle>Become a Partner</CardTitle>
                         <CardDescription>
-                        Create an account to list your vehicles on DriveLink.
+                        Create an account to list your services on DriveLink.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                        <div className="space-y-2 text-left">
+                           <Label>I am a...</Label>
+                           <RadioGroup value={partnerType} onValueChange={(val) => setPartnerType(val as 'owner' | 'mechanic')} className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <RadioGroupItem value="owner" id="owner" className="peer sr-only" />
+                                    <Label htmlFor="owner" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                        <Car className="mb-3 h-6 w-6" />
+                                        Vehicle Owner
+                                    </Label>
+                                </div>
+                                <div>
+                                    <RadioGroupItem value="mechanic" id="mechanic" className="peer sr-only" />
+                                    <Label htmlFor="mechanic" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                        <Wrench className="mb-3 h-6 w-6" />
+                                        Mechanic
+                                    </Label>
+                                </div>
+                           </RadioGroup>
+                        </div>
                          <div className="space-y-2 text-left">
                            <Label htmlFor="name-signup">Full Name or Company</Label>
                            <Input id="name-signup" placeholder="Your Name" ref={signUpNameRef} required/>

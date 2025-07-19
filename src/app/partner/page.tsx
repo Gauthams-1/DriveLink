@@ -6,7 +6,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarInset,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
@@ -15,7 +14,9 @@ import {
 } from '@/components/ui/sidebar';
 import { PartnerDashboard } from '@/components/PartnerDashboard';
 import { FleetManagement } from '@/components/FleetManagement';
-import { LogOut, PanelLeft, DollarSign, Car, BarChart, Settings, LifeBuoy } from 'lucide-react';
+import { MechanicDashboard } from '@/components/MechanicDashboard';
+import { MyJobs } from '@/components/MyJobs';
+import { LogOut, PanelLeft, DollarSign, Car, BarChart, LifeBuoy, Wrench, Briefcase } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
@@ -55,6 +56,8 @@ export default function PartnerPage() {
       </div>
     );
   }
+  
+  const isMechanic = user.partnerType === 'mechanic';
 
   return (
     <SidebarProvider>
@@ -77,7 +80,20 @@ export default function PartnerPage() {
                         <span>Dashboard</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                    <SidebarMenuItem>
+                    
+                    {isMechanic ? (
+                       <SidebarMenuItem>
+                        <SidebarMenuButton
+                        onClick={() => setActiveTab('jobs')}
+                        isActive={activeTab === 'jobs'}
+                        tooltip={{ children: 'My Jobs' }}
+                        >
+                        <Briefcase />
+                        <span>My Jobs</span>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    ) : (
+                       <SidebarMenuItem>
                         <SidebarMenuButton
                         onClick={() => setActiveTab('fleet')}
                         isActive={activeTab === 'fleet'}
@@ -87,6 +103,8 @@ export default function PartnerPage() {
                         <span>My Fleet</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
+                    )}
+                   
                      <SidebarMenuItem>
                         <SidebarMenuButton
                         onClick={() => setActiveTab('earnings')}
@@ -134,8 +152,9 @@ export default function PartnerPage() {
           </header>
 
           <main className="flex-1 p-6">
-            {activeTab === 'dashboard' && <PartnerDashboard user={user} />}
-            {activeTab === 'fleet' && <FleetManagement user={user} onFleetUpdate={setUser} />}
+            {activeTab === 'dashboard' && (isMechanic ? <MechanicDashboard user={user} /> : <PartnerDashboard user={user} />)}
+            {activeTab === 'fleet' && !isMechanic && <FleetManagement user={user} onFleetUpdate={setUser} />}
+            {activeTab === 'jobs' && isMechanic && <MyJobs user={user} />}
             {activeTab === 'earnings' && <div>Earnings Details Coming Soon</div>}
           </main>
         </SidebarInset>

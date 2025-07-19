@@ -1,9 +1,4 @@
 
-
-
-
-
-
 export type Car = {
   id: number;
   name: string;
@@ -101,15 +96,21 @@ export type User = {
   memberSince: Date;
   isGuest?: boolean;
   isPartner?: boolean;
+  partnerType?: 'owner' | 'mechanic';
   vehicles?: PartnerVehicle[];
+  jobs?: Job[];
   partnerStats?: PartnerStats;
 };
 
 export type PartnerStats = {
   totalRevenue: number;
-  activeBookings: number;
-  totalVehicles: number;
   avgRating: number;
+  // Vehicle owner stats
+  activeBookings?: number;
+  totalVehicles?: number;
+  // Mechanic stats
+  activeJobs?: number;
+  completedJobs?: number;
 };
 
 export type PartnerVehicle = (Car | Bus) & {
@@ -132,6 +133,17 @@ export type Mechanic = {
     specialty: string;
     avatarUrl: string;
     reasoning?: string;
+};
+
+export type Job = {
+    id: number;
+    customerName: string;
+    location: string;
+    problemDescription: string;
+    status: 'Active' | 'Completed' | 'Cancelled';
+    date: Date;
+    mechanicId: number;
+    invoiceAmount?: number;
 };
 
 

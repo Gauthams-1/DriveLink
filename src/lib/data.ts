@@ -1,11 +1,5 @@
 
-
-
-
-
-
-
-import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic } from './types';
+import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic, Job } from './types';
 
 // Note: All image URLs have been removed as requested.
 // They are kept as empty strings in the array for data structure consistency.
@@ -324,6 +318,7 @@ const defaultUser: User = {
   memberSince: new Date(),
   isGuest: true,
   isPartner: false,
+  partnerType: 'owner',
   vehicles: [],
   partnerStats: { totalRevenue: 0, activeBookings: 0, totalVehicles: 0, avgRating: 0 },
 };
@@ -364,6 +359,38 @@ export const samplePartnerVehicles: PartnerVehicle[] = [
     renter: null,
     driver: { name: 'Suresh Patil', phone: '9012345678' },
   }
+];
+
+export const sampleMechanicJobs: Job[] = [
+    {
+        id: 1,
+        customerName: 'Aarav Patel',
+        location: 'Koregaon Park, Pune',
+        problemDescription: 'Car is not starting, there is a clicking sound.',
+        status: 'Active',
+        date: new Date('2024-07-20T10:00:00Z'),
+        mechanicId: 2
+    },
+    {
+        id: 2,
+        customerName: 'Priya Singh',
+        location: 'Juhu, Mumbai',
+        problemDescription: 'Flat tire on the highway.',
+        status: 'Completed',
+        date: new Date('2024-07-19T15:30:00Z'),
+        mechanicId: 2,
+        invoiceAmount: 500
+    },
+    {
+        id: 3,
+        customerName: 'Rohan Mehta',
+        location: 'Indiranagar, Bengaluru',
+        problemDescription: 'Engine is overheating and smoke is coming out.',
+        status: 'Completed',
+        date: new Date('2024-07-18T11:00:00Z'),
+        mechanicId: 2,
+        invoiceAmount: 3500
+    }
 ];
 
 
@@ -452,11 +479,11 @@ const getRegisteredUsers = (): User[] => {
     if (typeof window === 'undefined') return [];
     let usersJson = localStorage.getItem('driveLinkRegisteredUsers');
     
-    // If no users exist, create a default partner and save them.
+    // If no users exist, create default partners and save them.
     if (!usersJson) {
-        const defaultPartner: User = {
-            name: "Default Partner",
-            email: "partner@example.com",
+        const defaultOwnerPartner: User = {
+            name: "Default Owner Partner",
+            email: "owner@example.com",
             password: "password",
             phone: "1234567890",
             address: "123 Partner Lane, Mumbai",
@@ -467,16 +494,37 @@ const getRegisteredUsers = (): User[] => {
             memberSince: new Date(),
             isGuest: false,
             isPartner: true,
+            partnerType: 'owner',
             vehicles: samplePartnerVehicles,
-            partnerStats: { totalRevenue: 850000, activeBookings: 5, totalVehicles: 4, avgRating: 4.9 },
+            partnerStats: { totalRevenue: 850000, avgRating: 4.9, activeBookings: 1, totalVehicles: 5 },
         };
-        const users = [defaultPartner];
+        const defaultMechanicPartner: User = {
+            name: "Default Mechanic Partner",
+            email: "mechanic@example.com",
+            password: "password",
+            phone: "0987654321",
+            address: "456 Garage Street, Pune",
+            licenseNumber: "MH0987654321",
+            aadhaarNumber: "987654321098",
+            isVerified: true,
+            avatarUrl: "",
+            memberSince: new Date(),
+            isGuest: false,
+            isPartner: true,
+            partnerType: 'mechanic',
+            jobs: sampleMechanicJobs,
+            partnerStats: { totalRevenue: 48000, avgRating: 4.8, activeJobs: 1, completedJobs: 2 },
+        };
+        const users = [defaultOwnerPartner, defaultMechanicPartner];
         usersJson = JSON.stringify(users);
         localStorage.setItem('driveLinkRegisteredUsers', usersJson);
         return users;
     }
 
-    return JSON.parse(usersJson);
+    return JSON.parse(usersJson).map((user: User) => ({
+        ...user,
+        memberSince: new Date(user.memberSince)
+    }));
 }
 
 const saveRegisteredUsers = (users: User[]) => {
@@ -485,7 +533,7 @@ const saveRegisteredUsers = (users: User[]) => {
     }
 }
 
-export function registerUser(details: Pick<User, 'name' | 'email' | 'password'>): User {
+export function registerUser(details: Pick<User, 'name' | 'email' | 'password' | 'partnerType'>): User {
     const users = getRegisteredUsers();
     if (users.some(u => u.email === details.email)) {
         throw new Error("A user with this email already exists.");
@@ -495,10 +543,19 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password'>)
         ...defaultUser,
         ...details,
         isGuest: false,
+        isPartner: true, // All registrations via this flow are partners
         memberSince: new Date(),
         avatarUrl: "",
-        vehicles: [],
-        partnerStats: { totalRevenue: 0, activeBookings: 0, totalVehicles: 0, avgRating: 0 },
+        vehicles: details.partnerType === 'owner' ? [] : undefined,
+        jobs: details.partnerType === 'mechanic' ? [] : undefined,
+        partnerStats: {
+          totalRevenue: 0,
+          avgRating: 0,
+          activeBookings: details.partnerType === 'owner' ? 0 : undefined,
+          totalVehicles: details.partnerType === 'owner' ? 0 : undefined,
+          activeJobs: details.partnerType === 'mechanic' ? 0 : undefined,
+          completedJobs: details.partnerType === 'mechanic' ? 0 : undefined,
+        },
     };
 
     users.push(newUser);
@@ -535,7 +592,7 @@ export function getCurrentUser(): User {
         isPartner: parsedUser.isPartner,
         memberSince: new Date(parsedUser.memberSince),
         vehicles: parsedUser.vehicles || [],
-        partnerStats: parsedUser.partnerStats || { totalRevenue: 0, activeBookings: 0, totalVehicles: 0, avgRating: 0 },
+        partnerStats: parsedUser.partnerStats || { totalRevenue: 0, avgRating: 0 },
       };
     }
   } catch (error) {
