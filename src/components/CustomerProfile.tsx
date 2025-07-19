@@ -15,7 +15,7 @@ import { Label } from "./ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "./ui/separator";
 import { generateAvatarAction } from "@/app/actions";
-import { Loader2, Sparkles, UserCheck, UserX, ShieldCheck, Mail, Phone, MapPin, Edit, X } from "lucide-react";
+import { Loader2, Sparkles, UserCheck, UserX, ShieldCheck, Mail, Phone, MapPin, Edit, X, Upload } from "lucide-react";
 import type { User } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { Textarea } from "./ui/textarea";
@@ -49,7 +49,10 @@ export function CustomerProfile() {
     const user = getCurrentUser();
     setCurrentUser(user);
     setFormData(user);
-    setReservations(findCarReservations());
+    // Move side-effectful code to useEffect
+    if (typeof window !== 'undefined') {
+        setReservations(findCarReservations());
+    }
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -60,7 +63,6 @@ export function CustomerProfile() {
   const handleSave = () => {
     if (!currentUser) return;
     
-    // Create a new user object with all fields from formData, falling back to currentUser
     const updatedUser: User = {
         ...currentUser,
         name: formData.name || currentUser.name,
@@ -69,12 +71,12 @@ export function CustomerProfile() {
         address: formData.address || currentUser.address,
         licenseNumber: formData.licenseNumber || currentUser.licenseNumber,
         aadhaarNumber: formData.aadhaarNumber || currentUser.aadhaarNumber,
-        isVerified: !!(formData.licenseNumber && formData.aadhaarNumber), // Auto-verify if both are present
-        avatarUrl: avatarGenState.avatarDataUri || currentUser.avatarUrl,
+        isVerified: !!(formData.licenseNumber && formData.aadhaarNumber),
+        avatarUrl: avatarGenState.avatarDataUri || formData.avatarUrl || currentUser.avatarUrl,
     };
     
-    setCurrentUser(updatedUser);
     saveUser(updatedUser);
+    setCurrentUser(updatedUser);
     setIsEditing(false);
     toast({
         title: "Profile Updated",
@@ -226,10 +228,16 @@ export function CustomerProfile() {
                              <div className="space-y-1">
                                 <Label htmlFor="licenseNumber">Driving License Number</Label>
                                 <Input id="licenseNumber" name="licenseNumber" value={formData.licenseNumber} onChange={handleInputChange} />
+                                <Button asChild variant="outline" className="w-full mt-2">
+                                  <label><Upload className="mr-2 h-4 w-4" /> Upload Document<input type="file" className="hidden" /></label>
+                                </Button>
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="aadhaarNumber">Aadhaar Card Number</Label>
                                 <Input id="aadhaarNumber" name="aadhaarNumber" value={formData.aadhaarNumber} onChange={handleInputChange} />
+                                <Button asChild variant="outline" className="w-full mt-2">
+                                  <label><Upload className="mr-2 h-4 w-4" /> Upload Document<input type="file" className="hidden" /></label>
+                                </Button>
                             </div>
                         </div>
                     ) : (
