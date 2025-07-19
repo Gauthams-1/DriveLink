@@ -3,6 +3,7 @@
 
 
 
+
 export type Car = {
   id: number;
   name: string;
@@ -58,6 +59,10 @@ export type Bus = {
   amenities: string[];
   images: string[];
   driverRating: number;
+  driver?: {
+    name: string;
+    phone: string;
+  };
 };
 
 export type Truck = {

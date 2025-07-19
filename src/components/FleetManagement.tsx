@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -12,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Edit, Car as CarIcon, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route, Bus as BusIcon, Wifi, Thermometer, Tv } from 'lucide-react';
+import { PlusCircle, Edit, Car as CarIcon, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route, Bus as BusIcon, Wifi, Thermometer, Tv, SteeringWheel } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { cn } from '@/lib/utils';
@@ -36,6 +37,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                 seats: 45,
                 pricePerDay: 15000,
                 amenities: ['Air Conditioning', 'Wi-Fi'],
+                driver: { name: '', phone: '' },
                 status: 'Available',
             };
         }
@@ -68,6 +70,17 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
         const isNumber = type === 'number';
         setFormData(prev => ({ ...prev, [name]: isNumber ? Number(value) : value }));
     };
+
+    const handleDriverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            driver: {
+                ...(prev as Bus).driver,
+                [name]: value,
+            },
+        }));
+    }
     
     const handleSelectChange = (name: string, value: string) => {
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -139,6 +152,10 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                             <Label htmlFor="pricePerDay">Price Per Day (₹)</Label>
                             <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay} onChange={handleChange} required />
                         </div>
+                         <div className="space-y-1">
+                            <Label htmlFor="pricePerKm">Price Per Kilometer (₹)</Label>
+                            <Input id="pricePerKm" name="pricePerKm" type="number" value={(formData as Car).pricePerKm || ''} onChange={handleChange} />
+                        </div>
                     </div>
                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="space-y-1">
@@ -200,6 +217,19 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                         <div className="space-y-1">
                             <Label htmlFor="driverRating">Driver Rating</Label>
                             <Input id="driverRating" name="driverRating" type="number" step="0.1" max="5" value={(formData as Bus).driverRating || ''} onChange={handleChange} />
+                        </div>
+                    </div>
+                     <div className="space-y-1">
+                        <Label>Driver Details</Label>
+                         <div className="grid grid-cols-2 gap-4 rounded-md border p-4">
+                            <div className="space-y-1">
+                                <Label htmlFor="driverName" className="text-xs">Driver Name</Label>
+                                <Input id="driverName" name="name" value={(formData as Bus).driver?.name || ''} onChange={handleDriverChange} placeholder="e.g. Ramesh Kumar" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="driverPhone" className="text-xs">Driver Phone</Label>
+                                <Input id="driverPhone" name="phone" value={(formData as Bus).driver?.phone || ''} onChange={handleDriverChange} placeholder="e.g. 9876543210"/>
+                            </div>
                         </div>
                     </div>
                     <div className="space-y-1">
@@ -275,12 +305,21 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
             </div>
             
             {isBus ? (
-                <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>
-                    <div className="flex flex-wrap gap-1 col-span-2">
-                        {vehicle.amenities.slice(0, 3).map(a => <Badge key={a} variant="outline">{a}</Badge>)}
+                <>
+                    <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>
+                        <div className="flex flex-wrap gap-1 col-span-2">
+                            {vehicle.amenities.slice(0, 3).map(a => <Badge key={a} variant="outline">{a}</Badge>)}
+                        </div>
                     </div>
-                </div>
+                    {vehicle.driver && (
+                        <div className="text-sm space-y-1 border-t pt-2 mt-2">
+                            <p className="font-semibold flex items-center gap-2"><SteeringWheel className="w-4 h-4" /> Driver Details</p>
+                            <div className="flex items-center gap-2 text-muted-foreground"><UserIcon className="w-3 h-3"/> {vehicle.driver.name}</div>
+                            <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-3 h-3"/> {vehicle.driver.phone}</div>
+                        </div>
+                    )}
+                </>
             ) : (
                 <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>

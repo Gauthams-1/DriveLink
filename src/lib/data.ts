@@ -4,6 +4,7 @@
 
 
 
+
 import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic } from './types';
 
 // Note: All image URLs have been removed as requested.
@@ -361,6 +362,7 @@ export const samplePartnerVehicles: PartnerVehicle[] = [
     id: 5,
     status: 'Available',
     renter: null,
+    driver: { name: 'Suresh Patil', phone: '9012345678' },
   }
 ];
 
