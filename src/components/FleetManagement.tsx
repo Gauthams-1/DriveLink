@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Edit, Car as CarIcon, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route, Bus as BusIcon, Wifi, Thermometer, Tv, SteeringWheel } from 'lucide-react';
+import { PlusCircle, Edit, Car as CarIcon, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route, Bus as BusIcon, Wifi, Thermometer, Tv, UserCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { cn } from '@/lib/utils';
@@ -76,7 +76,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
         setFormData(prev => ({
             ...prev,
             driver: {
-                ...(prev as Bus).driver,
+                ...((prev as Bus).driver || {}),
                 [name]: value,
             },
         }));
@@ -314,7 +314,7 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
                     </div>
                     {vehicle.driver && (
                         <div className="text-sm space-y-1 border-t pt-2 mt-2">
-                            <p className="font-semibold flex items-center gap-2"><SteeringWheel className="w-4 h-4" /> Driver Details</p>
+                            <p className="font-semibold flex items-center gap-2"><UserCircle className="w-4 h-4" /> Driver Details</p>
                             <div className="flex items-center gap-2 text-muted-foreground"><UserIcon className="w-3 h-3"/> {vehicle.driver.name}</div>
                             <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-3 h-3"/> {vehicle.driver.phone}</div>
                         </div>
