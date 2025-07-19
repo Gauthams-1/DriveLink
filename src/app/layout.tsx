@@ -1,20 +1,27 @@
+
+'use client';
+
 import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
-
-export const metadata: Metadata = {
-  title: "DriveLink",
-  description: "Your complete transportation solution.",
-};
+import { usePathname } from 'next/navigation';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const isPortalPage = pathname === '/' || pathname === '/login' || pathname.startsWith('/partner/login');
+
+  const metadata: Metadata = {
+    title: "DriveLink",
+    description: "Your complete transportation solution.",
+  };
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -34,9 +41,9 @@ export default function RootLayout({
           "min-h-screen bg-background font-body antialiased flex flex-col"
         )}
       >
-        <Header />
+        {!isPortalPage && <Header />}
         <main className="flex-grow">{children}</main>
-        <Footer />
+        {!isPortalPage && <Footer />}
         <Toaster />
       </body>
     </html>

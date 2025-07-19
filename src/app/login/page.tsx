@@ -43,12 +43,12 @@ export default function CustomerLoginPage() {
     
     const user = authenticateUser(email, password);
 
-    if (user) {
+    if (user && !user.isPartner) {
       handleLoginSuccess(user);
     } else {
         toast({
             title: "Sign In Failed",
-            description: "Invalid email or password. Please try again.",
+            description: "Invalid customer credentials. Please try again or use the partner portal.",
             variant: "destructive",
         });
     }
@@ -69,7 +69,7 @@ export default function CustomerLoginPage() {
     }
     
     try {
-        const newUser = registerUser({ name, email, password });
+        const newUser = registerUser({ name, email, password, isPartner: false });
         handleLoginSuccess(newUser);
     } catch (error: any) {
         toast({
@@ -86,8 +86,8 @@ export default function CustomerLoginPage() {
             <Logo />
              <Tabs defaultValue="sign-in" className="w-[400px]">
                 <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="sign-in">Sign In</TabsTrigger>
-                    <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
+                    <TabsTrigger value="sign-in">Customer Sign In</TabsTrigger>
+                    <TabsTrigger value="sign-up">Customer Sign Up</TabsTrigger>
                 </TabsList>
                 <TabsContent value="sign-in">
                     <Card>

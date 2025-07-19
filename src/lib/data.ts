@@ -302,8 +302,6 @@ let defaultPartnersCreated = false;
 
 const getRegisteredUsers = (): User[] => {
     if (typeof window === 'undefined') {
-        // On the server, we can't use localStorage, so we'll just return the defaults if they exist.
-        // This is a simplified approach for this demo.
         if (!registeredUsers) {
             registeredUsers = [];
             createDefaultPartners();
@@ -311,7 +309,6 @@ const getRegisteredUsers = (): User[] => {
         return registeredUsers;
     }
 
-    // On the client, we use localStorage as the source of truth.
     if (registeredUsers === null) {
         let usersJson = localStorage.getItem('driveLinkRegisteredUsers');
         if (usersJson) {
@@ -480,7 +477,7 @@ export const findSpecializedVehicleReservations = (): SpecializedVehicleReservat
 };
 
 
-export function registerUser(details: Pick<User, 'name' | 'email' | 'password' | 'partnerType'>): User {
+export function registerUser(details: Pick<User, 'name' | 'email' | 'password' | 'partnerType' | 'isPartner'>): User {
     const users = getRegisteredUsers();
     if (users.some(u => u.email === details.email)) {
         throw new Error("A user with this email already exists.");
@@ -491,9 +488,9 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password' |
         name: details.name,
         email: details.email,
         password: details.password,
+        isPartner: details.isPartner,
         partnerType: details.partnerType,
         isGuest: false,
-        isPartner: true, // All registrations via this flow are partners
         memberSince: new Date(),
         avatarUrl: "",
         vehicles: details.partnerType === 'owner' ? [] : undefined,
