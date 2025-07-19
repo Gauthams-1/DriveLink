@@ -304,14 +304,16 @@ let defaultPartnersCreated = false;
 const getRegisteredUsers = (): User[] => {
     if (typeof window === 'undefined') {
         if (!registeredUsers) {
+            // Server-side: Initialize with default partners
             registeredUsers = [];
             createDefaultPartners();
         }
         return registeredUsers;
     }
 
+    // Client-side: Load from localStorage
     if (registeredUsers === null) {
-        let usersJson = localStorage.getItem('driveLinkRegisteredUsers');
+        const usersJson = localStorage.getItem('driveLinkRegisteredUsers');
         if (usersJson) {
             registeredUsers = JSON.parse(usersJson).map((user: User) => ({
                 ...user,
@@ -319,6 +321,7 @@ const getRegisteredUsers = (): User[] => {
             }));
             defaultPartnersCreated = true;
         } else {
+            // First time client is loading, create defaults and save
             registeredUsers = [];
             createDefaultPartners();
             saveRegisteredUsers(registeredUsers);
@@ -436,9 +439,9 @@ export function getAllRegisteredMechanics(): Mechanic[] {
             name: u.name,
             location: u.address,
             phone: u.phone,
-            rating: u.partnerStats?.avgRating || 0,
+            rating: u.partnerStats?.avgRating || 4.5,
             specialty: u.specialty || 'General Repair',
-            avatarUrl: u.avatarUrl,
+            avatarUrl: u.avatarUrl || '',
         }));
 }
 
@@ -528,11 +531,12 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password' |
         name: details.name,
         email: details.email,
         password: details.password,
-        isPartner: details.isPartner,
+        isPartner: details.isPartner ?? false,
         partnerType: details.partnerType,
         isGuest: false,
         memberSince: new Date(),
         avatarUrl: "",
+        // Initialize partner-specific fields
         vehicles: details.partnerType === 'owner' ? [] : undefined,
         jobs: details.partnerType === 'mechanic' ? [] : undefined,
         trips: details.partnerType === 'driver' ? [] : undefined,
@@ -540,6 +544,7 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password' |
           totalRevenue: 0,
           avgRating: 0,
         },
+        specialty: details.partnerType === 'mechanic' ? 'General Repair' : undefined,
     };
 
     users.push(newUser);
@@ -593,8 +598,10 @@ export function saveUser(user: User) {
       const userIndex = users.findIndex(u => u.email === user.email);
       if (userIndex !== -1) {
         users[userIndex] = user;
-        saveRegisteredUsers(users);
+      } else {
+        users.push(user);
       }
+      saveRegisteredUsers(users);
     }
   }
 }
@@ -644,3 +651,4 @@ export const findOwnerOfVehicle = (vehicleId: number): User | undefined => {
     return users.find(u => u.isPartner && u.vehicles?.some(v => v.id === vehicleId));
 };
 
+    
