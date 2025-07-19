@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarTrigger,
+  SidebarInset,
 } from '@/components/ui/sidebar';
 import { PartnerDashboard } from '@/components/PartnerDashboard';
 import { FleetManagement } from '@/components/FleetManagement';
