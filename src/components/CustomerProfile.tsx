@@ -12,6 +12,10 @@ export function CustomerProfile() {
 
   return (
     <div className="space-y-8">
+       <div className="mb-8">
+        <h1 className="text-3xl font-bold font-headline">My Profile</h1>
+        <p className="text-muted-foreground">Manage your personal information and booking history.</p>
+      </div>
       <Card>
         <CardHeader>
           <div className="flex items-center gap-6">
