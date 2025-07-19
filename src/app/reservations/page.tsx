@@ -1,3 +1,7 @@
+
+'use client';
+
+import { useState } from 'react';
 import { findReservations } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,9 +26,25 @@ import {
 import Image from 'next/image';
 import { Car, Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 export default function ReservationsPage() {
-  const reservations = findReservations();
+  const initialReservations = findReservations();
+  const [reservations, setReservations] = useState(initialReservations);
+  const { toast } = useToast();
+
+  const handleCancelReservation = (reservationId: number) => {
+    // In a real app, you would make an API call here to delete the reservation.
+    // For this demo, we'll just filter it out from the local state.
+    const updatedReservations = reservations.filter(r => r.id !== reservationId);
+    setReservations(updatedReservations);
+
+    toast({
+      title: "Reservation Cancelled",
+      description: "Your booking has been successfully cancelled.",
+    });
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -86,7 +106,10 @@ export default function ReservationsPage() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Keep Reservation</AlertDialogCancel>
-                          <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          <AlertDialogAction 
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={() => handleCancelReservation(reservation.id)}
+                          >
                             Yes, Cancel
                           </AlertDialogAction>
                         </AlertDialogFooter>
@@ -104,7 +127,9 @@ export default function ReservationsPage() {
           <Car className="mx-auto h-12 w-12 text-muted-foreground" />
           <h2 className="mt-4 text-xl font-semibold">No reservations yet</h2>
           <p className="mt-2 text-muted-foreground">Start planning your next trip to see your reservations here.</p>
-          <Button className="mt-6">Find a Car</Button>
+          <Button asChild className="mt-6">
+            <Link href="/cars">Find a Car</Link>
+          </Button>
         </div>
       )}
     </div>
