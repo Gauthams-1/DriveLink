@@ -13,6 +13,7 @@ function Redirector() {
 
     useEffect(() => {
         const newParams = new URLSearchParams(searchParams.toString());
+        // Use replace to avoid adding the old URL to the history stack
         router.replace(`/reservations/confirm?${newParams.toString()}`);
     }, [router, searchParams]);
     
@@ -28,10 +29,11 @@ function Redirector() {
     );
 }
 
+// This page now uses Suspense to handle the useSearchParams hook correctly.
 export default function DeprecatedReservationDetailsPage() {
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <Redirector />
         </Suspense>
-    )
+    );
 }
