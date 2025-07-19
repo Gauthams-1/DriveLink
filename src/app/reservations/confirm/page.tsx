@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import type { Car } from '@/lib/types';
+import Link from 'next/link';
 
 
 function ConfirmationContent() {
@@ -54,28 +55,11 @@ function ConfirmationContent() {
     );
   }
 
-  const handleConfirm = () => {
-    // In a real app, you would save this to the database.
-    // For this demo, we'll store it in localStorage.
-    const newReservation = {
-        id: Date.now(),
-        carId: car.id,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        totalCost: parseFloat(totalCost),
-    };
-    
-    const existingReservations = JSON.parse(localStorage.getItem('carReservations') || '[]');
-    localStorage.setItem('carReservations', JSON.stringify([...existingReservations, newReservation]));
-
-    toast({
-        title: "Reservation Confirmed!",
-        description: `Your booking for the ${car.name} is complete.`,
-    });
-    // Redirect to the main reservations page
-    router.push('/reservations');
+  const getPaymentUrl = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    return `/reservations/payment?${params.toString()}`;
   }
-
+  
   const addonDetails = [
       { id: 'insurance', label: 'Full Insurance' },
       { id: 'gps', label: 'GPS Navigation' },
@@ -133,13 +117,15 @@ function ConfirmationContent() {
             <Separator className="my-4" />
             <div className="flex items-center justify-between text-xl font-bold">
                 <span>Total Cost</span>
-                <span>₹{parseFloat(totalCost).toFixed(2)}</span>
+                <span>₹{parseFloat(totalCost).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full" size="lg" onClick={handleConfirm}>
-            <CheckCircle className="mr-2 h-5 w-5" />
-            Confirm Reservation
+          <Button className="w-full" size="lg" asChild>
+            <Link href={getPaymentUrl()}>
+              <CheckCircle className="mr-2 h-5 w-5" />
+              Proceed to Payment
+            </Link>
           </Button>
         </CardFooter>
       </Card>
