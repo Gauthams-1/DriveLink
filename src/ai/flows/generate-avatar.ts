@@ -10,7 +10,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 
 const GenerateAvatarInputSchema = z.object({
     prompt: z.string().describe('A text description of the avatar to generate.'),
@@ -39,7 +39,7 @@ const generateAvatarFlow = ai.defineFlow(
     async (input) => {
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-preview-image-generation',
-            prompt: `Generate a professional, high-quality, circular avatar suitable for a user profile. The user has requested the following: "${input.prompt}". The avatar should be clean, modern, and centered.`,
+            prompt: `A high-quality, professional, circular user profile avatar of: ${input.prompt}. The avatar should be clean, modern, and centered.`,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],
             },
