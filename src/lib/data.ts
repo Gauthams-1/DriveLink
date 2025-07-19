@@ -12,7 +12,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 22, // kmpl
     location: 'Mumbai, MH',
-    images: ['https://images.unsplash.com/photo-1629007238493-2195f0616954?q=80&w=600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1629007238493-2195f0616954?q=80&w=600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1629007238493-2195f0616954?q=80&w=600&auto=format&fit=crop'],
+    images: ['https://images.unsplash.com/photo-1619429424855-ac749e611e8a?q=80&w=600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1619429424855-ac749e611e8a?q=80&w=600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1619429424855-ac749e611e8a?q=80&w=600&auto=format&fit=crop'],
     description: 'A reliable and fuel-efficient hatchback, perfect for city driving and small families.',
     features: ['Bluetooth', 'Backup Camera', 'Apple CarPlay'],
   },
@@ -26,7 +26,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 17, // kmpl
     location: 'Delhi, DL',
-    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    images: ['https://images.unsplash.com/photo-1555353540-64580b53c258?q=80&w=600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1555353540-64580b53c258?q=80&w=600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1555353540-64580b53c258?q=80&w=600&auto=format&fit=crop'],
     description: 'A stylish and safe compact SUV, ready for any adventure, from mountain roads to city streets.',
     features: ['All-Wheel Drive', 'Sunroof', 'Touchscreen Infotainment'],
   },
