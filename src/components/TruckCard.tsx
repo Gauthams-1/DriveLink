@@ -37,7 +37,7 @@ export function TruckCard({ truck }: TruckCardProps) {
       </CardContent>
       <CardFooter className="p-4 flex justify-between items-center bg-muted/50">
         <div>
-          <span className="text-2xl font-bold">${truck.pricePerDay}</span>
+          <span className="text-2xl font-bold">₹{truck.pricePerDay}</span>
           <span className="text-sm text-muted-foreground">/day</span>
         </div>
         <Button asChild>

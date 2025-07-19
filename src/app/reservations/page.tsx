@@ -63,7 +63,7 @@ export default function ReservationsPage() {
                 <TableCell>
                   {format(reservation.startDate, 'MMM d, yyyy')} - {format(reservation.endDate, 'MMM d, yyyy')}
                 </TableCell>
-                <TableCell className="text-right">${reservation.totalCost.toFixed(2)}</TableCell>
+                <TableCell className="text-right">₹{reservation.totalCost.toFixed(2)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button variant="ghost" size="icon">

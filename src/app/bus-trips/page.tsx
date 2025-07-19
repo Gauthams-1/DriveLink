@@ -35,7 +35,7 @@ export default function BusTripsPage() {
                 <Label htmlFor="destination">Destination</Label>
                  <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="destination" placeholder="e.g., Las Vegas" className="pl-10" />
+                    <Input id="destination" placeholder="e.g., Goa" className="pl-10" />
                  </div>
               </div>
               <div className="lg:col-span-3 space-y-2">

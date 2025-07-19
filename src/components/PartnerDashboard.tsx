@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Badge } from "./ui/badge";
-import { DollarSign, Car, Star, PlusCircle, ArrowUpRight } from "lucide-react";
+import { Car, Star, PlusCircle } from "lucide-react";
 
 export function PartnerDashboard() {
   return (
@@ -16,10 +16,10 @@ export function PartnerDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground font-bold">₹</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${partnerStats.totalRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-bold">₹{partnerStats.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </CardContent>
         </Card>
@@ -85,7 +85,7 @@ export function PartnerDashboard() {
                       {vehicle.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">${vehicle.pricePerDay}</TableCell>
+                  <TableCell className="text-right">₹{vehicle.pricePerDay}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

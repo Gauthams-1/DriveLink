@@ -6,7 +6,7 @@ export type Car = {
   seats: number;
   luggage: number; // in bags
   transmission: 'Automatic' | 'Manual';
-  mpg: number;
+  mpg: number; // kmpl
   location: string;
   images: string[];
   description: string;

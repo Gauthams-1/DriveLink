@@ -29,7 +29,7 @@ const CarRecommendationInputSchema = z.object({
       'The planned activities (e.g., city driving, off-roading, long highway trips).' + 
       'Provide a detailed description of the activities the car will be used for.'
     ),
-  budget: z.number().describe('The budget for the car rental in USD'),
+  budget: z.number().describe('The budget for the car rental in INR'),
 });
 export type CarRecommendationInput = z.infer<typeof CarRecommendationInputSchema>;
 
@@ -55,7 +55,7 @@ const prompt = ai.definePrompt({
   name: 'carRecommendationPrompt',
   input: {schema: CarRecommendationInputSchema},
   output: {schema: CarRecommendationOutputSchema},
-  prompt: `You are an expert car rental assistant. A user is looking to rent a car, and you must recommend a car type based on their needs.
+  prompt: `You are an expert car rental assistant in India. A user is looking to rent a car, and you must recommend a car type based on their needs.
 
 Consider the following information about the user's trip:
 
@@ -67,7 +67,7 @@ Budget: {{{budget}}}
 Based on this information, recommend a car type and explain your reasoning. Be as detailed as possible when explaining the recommendation, but also be concise.
 
 {{#if budget}}
-Considering the budget of {{{budget}}} USD, ensure the car is within this price range, if possible.
+Considering the budget of {{{budget}}} INR, ensure the car is within this price range, if possible.
 {{/if}}
 `,
 });

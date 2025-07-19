@@ -57,8 +57,8 @@ export function RecommendationForm() {
                 <Input id="numPassengers" name="numPassengers" type="number" min="1" placeholder="e.g., 4" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="budget">Budget (USD)</Label>
-                <Input id="budget" name="budget" type="number" min="0" placeholder="e.g., 500" required />
+                <Label htmlFor="budget">Budget (INR)</Label>
+                <Input id="budget" name="budget" type="number" min="0" placeholder="e.g., 25000" required />
               </div>
             </div>
             <div className="space-y-2">

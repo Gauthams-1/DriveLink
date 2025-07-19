@@ -202,7 +202,7 @@ export function CustomerProfile() {
                     <TableCell>
                       {format(reservation.startDate, 'MMM d, yyyy')} - {format(reservation.endDate, 'MMM d, yyyy')}
                     </TableCell>
-                    <TableCell className="text-right">${reservation.totalCost.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">₹{reservation.totalCost.toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

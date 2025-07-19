@@ -15,9 +15,9 @@ import { useToast } from '@/hooks/use-toast';
 import type { DateRange } from 'react-day-picker';
 
 const ADDONS = [
-  { id: 'insurance', label: 'Full Insurance', price: 25 },
-  { id: 'gps', label: 'GPS Navigation', price: 10 },
-  { id: 'child-seat', label: 'Child Seat', price: 8 },
+  { id: 'insurance', label: 'Full Insurance', price: 1500 },
+  { id: 'gps', label: 'GPS Navigation', price: 500 },
+  { id: 'child-seat', label: 'Child Seat', price: 400 },
 ];
 
 export function CostCalculator({ car }: { car: Car }) {
@@ -118,7 +118,7 @@ export function CostCalculator({ car }: { car: Car }) {
                 />
                 <Label htmlFor={addon.id} className="font-normal flex justify-between w-full">
                   <span>{addon.label}</span>
-                  <span className="text-muted-foreground">${addon.price}/day</span>
+                  <span className="text-muted-foreground">₹{addon.price}/day</span>
                 </Label>
               </div>
             ))}
@@ -128,7 +128,7 @@ export function CostCalculator({ car }: { car: Car }) {
         <div className="space-y-2 pt-4 border-t">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Base price ({rentalDays} days)</span>
-            <span>${(rentalDays * car.pricePerDay).toFixed(2)}</span>
+            <span>₹{(rentalDays * car.pricePerDay).toFixed(2)}</span>
           </div>
            {selectedAddons.map(addonId => {
               const addon = ADDONS.find(a => a.id === addonId);
@@ -136,7 +136,7 @@ export function CostCalculator({ car }: { car: Car }) {
               return (
                  <div key={addonId} className="flex justify-between text-sm">
                    <span className="text-muted-foreground">{addon.label}</span>
-                   <span>${(addon.price * rentalDays).toFixed(2)}</span>
+                   <span>₹{(addon.price * rentalDays).toFixed(2)}</span>
                  </div>
               )
            })}
@@ -146,7 +146,7 @@ export function CostCalculator({ car }: { car: Car }) {
       <CardFooter className="flex-col items-stretch space-y-4">
         <div className="flex justify-between text-xl font-bold">
           <span>Total Cost</span>
-          <span>${totalCost.toFixed(2)}</span>
+          <span>₹{totalCost.toFixed(2)}</span>
         </div>
         <Button size="lg" onClick={handleReserve} disabled={!dateRange?.from || !dateRange?.to}>Reserve Now</Button>
       </CardFooter>

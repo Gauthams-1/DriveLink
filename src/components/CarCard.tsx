@@ -33,12 +33,12 @@ export function CarCard({ car }: CarCardProps) {
             <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {car.seats} Seats</div>
             <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> {car.luggage} Bags</div>
             <div className="flex items-center gap-2"><GitBranch className="w-4 h-4 text-primary" /> {car.transmission}</div>
-            <div className="flex items-center gap-2"><Gauge className="w-4 h-4 text-primary" /> {car.mpg} MPG</div>
+            <div className="flex items-center gap-2"><Gauge className="w-4 h-4 text-primary" /> {car.mpg} KMPL</div>
           </div>
         </CardContent>
         <CardFooter className="p-4 flex justify-between items-center bg-muted/50">
           <div>
-            <span className="text-2xl font-bold">${car.pricePerDay}</span>
+            <span className="text-2xl font-bold">₹{car.pricePerDay}</span>
             <span className="text-sm text-muted-foreground">/day</span>
           </div>
           <Button asChild>
