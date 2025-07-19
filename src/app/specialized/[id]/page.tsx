@@ -86,7 +86,7 @@ export default function SpecializedVehicleDetailPage({ params }: { params: { id:
             </Card>
 
             <Button size="lg" className="w-full" asChild>
-                <Link href={`#`}>Book Now</Link>
+                <Link href={`/specialized/confirm?vehicleId=${vehicle.id}`}>Book Now</Link>
             </Button>
 
           </div>

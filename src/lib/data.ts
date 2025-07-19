@@ -1,4 +1,4 @@
-import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle } from './types';
+import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails } from './types';
 
 export const cars: Car[] = [
   {
@@ -299,6 +299,8 @@ export const carReservations: Reservation[] = [];
 
 export const busReservations: BusReservation[] = [];
 
+export const specializedVehicleReservations: SpecializedVehicleReservation[] = [];
+
 const defaultUser: User = {
   name: "Guest User",
   email: "guest@example.com",
@@ -353,6 +355,17 @@ export const findBusReservations = (): BusReservationWithDetails[] => {
             return bus ? { ...r, bus, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
         })
         .filter((r): r is BusReservationWithDetails => r !== null);
+};
+
+export const findSpecializedVehicleReservations = (): SpecializedVehicleReservationWithDetails[] => {
+  if (typeof window === 'undefined') return [];
+  const storedReservations: SpecializedVehicleReservation[] = JSON.parse(localStorage.getItem('specializedVehicleReservations') || '[]');
+  return storedReservations
+        .map(r => {
+            const vehicle = findSpecializedVehicleById(r.vehicleId);
+            return vehicle ? { ...r, vehicle, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
+        })
+        .filter((r): r is SpecializedVehicleReservationWithDetails => r !== null);
 };
 
 

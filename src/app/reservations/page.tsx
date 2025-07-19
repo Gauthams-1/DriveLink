@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { findCarById, findBusById } from '@/lib/data';
+import { findCarById, findBusById, findSpecializedVehicleById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -24,13 +24,13 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import Image from 'next/image';
-import { Car, Pencil, Trash2, Bus } from 'lucide-react';
+import { Car, Pencil, Trash2, Bus, Accessibility } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import type { CarReservationWithDetails, BusReservationWithDetails, Reservation, BusReservation } from '@/lib/types';
+import type { CarReservationWithDetails, BusReservationWithDetails, Reservation, BusReservation, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails } from '@/lib/types';
 
-type UnifiedReservation = (CarReservationWithDetails & { type: 'car' }) | (BusReservationWithDetails & { type: 'bus' });
+type UnifiedReservation = (CarReservationWithDetails & { type: 'car' }) | (BusReservationWithDetails & { type: 'bus' }) | (SpecializedVehicleReservationWithDetails & { type: 'specialized' });
 
 export default function ReservationsPage() {
   const [reservations, setReservations] = useState<UnifiedReservation[]>([]);
@@ -41,6 +41,7 @@ export default function ReservationsPage() {
     // We're using localStorage to simulate persistence.
     const storedCarReservations: Reservation[] = JSON.parse(localStorage.getItem('carReservations') || '[]');
     const storedBusReservations: BusReservation[] = JSON.parse(localStorage.getItem('busReservations') || '[]');
+    const storedSpecializedReservations: SpecializedVehicleReservation[] = JSON.parse(localStorage.getItem('specializedVehicleReservations') || '[]');
 
     const carReservationsWithDetails: CarReservationWithDetails[] = storedCarReservations
       .map(r => {
@@ -56,16 +57,36 @@ export default function ReservationsPage() {
       })
       .filter((r): r is BusReservationWithDetails => r !== null);
 
+    const specializedReservationsWithDetails: SpecializedVehicleReservationWithDetails[] = storedSpecializedReservations
+      .map(r => {
+        const vehicle = findSpecializedVehicleById(r.vehicleId);
+        return vehicle ? { ...r, vehicle, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
+      })
+      .filter((r): r is SpecializedVehicleReservationWithDetails => r !== null);
+
     const allReservations: UnifiedReservation[] = [
       ...carReservationsWithDetails.map(r => ({ ...r, type: 'car' as const })),
       ...busReservationsWithDetails.map(r => ({ ...r, type: 'bus' as const })),
+      ...specializedReservationsWithDetails.map(r => ({ ...r, type: 'specialized' as const })),
     ];
     
     setReservations(allReservations);
   }, []);
 
-  const handleCancelReservation = (reservationId: number, type: 'car' | 'bus') => {
-    const storageKey = type === 'car' ? 'carReservations' : 'busReservations';
+  const handleCancelReservation = (reservationId: number, type: 'car' | 'bus' | 'specialized') => {
+    let storageKey = '';
+    switch (type) {
+      case 'car':
+        storageKey = 'carReservations';
+        break;
+      case 'bus':
+        storageKey = 'busReservations';
+        break;
+      case 'specialized':
+        storageKey = 'specializedVehicleReservations';
+        break;
+    }
+    
     const storedReservations = JSON.parse(localStorage.getItem(storageKey) || '[]');
     const updatedStoredReservations = storedReservations.filter((r: {id: number}) => r.id !== reservationId);
     localStorage.setItem(storageKey, JSON.stringify(updatedStoredReservations));
@@ -103,20 +124,35 @@ export default function ReservationsPage() {
           </TableHeader>
           <TableBody>
             {sortedReservations.map((reservation) => {
-              const isCar = reservation.type === 'car';
-              const vehicle = isCar ? reservation.car : reservation.bus;
-              const vehicleUrl = isCar ? `/cars/${vehicle.id}` : `/bus-trips/${vehicle.id}`;
+              let vehicle, vehicleUrl, aiHint, icon;
+              
+              if (reservation.type === 'car') {
+                vehicle = reservation.car;
+                vehicleUrl = `/cars/${vehicle.id}`;
+                aiHint = vehicle.type === 'Bike' || vehicle.type === 'Scooter' ? 'motorcycle scooter' : 'car';
+                icon = <Car className="h-5 w-5 mr-2 text-muted-foreground" />;
+              } else if (reservation.type === 'bus') {
+                vehicle = reservation.bus;
+                vehicleUrl = `/bus-trips/${vehicle.id}`;
+                aiHint = 'bus';
+                icon = <Bus className="h-5 w-5 mr-2 text-muted-foreground" />;
+              } else { // specialized
+                vehicle = reservation.vehicle;
+                vehicleUrl = `/specialized/${vehicle.id}`;
+                aiHint = 'accessible van';
+                icon = <Accessibility className="h-5 w-5 mr-2 text-muted-foreground" />;
+              }
 
               return (
                 <TableRow key={`${reservation.type}-${reservation.id}`}>
                   <TableCell>
                     <Link href={vehicleUrl} className="flex items-center gap-4 group">
                       <div className="relative w-24 h-16 rounded-md overflow-hidden">
-                        <Image src={vehicle.images[0]} alt={vehicle.name} layout="fill" objectFit="cover" data-ai-hint={isCar ? "car" : "bus"} />
+                        <Image src={vehicle.images[0]} alt={vehicle.name} layout="fill" objectFit="cover" data-ai-hint={aiHint} />
                       </div>
                       <div>
-                        <div className="font-medium group-hover:underline">{vehicle.name}</div>
-                        <div className="text-sm text-muted-foreground">{vehicle.type}</div>
+                        <div className="font-medium group-hover:underline flex items-center">{icon} {vehicle.name}</div>
+                        <div className="text-sm text-muted-foreground ml-7">{vehicle.type}</div>
                       </div>
                     </Link>
                   </TableCell>
@@ -170,6 +206,7 @@ export default function ReservationsPage() {
           <div className="flex justify-center gap-4">
             <Car className="mx-auto h-12 w-12 text-muted-foreground" />
             <Bus className="mx-auto h-12 w-12 text-muted-foreground" />
+            <Accessibility className="mx-auto h-12 w-12 text-muted-foreground" />
           </div>
           <h2 className="mt-4 text-xl font-semibold">No reservations yet</h2>
           <p className="mt-2 text-muted-foreground">Start planning your next trip to see your reservations here.</p>

@@ -31,6 +31,15 @@ export type BusReservation = {
     totalCost: number;
 }
 
+export type SpecializedVehicleReservation = {
+  id: number;
+  vehicleId: number;
+  contactName: string;
+  startDate: Date;
+  endDate: Date;
+  totalCost: number;
+}
+
 export type Bus = {
   id: number;
   name: string;
@@ -105,3 +114,4 @@ export type PartnerVehicle = {
 // Types with joined details
 export type CarReservationWithDetails = Reservation & { car: Car };
 export type BusReservationWithDetails = BusReservation & { bus: Bus };
+export type SpecializedVehicleReservationWithDetails = SpecializedVehicleReservation & { vehicle: SpecializedVehicle };
