@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -57,8 +58,8 @@ export function CarSearchForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     const params = new URLSearchParams();
     params.set('location', values.location);
-    params.set('pickup', format(values.pickupDate, 'yyyy-MM-dd'));
-    params.set('dropoff', format(values.dropoffDate, 'yyyy-MM-dd'));
+    params.set('pickup', values.pickupDate.toISOString());
+    params.set('dropoff', values.dropoffDate.toISOString());
     if (values.carType && values.carType !== 'all') {
       params.set('type', values.carType);
     }

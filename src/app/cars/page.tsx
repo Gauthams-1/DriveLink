@@ -2,22 +2,20 @@
 'use client';
 
 import { CarCard } from "@/components/CarCard";
-import { getAllAvailableCars } from "@/lib/data";
-import type { Car } from "@/lib/types";
+import { getAllAvailableCars, findCarReservations } from "@/lib/data";
+import type { Car, CarReservationWithDetails } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { CarSearchForm } from "@/components/CarSearchForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams } from "next/navigation";
-
-type SearchParams = {
-  location?: string;
-  type?: 'Sedan' | 'SUV' | 'Minivan' | 'Convertible' | 'Coupe' | 'Bike' | 'Scooter';
-};
+import { isWithinInterval, parseISO } from "date-fns";
 
 function CarList() {
   const searchParams = useSearchParams();
   const location = searchParams.get('location');
   const type = searchParams.get('type');
+  const pickupDateStr = searchParams.get('pickup');
+  const dropoffDateStr = searchParams.get('dropoff');
   
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,9 +31,33 @@ function CarList() {
     if (type && type !== 'all') {
       filteredCars = filteredCars.filter(car => car.type === type);
     }
+    
+    if (pickupDateStr && dropoffDateStr) {
+      const searchFrom = parseISO(pickupDateStr);
+      const searchTo = parseISO(dropoffDateStr);
+      const allReservations = findCarReservations();
+      
+      const isOverlapping = (start1: Date, end1: Date, start2: Date, end2: Date) => {
+        return start1 < end2 && start2 < end1;
+      }
+      
+      filteredCars = filteredCars.filter(car => {
+          const carReservations = allReservations.filter(r => r.carId === car.id);
+          if (carReservations.length === 0) {
+              return true; // No reservations, so it's available
+          }
+
+          const isBooked = carReservations.some(reservation => 
+              isOverlapping(searchFrom, searchTo, reservation.startDate, reservation.endDate)
+          );
+          
+          return !isBooked;
+      });
+    }
+
     setCars(filteredCars);
     setLoading(false);
-  }, [location, type]);
+  }, [location, type, pickupDateStr, dropoffDateStr]);
 
   if (loading) {
     return (
@@ -64,7 +86,7 @@ function CarList() {
       ) : (
         <div className="text-center col-span-full py-16 border-2 border-dashed rounded-lg">
           <h2 className="text-2xl font-semibold mb-2">No Cars Found</h2>
-          <p className="text-muted-foreground">No partner vehicles are available for this search. Try different filters or check back later.</p>
+          <p className="text-muted-foreground">No partner vehicles are available for this search. Try different dates or filters.</p>
         </div>
       )}
     </>
@@ -76,7 +98,7 @@ export default function CarsPage() {
   const location = searchParams.get('location');
   const type = searchParams.get('type');
 
-  const displayLocation = type ? `${type}s` : 'All Vehicles';
+  const displayLocation = type && type !== 'all' ? `${type}s` : 'All Vehicles';
   
   return (
     <div className="container mx-auto py-8 px-4">
@@ -94,7 +116,7 @@ export default function CarsPage() {
             <div className="mb-8">
                 <h2 className="text-3xl font-bold font-headline">Available Vehicles</h2>
                 <p className="text-muted-foreground">
-                Showing results for {displayLocation} {location ? `in ${location}` : ''}
+                 Showing results for {displayLocation} {location ? `in ${location}` : ''}
                 </p>
             </div>
           <CarList />
