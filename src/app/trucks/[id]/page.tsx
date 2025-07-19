@@ -71,10 +71,6 @@ export default function TruckDetailPage({ params }: { params: { id: string } }) 
                   <span className="text-muted-foreground flex items-center gap-2"><Star className="w-4 h-4" /> Driver Rating</span>
                   <span className="font-medium">{truck.driver.rating}/5</span>
                 </div>
-                 <div className="text-sm">
-                  <span className="text-muted-foreground">Driver: </span>
-                  <span className="font-medium">{truck.driver.name}</span>
-                </div>
               </CardContent>
             </Card>
 

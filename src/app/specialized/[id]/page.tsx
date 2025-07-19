@@ -62,10 +62,6 @@ export default function SpecializedVehicleDetailPage({ params }: { params: { id:
                   <span className="text-muted-foreground flex items-center gap-2"><Star className="w-4 h-4" /> Driver Rating</span>
                   <span className="font-medium">{vehicle.driver.rating}/5</span>
                 </div>
-                 <div className="text-sm">
-                  <span className="text-muted-foreground">Driver: </span>
-                  <span className="font-medium">{vehicle.driver.name}</span>
-                </div>
               </CardContent>
             </Card>
 
