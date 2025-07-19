@@ -38,6 +38,7 @@ export type SpecializedVehicleReservation = {
   startDate: Date;
   endDate: Date;
   totalCost: number;
+  caretakerAssistance?: boolean;
 }
 
 export type Bus = {

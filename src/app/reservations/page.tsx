@@ -24,11 +24,12 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import Image from 'next/image';
-import { Car, Pencil, Trash2, Bus, Accessibility } from 'lucide-react';
+import { Car, Pencil, Trash2, Bus, Accessibility, HeartHandshake } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import type { CarReservationWithDetails, BusReservationWithDetails, Reservation, BusReservation, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails } from '@/lib/types';
+import { Badge } from '@/components/ui/badge';
 
 type UnifiedReservation = (CarReservationWithDetails & { type: 'car' }) | (BusReservationWithDetails & { type: 'bus' }) | (SpecializedVehicleReservationWithDetails & { type: 'specialized' });
 
@@ -153,6 +154,12 @@ export default function ReservationsPage() {
                       <div>
                         <div className="font-medium group-hover:underline flex items-center">{icon} {vehicle.name}</div>
                         <div className="text-sm text-muted-foreground ml-7">{vehicle.type}</div>
+                        {reservation.type === 'specialized' && reservation.caretakerAssistance && (
+                           <Badge variant="outline" className="mt-1 ml-7 bg-blue-100 text-blue-800 border-blue-200">
+                                <HeartHandshake className="h-3 w-3 mr-1" />
+                                Caretaker
+                           </Badge>
+                        )}
                       </div>
                     </Link>
                   </TableCell>

@@ -7,7 +7,7 @@ import { findSpecializedVehicleById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Users, Briefcase, User, Mail, Phone, Banknote, CreditCard } from 'lucide-react';
+import { CheckCircle, Calendar, Users, Briefcase, User, Mail, Phone, Banknote, CreditCard, HeartHandshake } from 'lucide-react';
 import { addDays, differenceInDays, format } from 'date-fns';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
@@ -16,6 +16,9 @@ import type { DateRange } from 'react-day-picker';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
+
+const CARETAKER_PRICE_PER_DAY = 2000;
 
 function SpecializedVehicleConfirmationContent() {
   const router = useRouter();
@@ -31,16 +34,20 @@ function SpecializedVehicleConfirmationContent() {
   });
   const [totalCost, setTotalCost] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [caretakerAssistance, setCaretakerAssistance] = useState(false);
   
   const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) : 0;
+  const caretakerCost = caretakerAssistance && rentalDays > 0 ? rentalDays * CARETAKER_PRICE_PER_DAY : 0;
 
   useEffect(() => {
     if (vehicle && rentalDays > 0) {
-      setTotalCost(rentalDays * vehicle.pricePerDay);
+      const baseCost = rentalDays * vehicle.pricePerDay;
+      const finalCaretakerCost = caretakerAssistance ? rentalDays * CARETAKER_PRICE_PER_DAY : 0;
+      setTotalCost(baseCost + finalCaretakerCost);
     } else {
       setTotalCost(0);
     }
-  }, [dateRange, vehicle, rentalDays]);
+  }, [dateRange, vehicle, rentalDays, caretakerAssistance]);
 
   if (!vehicle) {
     return (
@@ -78,6 +85,7 @@ function SpecializedVehicleConfirmationContent() {
         endDate: dateRange.to,
         totalCost: totalCost,
         contactName: formData.get('contactName'),
+        caretakerAssistance: caretakerAssistance,
     };
     
     const existingReservations = JSON.parse(localStorage.getItem('specializedVehicleReservations') || '[]');
@@ -120,6 +128,20 @@ function SpecializedVehicleConfirmationContent() {
                         <Input id="contactEmail" name="contactEmail" type="email" placeholder="your@email.com" required />
                     </div>
                  </div>
+                  <div className="space-y-2 pt-2">
+                    <Label>Add-ons</Label>
+                     <div className="flex items-center space-x-2 rounded-md border p-3">
+                        <Checkbox 
+                        id="caretaker"
+                        checked={caretakerAssistance}
+                        onCheckedChange={(checked) => setCaretakerAssistance(checked as boolean)}
+                        />
+                        <Label htmlFor="caretaker" className="font-normal flex justify-between w-full">
+                        <span className="flex items-center gap-2"><HeartHandshake className="h-4 w-4"/> Caretaker Assistance</span>
+                        <span className="text-muted-foreground">₹{CARETAKER_PRICE_PER_DAY}/day</span>
+                        </Label>
+                    </div>
+                 </div>
             </CardContent>
           </Card>
         </div>
@@ -150,6 +172,13 @@ function SpecializedVehicleConfirmationContent() {
                 <span>Number of days</span>
                 <span>x {rentalDays}</span>
               </div>
+
+                {caretakerCost > 0 && (
+                    <div className="flex items-center justify-between text-muted-foreground">
+                        <span>Caretaker Assistance</span>
+                        <span>₹{caretakerCost.toLocaleString()}</span>
+                    </div>
+                )}
 
               <Separator className="my-4" />
               <div className="flex items-center justify-between text-2xl font-bold">
