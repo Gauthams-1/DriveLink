@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Car, Bus, Truck, Wrench, Users, Ambulance, ShieldCheck, Route, Wallet } from "lucide-react";
+import { Car, Bus, Truck, Wrench, Users, Ambulance, ShieldCheck, Route, Wallet, UserCircle, Handshake } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -65,6 +65,34 @@ const aboutFeatures = [
         icon: Wallet,
         title: "Transparent Pricing",
         description: "No hidden fees. Get clear, upfront pricing for all services before you book."
+    }
+];
+
+const partnerOptions = [
+    {
+        icon: Car,
+        title: "Car Owner",
+        href: "/partner/car-owner"
+    },
+    {
+        icon: Bus,
+        title: "Bus Owner",
+        href: "/partner/bus-owner"
+    },
+    {
+        icon: Wrench,
+        title: "Mechanic",
+        href: "/partner/mechanic"
+    },
+    {
+        icon: UserCircle,
+        title: "Driver",
+        href: "/partner/driver"
+    },
+    {
+        icon: Truck,
+        title: "Truck Service",
+        href: "/partner/truck-service"
     }
 ]
 
@@ -145,19 +173,24 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 bg-muted">
          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-               <div className="p-8 bg-muted rounded-lg">
-                  <h2 className="text-3xl md:text-4xl font-headline font-bold mb-4">Become a DriveLink Partner</h2>
-                  <p className="text-lg text-muted-foreground mb-6">Have a vehicle? Join our network and start earning. We provide the tools and support you need to manage your fleet, track bookings, and grow your business.</p>
-                  <Button asChild size="lg">
-                     <Link href="/partner">Learn More</Link>
-                  </Button>
-               </div>
-               <div className="relative h-[400px] rounded-lg overflow-hidden">
-                  <Image src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?q=80&w=2025&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Partner with a car" layout="fill" objectFit="cover" data-ai-hint="partner car" />
-               </div>
+            <div className="text-center max-w-3xl mx-auto mb-12">
+                <h2 className="text-3xl md:text-4xl font-headline font-bold">Become a DriveLink Partner</h2>
+                <p className="text-lg text-muted-foreground mt-4">Have a vehicle, a garage, or driving skills? Join our network and start earning. We provide the tools and support you need to grow your business.</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-8">
+                {partnerOptions.map((option) => (
+                    <Card key={option.title} className="text-center p-4 hover:shadow-xl hover:-translate-y-1 transition-transform duration-300">
+                        <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-3">
+                            <option.icon className="h-8 w-8 text-primary" />
+                        </div>
+                        <h3 className="font-bold font-headline mb-3">{option.title}</h3>
+                        <Button asChild variant="outline" size="sm">
+                            <Link href={option.href}>Join Now</Link>
+                        </Button>
+                    </Card>
+                ))}
             </div>
          </div>
       </section>
