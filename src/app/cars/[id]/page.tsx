@@ -23,7 +23,7 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
             <CarouselContent>
               {car.images.map((src, index) => (
                 <CarouselItem key={index}>
-                  <div className="relative h-96">
+                  <div className="relative h-[400px]">
                     <Image src={src} alt={`${car.name} view ${index + 1}`} layout="fill" objectFit="cover" data-ai-hint="car" />
                   </div>
                 </CarouselItem>

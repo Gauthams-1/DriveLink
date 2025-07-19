@@ -85,7 +85,7 @@ export default function Home() {
                      <Link href="/recommendations">Try the AI Assistant</Link>
                   </Button>
                </div>
-               <div className="relative h-80 rounded-lg overflow-hidden shadow-xl">
+               <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
                  <Image src="https://placehold.co/600x400.png" alt="AI illustration" layout="fill" objectFit="cover" data-ai-hint="artificial intelligence futuristic" />
                </div>
             </div>
