@@ -37,20 +37,23 @@ const generateAvatarFlow = ai.defineFlow(
         outputSchema: GenerateAvatarOutputSchema,
     },
     async (input) => {
-        const { media } = await ai.generate({
+        const result = await ai.generate({
             model: 'googleai/gemini-2.0-flash-preview-image-generation',
             prompt: `A high-quality, professional, circular user profile avatar of: ${input.prompt}. The avatar should be clean, modern, and centered.`,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],
             },
         });
-        
-        if (!media.url) {
-            throw new Error('Image generation failed.');
+
+        const imagePart = result.output?.message.content.find(part => part.media);
+
+        if (!imagePart || !imagePart.media?.url) {
+            console.error('Image generation failed. Response:', JSON.stringify(result, null, 2));
+            throw new Error('Image generation failed. No media content was returned from the AI.');
         }
 
         return {
-            avatarDataUri: media.url,
+            avatarDataUri: imagePart.media.url,
         };
     }
 );
