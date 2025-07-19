@@ -13,11 +13,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { CustomerProfile } from '@/components/CustomerProfile';
 import { PartnerDashboard } from '@/components/PartnerDashboard';
-import { Home, PanelLeft, Shield, User } from 'lucide-react';
+import { Home, LogOut, PanelLeft, Shield, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
-import { getCurrentUser } from '@/lib/data';
+import { getCurrentUser, logoutUser } from '@/lib/data';
 import type { User as UserType } from '@/lib/types';
 import { AuthPage } from '@/components/AuthPage';
 
@@ -29,6 +29,30 @@ export default function ProfilePage() {
     setUser(getCurrentUser());
   }, []);
 
+  const handleLogin = () => {
+    // In a real app, this would be the result of a successful login API call.
+    // For now, we'll simulate it by creating a non-guest user.
+    const loggedInUser = {
+      name: 'Radhika Sharma',
+      email: 'radhika.sharma@example.com',
+      phone: '+91 98765 43210',
+      address: '123, Lotus Boulevard, Mumbai, MH, 400001',
+      licenseNumber: 'MH1220230045678',
+      aadhaarNumber: '123456789012',
+      isVerified: true,
+      avatarUrl: 'https://placehold.co/100x100.png',
+      memberSince: new Date('2022-08-15T00:00:00Z'),
+      isGuest: false,
+    };
+    saveUser(loggedInUser);
+    setUser(loggedInUser);
+  };
+  
+  const handleLogout = () => {
+    logoutUser();
+    setUser(getCurrentUser());
+  };
+
   if (!user) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -38,7 +62,7 @@ export default function ProfilePage() {
   }
 
   if (user.isGuest) {
-    return <AuthPage />;
+    return <AuthPage onLoginSuccess={handleLogin} />;
   }
 
   return (
@@ -72,6 +96,12 @@ export default function ProfilePage() {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarContent>
+             <SidebarFooter>
+                <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span className="group-data-[collapsible=icon]:hidden">Logout</span>
+                </Button>
+            </SidebarFooter>
         </Sidebar>
 
         <SidebarInset className="flex flex-col">

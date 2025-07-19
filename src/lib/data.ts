@@ -399,3 +399,7 @@ export function saveUser(user: User) {
     localStorage.setItem('driveLinkUser', JSON.stringify(user));
   }
 }
+
+export function logoutUser() {
+  saveUser(defaultUser);
+}

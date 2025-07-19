@@ -15,10 +15,11 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Logo } from './Logo';
 
-export function AuthPage() {
+export function AuthPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   // In a real app, these handlers would call your authentication service
   const handleSignIn = () => {
-    alert('Sign in functionality not implemented.');
+    // For this demo, we'll just call the success handler directly.
+    onLoginSuccess();
   };
 
   const handleSignUp = () => {
@@ -45,11 +46,11 @@ export function AuthPage() {
                     <CardContent className="space-y-4">
                         <div className="space-y-2 text-left">
                         <Label htmlFor="email-signin">Email</Label>
-                        <Input id="email-signin" type="email" placeholder="m@example.com" />
+                        <Input id="email-signin" type="email" placeholder="m@example.com" defaultValue="radhika.sharma@example.com" />
                         </div>
                         <div className="space-y-2 text-left">
                         <Label htmlFor="password-signin">Password</Label>
-                        <Input id="password-signin" type="password" />
+                        <Input id="password-signin" type="password" defaultValue="password" />
                         </div>
                     </CardContent>
                     <CardFooter>
