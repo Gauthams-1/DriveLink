@@ -7,14 +7,12 @@ import * as z from 'zod';
 import { Card, CardContent } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { MapPin, Truck } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 const formSchema = z.object({
     pickup: z.string().min(2, 'Pickup address is required.'),
     destination: z.string().min(2, 'Destination address is required.'),
-    truckSize: z.string().optional(),
 });
 
 export function TruckSearchForm() {
@@ -25,7 +23,6 @@ export function TruckSearchForm() {
         defaultValues: {
             pickup: '',
             destination: '',
-            truckSize: 'all',
         },
     });
 
@@ -33,9 +30,6 @@ export function TruckSearchForm() {
         const params = new URLSearchParams();
         params.set('pickup', values.pickup);
         params.set('destination', values.destination);
-        if (values.truckSize && values.truckSize !== 'all') {
-            params.set('size', values.truckSize);
-        }
         router.push(`/trucks?${params.toString()}`);
     }
 
@@ -43,8 +37,8 @@ export function TruckSearchForm() {
         <Card className="shadow-lg">
             <CardContent className="p-4 md:p-6">
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-10 gap-4 items-end">
-                        <div className="lg:col-span-3 space-y-2">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <div className="space-y-2">
                             <FormField
                                 control={form.control}
                                 name="pickup"
@@ -60,7 +54,7 @@ export function TruckSearchForm() {
                                 )}
                             />
                         </div>
-                        <div className="lg:col-span-3 space-y-2">
+                        <div className="space-y-2">
                              <FormField
                                 control={form.control}
                                 name="destination"
@@ -76,31 +70,7 @@ export function TruckSearchForm() {
                                 )}
                             />
                         </div>
-                        <div className="lg:col-span-2 space-y-2">
-                             <FormField
-                                control={form.control}
-                                name="truckSize"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Truck Size</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select truck size" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="all">All Sizes</SelectItem>
-                                                <SelectItem value="Mini">Mini</SelectItem>
-                                                <SelectItem value="Medium">Medium</SelectItem>
-                                                <SelectItem value="Large">Large</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="lg:col-span-2">
+                        <div>
                             <Button type="submit" className="w-full">
                                 Find Truck
                             </Button>
