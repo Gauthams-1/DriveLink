@@ -80,10 +80,12 @@ export function CustomerProfile() {
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-6">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={newAvatar || user.avatarUrl} alt={user.name} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-24 w-24 border-4 border-background ring-4 ring-primary">
+                  <AvatarImage src={newAvatar || user.avatarUrl} alt={user.name} />
+                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </div>
               
               {!isEditing ? (
                 <div>
