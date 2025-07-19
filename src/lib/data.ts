@@ -1,4 +1,4 @@
-import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails } from './types';
+import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle } from './types';
 
 export const cars: Car[] = [
   {
@@ -247,6 +247,43 @@ export const trucks: Truck[] = [
     },
 ];
 
+export const specializedVehicles: SpecializedVehicle[] = [
+  {
+    id: 1,
+    name: 'Freedom Wheels Transporter',
+    type: 'Wheelchair Accessible Van',
+    description: 'A spacious van equipped with a hydraulic ramp and secure wheelchair restraints for safe and comfortable travel.',
+    pricePerDay: 7000,
+    capacity: '1 Wheelchair + 4 Passengers',
+    features: ['Hydraulic Ramp', 'Wheelchair Locks', 'High Roof', 'Spacious Interior'],
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    driver: { name: 'Sunita Pawar', rating: 4.9 },
+  },
+  {
+    id: 2,
+    name: 'Paws & Go Cruiser',
+    type: 'Pet-Friendly SUV',
+    description: 'Travel with your furry friends without worry. This SUV comes with pet-safe seat covers, a safety harness, and a water bowl.',
+    pricePerDay: 5500,
+    capacity: '2 Pets + 3 Passengers',
+    features: ['Pet Seat Covers', 'Safety Harness', 'Air Purification', 'Spill-proof Water Bowl'],
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    driver: { name: 'Amit Sharma', rating: 4.8 },
+  },
+  {
+    id: 3,
+    name: 'Golden Years Comfort Ride',
+    type: 'Senior-Friendly Sedan',
+    description: 'A comfortable sedan with low-step entry, extra cushioning, and a patient, courteous driver for our senior citizens.',
+    pricePerDay: 4000,
+    capacity: '4 Passengers',
+    features: ['Easy Entry/Exit', 'Extra Legroom', 'Comfort-tuned Suspension', 'First-Aid Kit'],
+    images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+    driver: { name: 'Rajeshwari Iyer', rating: 5.0 },
+  },
+];
+
+
 export const carReservations: Reservation[] = [];
 
 export const busReservations: BusReservation[] = [];
@@ -282,6 +319,8 @@ export const partnerVehicles: PartnerVehicle[] = [
 export const findCarById = (id: number) => cars.find(car => car.id === id);
 export const findBusById = (id: number) => buses.find(bus => bus.id === id);
 export const findTruckById = (id: number) => trucks.find(truck => truck.id === id);
+export const findSpecializedVehicleById = (id: number) => specializedVehicles.find(v => v.id === id);
+
 
 export const findCarReservations = (): CarReservationWithDetails[] => {
   if (typeof window === 'undefined') return [];

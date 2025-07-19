@@ -59,6 +59,21 @@ export type Truck = {
   };
 };
 
+export type SpecializedVehicle = {
+  id: number;
+  name: string;
+  type: 'Wheelchair Accessible Van' | 'Pet-Friendly SUV' | 'Senior-Friendly Sedan';
+  description: string;
+  pricePerDay: number;
+  capacity: string;
+  features: string[];
+  images: string[];
+  driver: {
+    name: string;
+    rating: number;
+  };
+};
+
 export type User = {
   name: string;
   email: string;
