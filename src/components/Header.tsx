@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -37,27 +38,32 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center px-4">
-        <Link href="/">
-          <Logo />
-        </Link>
-        <div className="hidden md:flex flex-1 items-center justify-end space-x-4">
-          <NavLinks />
+        <div className="hidden md:flex items-center gap-6">
+            <Link href="/">
+              <Logo />
+            </Link>
+            <NavLinks />
         </div>
-        <div className="flex md:hidden flex-1 justify-end">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <div className="flex flex-col gap-4 p-4">
+        <div className="flex md:hidden items-center">
+             <Sheet>
+                <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Toggle navigation menu</span>
+                </Button>
+                </SheetTrigger>
+                <SheetContent side="left">
+                <div className="flex flex-col gap-4 p-4">
+                    <Logo />
+                    <NavLinks className="flex-col space-x-0 space-y-2 items-start" />
+                </div>
+                </SheetContent>
+            </Sheet>
+        </div>
+        <div className="flex flex-1 items-center justify-end md:hidden">
+            <Link href="/">
                 <Logo />
-                <NavLinks className="flex-col space-x-0 space-y-2 items-start" />
-              </div>
-            </SheetContent>
-          </Sheet>
+            </Link>
         </div>
       </div>
     </header>
