@@ -38,13 +38,13 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center px-4">
-        <div className="hidden md:flex items-center gap-6">
-            <Link href="/">
-              <Logo />
-            </Link>
+        <Link href="/">
+            <Logo />
+        </Link>
+        <div className="md:flex items-center gap-6 ml-auto hidden">
             <NavLinks />
         </div>
-        <div className="flex md:hidden items-center">
+        <div className="flex flex-1 items-center justify-end md:hidden">
              <Sheet>
                 <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -59,11 +59,6 @@ export function Header() {
                 </div>
                 </SheetContent>
             </Sheet>
-        </div>
-        <div className="flex flex-1 items-center justify-end md:hidden">
-            <Link href="/">
-                <Logo />
-            </Link>
         </div>
       </div>
     </header>
