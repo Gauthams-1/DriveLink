@@ -1,6 +1,7 @@
 
 
 
+
 export type Car = {
   id: number;
   name: string;
@@ -95,6 +96,7 @@ export type User = {
   isGuest?: boolean;
   isPartner?: boolean;
   vehicles?: PartnerVehicle[];
+  partnerStats?: PartnerStats;
 };
 
 export type PartnerStats = {

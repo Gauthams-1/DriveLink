@@ -1,5 +1,4 @@
 
-import { partnerStats } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Badge } from "./ui/badge";
@@ -9,6 +8,7 @@ import type { User } from "@/lib/types";
 export function PartnerDashboard({ user }: { user: User }) {
   const fleet = user.vehicles || [];
   const activeBookings = fleet.filter(v => v.status === 'Rented').length;
+  const stats = user.partnerStats || { totalRevenue: 0, avgRating: 0 };
 
   return (
     <div className="space-y-8">
@@ -23,8 +23,8 @@ export function PartnerDashboard({ user }: { user: User }) {
             <span className="text-muted-foreground font-bold">₹</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{partnerStats.totalRevenue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <div className="text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">Lifetime earnings</p>
           </CardContent>
         </Card>
         <Card>
@@ -53,8 +53,8 @@ export function PartnerDashboard({ user }: { user: User }) {
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{partnerStats.avgRating}</div>
-            <p className="text-xs text-muted-foreground">Based on 25 reviews</p>
+            <div className="text-2xl font-bold">{stats.avgRating > 0 ? stats.avgRating : 'N/A'}</div>
+            <p className="text-xs text-muted-foreground">{stats.avgRating > 0 ? 'Based on customer reviews' : 'No reviews yet'}</p>
           </CardContent>
         </Card>
       </div>

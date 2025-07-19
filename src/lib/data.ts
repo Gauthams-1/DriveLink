@@ -1,6 +1,7 @@
 
 
 
+
 import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic } from './types';
 
 // Note: All image URLs have been removed as requested.
@@ -321,6 +322,7 @@ const defaultUser: User = {
   isGuest: true,
   isPartner: false,
   vehicles: [],
+  partnerStats: { totalRevenue: 0, activeBookings: 0, totalVehicles: 0, avgRating: 0 },
 };
 
 export const partnerStats: PartnerStats = {
@@ -461,6 +463,7 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password'>)
         memberSince: new Date(),
         avatarUrl: "",
         vehicles: [],
+        partnerStats: { totalRevenue: 0, activeBookings: 0, totalVehicles: 0, avgRating: 0 },
     };
 
     users.push(newUser);
@@ -497,6 +500,7 @@ export function getCurrentUser(): User {
         isPartner: parsedUser.isPartner,
         memberSince: new Date(parsedUser.memberSince),
         vehicles: parsedUser.vehicles || [],
+        partnerStats: parsedUser.partnerStats || { totalRevenue: 0, activeBookings: 0, totalVehicles: 0, avgRating: 0 },
       };
     }
   } catch (error) {
