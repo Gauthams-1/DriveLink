@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Car, Bus, Truck, Wrench, Users, Ambulance, ShieldCheck, Route, Wallet } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const services = [
   { 
@@ -70,8 +71,17 @@ const aboutFeatures = [
 export default function Home() {
   return (
     <div className="flex flex-col">
-      <section className="relative w-full py-20 md:py-32 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 flex flex-col items-center justify-center h-full text-center">
+      <section className="relative w-full py-20 md:py-32">
+        <Image
+          src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="Luxury car driving on a road"
+          layout="fill"
+          objectFit="cover"
+          className="absolute inset-0 z-0 brightness-50"
+          priority
+          data-ai-hint="car road"
+        />
+        <div className="relative container mx-auto px-4 flex flex-col items-center justify-center h-full text-center text-primary-foreground">
           <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4 drop-shadow-lg">
             Your Complete Transportation Solution
           </h1>
