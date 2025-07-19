@@ -46,11 +46,11 @@ export function AuthPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
                     <CardContent className="space-y-4">
                         <div className="space-y-2 text-left">
                         <Label htmlFor="email-signin">Email</Label>
-                        <Input id="email-signin" type="email" placeholder="m@example.com" defaultValue="radhika.sharma@example.com" />
+                        <Input id="email-signin" type="email" placeholder="m@example.com" />
                         </div>
                         <div className="space-y-2 text-left">
                         <Label htmlFor="password-signin">Password</Label>
-                        <Input id="password-signin" type="password" defaultValue="password" />
+                        <Input id="password-signin" type="password" placeholder="********" />
                         </div>
                     </CardContent>
                     <CardFooter>
