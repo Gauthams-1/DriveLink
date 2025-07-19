@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Menu, Car, Bus, Truck, Wrench } from 'lucide-react';
+import { Menu, Car, Bus, Truck, Wrench, User } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { cn } from '@/lib/utils';
+import { CarSearchForm } from './CarSearchForm';
 
 const navLinks = [
   { href: '/cars', label: 'Rentals', icon: Car },
@@ -41,29 +42,38 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center px-4">
-        <Link href="/">
-            <Logo />
-        </Link>
-        <div className="ml-auto flex items-center gap-6">
-            <div className="hidden md:flex">
-              <NavLinks />
-            </div>
-            <div className="flex items-center justify-end md:hidden">
-                <Sheet>
-                    <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                        <Menu className="h-6 w-6" />
-                        <span className="sr-only">Toggle navigation menu</span>
-                    </Button>
-                    </SheetTrigger>
-                    <SheetContent side="left">
-                    <div className="flex flex-col gap-4 p-4">
-                        <Logo />
-                        <NavLinks className="flex-col space-x-0 space-y-2 items-start" />
-                    </div>
-                    </SheetContent>
-                </Sheet>
-            </div>
+        <div className="flex items-center gap-6">
+          <Link href="/">
+              <Logo />
+          </Link>
+          <div className="hidden md:flex">
+            <NavLinks />
+          </div>
+        </div>
+
+        <div className="ml-auto flex items-center gap-2">
+          <Button variant="ghost" size="icon" asChild>
+             <Link href="/profile">
+                <User className="h-5 w-5" />
+                <span className="sr-only">Profile</span>
+             </Link>
+          </Button>
+          <div className="flex items-center justify-end md:hidden">
+              <Sheet>
+                  <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                      <Menu className="h-6 w-6" />
+                      <span className="sr-only">Toggle navigation menu</span>
+                  </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left">
+                  <div className="flex flex-col gap-4 p-4">
+                      <Logo />
+                      <NavLinks className="flex-col space-x-0 space-y-2 items-start" />
+                  </div>
+                  </SheetContent>
+              </Sheet>
+          </div>
         </div>
       </div>
     </header>

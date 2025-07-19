@@ -34,3 +34,25 @@ export type Bus = {
     rating: number;
   };
 };
+
+export type User = {
+  name: string;
+  email: string;
+  avatarUrl: string;
+  memberSince: Date;
+};
+
+export type PartnerStats = {
+  totalRevenue: number;
+  activeBookings: number;
+  totalVehicles: number;
+  avgRating: number;
+};
+
+export type PartnerVehicle = {
+  id: number;
+  name: string;
+  type: string;
+  status: 'Available' | 'Rented' | 'Maintenance';
+  pricePerDay: number;
+};

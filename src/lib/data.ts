@@ -1,4 +1,4 @@
-import type { Car, Reservation, Bus } from './types';
+import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle } from './types';
 
 export const cars: Car[] = [
   {
@@ -174,6 +174,29 @@ export const reservations: Reservation[] = [
       totalCost: 285,
     },
 ];
+
+export const user: User = {
+  name: "Alex Johnson",
+  email: "alex.j@example.com",
+  avatarUrl: "https://placehold.co/100x100.png",
+  memberSince: new Date("2022-03-15"),
+};
+
+export const partnerStats: PartnerStats = {
+  totalRevenue: 12530,
+  activeBookings: 5,
+  totalVehicles: 8,
+  avgRating: 4.9,
+};
+
+export const partnerVehicles: PartnerVehicle[] = [
+  { id: 1, name: "City Slicker", type: 'Coupe', status: 'Available', pricePerDay: 75 },
+  { id: 2, name: "Urban Explorer", type: 'SUV', status: 'Rented', pricePerDay: 65 },
+  { id: 3, name: "Luxury Liner", type: 'Sedan', status: 'Available', pricePerDay: 110 },
+  { id: 4, name: "Trail Blazer", type: 'SUV', status: 'Maintenance', pricePerDay: 70 },
+  { id: 5, name: "Compact Cruiser", type: 'Sedan', status: 'Available', pricePerDay: 45 },
+];
+
 
 export const findCarById = (id: number) => cars.find(car => car.id === id);
 export const findBusById = (id: number) => buses.find(bus => bus.id === id);
