@@ -15,16 +15,16 @@ type SearchParams = {
   type?: 'Sedan' | 'SUV' | 'Minivan' | 'Convertible' | 'Coupe' | 'Bike' | 'Scooter';
 };
 
-function CarList({ searchParams }: { searchParams: SearchParams }) {
+function CarList({ location, type }: { location?: string; type?: string }) {
   const allCars = getAllAvailableCars();
   let filteredCars: Car[] = allCars;
 
-  if (searchParams.location) {
-    filteredCars = filteredCars.filter(car => car.location?.toLowerCase().includes(searchParams.location!.toLowerCase()));
+  if (location) {
+    filteredCars = filteredCars.filter(car => car.location?.toLowerCase().includes(location.toLowerCase()));
   }
 
-  if (searchParams.type && searchParams.type !== 'all') {
-    filteredCars = filteredCars.filter(car => car.type === searchParams.type);
+  if (type && type !== 'all') {
+    filteredCars = filteredCars.filter(car => car.type === type);
   }
 
   return (
@@ -46,7 +46,10 @@ function CarList({ searchParams }: { searchParams: SearchParams }) {
 }
 
 export default function CarsPage({ searchParams }: { searchParams: SearchParams }) {
-  const displayLocation = searchParams.type ? `${searchParams.type}s` : 'All Vehicles';
+  const location = searchParams.location;
+  const type = searchParams.type;
+
+  const displayLocation = type ? `${type}s` : 'All Vehicles';
   
   return (
     <div className="container mx-auto py-8 px-4">
@@ -64,11 +67,11 @@ export default function CarsPage({ searchParams }: { searchParams: SearchParams 
             <div className="mb-8">
                 <h2 className="text-3xl font-bold font-headline">Available Vehicles</h2>
                 <p className="text-muted-foreground">
-                Showing results for {displayLocation} {searchParams.location ? `in ${searchParams.location}` : ''}
+                Showing results for {displayLocation} {location ? `in ${location}` : ''}
                 </p>
             </div>
           <Suspense fallback={<div>Loading cars...</div>}>
-            <CarList searchParams={searchParams} />
+            <CarList location={location} type={type} />
           </Suspense>
         </div>
         <aside className="lg:w-1/3 hidden">
