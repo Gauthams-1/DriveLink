@@ -72,27 +72,27 @@ const partnerOptions = [
     {
         icon: Car,
         title: "Car Owner",
-        href: "/partner/car-owner"
+        href: "/profile"
     },
     {
         icon: Bus,
         title: "Bus Owner",
-        href: "/partner/bus-owner"
+        href: "/profile"
     },
     {
         icon: Wrench,
         title: "Mechanic",
-        href: "/partner/mechanic"
+        href: "/profile"
     },
     {
         icon: UserCircle,
         title: "Driver",
-        href: "/partner/driver"
+        href: "/profile"
     },
     {
         icon: Truck,
         title: "Truck Service",
-        href: "/partner/truck-service"
+        href: "/profile"
     }
 ]
 
@@ -175,22 +175,34 @@ export default function Home() {
 
       <section className="py-16 md:py-24 bg-muted">
          <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-12">
-                <h2 className="text-3xl md:text-4xl font-headline font-bold">Become a DriveLink Partner</h2>
-                <p className="text-lg text-muted-foreground mt-4">Have a vehicle, a garage, or driving skills? Join our network and start earning. We provide the tools and support you need to grow your business.</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-8">
-                {partnerOptions.map((option) => (
-                    <Card key={option.title} className="text-center p-4 hover:shadow-xl hover:-translate-y-1 transition-transform duration-300">
-                        <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-3">
-                            <option.icon className="h-8 w-8 text-primary" />
-                        </div>
-                        <h3 className="font-bold font-headline mb-3">{option.title}</h3>
-                        <Button asChild variant="outline" size="sm">
-                            <Link href={option.href}>Join Now</Link>
-                        </Button>
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div className="text-center md:text-left max-w-3xl mx-auto">
+                    <h2 className="text-3xl md:text-4xl font-headline font-bold">Become a DriveLink Partner</h2>
+                    <p className="text-lg text-muted-foreground mt-4">Have a vehicle, a garage, or driving skills? Join our network and start earning. We provide the tools and support you need to grow your business.</p>
+                     <Button asChild size="lg" className="mt-6">
+                        <Link href="/profile">Get Started</Link>
+                    </Button>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {partnerOptions.slice(0, 5).map((option) => (
+                        <Card key={option.title} className="text-center p-4 hover:shadow-lg hover:-translate-y-1 transition-transform duration-200 bg-card">
+                            <Link href={option.href} className="flex flex-col items-center justify-center h-full">
+                                <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-3">
+                                    <option.icon className="h-8 w-8 text-primary" />
+                                </div>
+                                <h3 className="font-bold font-headline text-sm">{option.title}</h3>
+                            </Link>
+                        </Card>
+                    ))}
+                    <Card className="text-center p-4 hover:shadow-lg hover:-translate-y-1 transition-transform duration-200 bg-card col-span-2 sm:col-span-1">
+                        <Link href="/profile" className="flex flex-col items-center justify-center h-full">
+                             <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-3">
+                                <Handshake className="h-8 w-8 text-primary" />
+                            </div>
+                            <h3 className="font-bold font-headline text-sm">And more...</h3>
+                        </Link>
                     </Card>
-                ))}
+                </div>
             </div>
          </div>
       </section>

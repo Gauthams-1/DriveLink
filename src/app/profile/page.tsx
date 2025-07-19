@@ -5,11 +5,13 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarHeader,
   SidebarInset,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarProvider,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { CustomerProfile } from '@/components/CustomerProfile';
@@ -97,6 +99,14 @@ export default function ProfilePage() {
             </SidebarContent>
              <SidebarFooter>
                 <SidebarMenu>
+                     <SidebarMenuItem>
+                        <SidebarMenuButton asChild tooltip={{ children: 'Home' }}>
+                            <Link href="/">
+                                <Home />
+                                <span>Home</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton onClick={handleLogout} tooltip={{ children: 'Logout' }}>
                             <LogOut />
@@ -109,12 +119,8 @@ export default function ProfilePage() {
 
         <SidebarInset className="flex flex-col">
           <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6">
-             <Link href="/">
-                <Button variant="outline" size="icon">
-                    <Home className="h-4 w-4" />
-                </Button>
-             </Link>
-            <h1 className="text-lg font-semibold md:text-2xl">My Account</h1>
+             <SidebarTrigger className="md:hidden"/>
+            <h1 className="text-lg font-semibold md:text-2xl capitalize">{activeTab.replace('-', ' ')}</h1>
           </header>
 
           <main className="flex-1 p-6">
@@ -126,3 +132,4 @@ export default function ProfilePage() {
     </SidebarProvider>
   );
 }
+
