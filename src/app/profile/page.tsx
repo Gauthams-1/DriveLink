@@ -14,12 +14,32 @@ import { Button } from '@/components/ui/button';
 import { CustomerProfile } from '@/components/CustomerProfile';
 import { PartnerDashboard } from '@/components/PartnerDashboard';
 import { Home, PanelLeft, Shield, User } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
+import { getCurrentUser } from '@/lib/data';
+import type { User as UserType } from '@/lib/types';
+import { AuthPage } from '@/components/AuthPage';
 
 export default function ProfilePage() {
+  const [user, setUser] = useState<UserType | null>(null);
   const [activeTab, setActiveTab] = useState('profile');
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
+
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Loading...
+      </div>
+    );
+  }
+
+  if (user.isGuest) {
+    return <AuthPage />;
+  }
 
   return (
     <SidebarProvider>

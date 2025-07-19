@@ -311,6 +311,7 @@ const defaultUser: User = {
   isVerified: false,
   avatarUrl: "https://placehold.co/100x100.png",
   memberSince: new Date(),
+  isGuest: true,
 };
 
 export const partnerStats: PartnerStats = {
@@ -381,6 +382,7 @@ export function getCurrentUser(): User {
       return {
         ...defaultUser,
         ...parsedUser,
+        isGuest: parsedUser.isGuest,
         memberSince: new Date(parsedUser.memberSince),
       };
     }

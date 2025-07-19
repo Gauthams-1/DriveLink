@@ -94,6 +94,7 @@ export type User = {
   isVerified: boolean;
   avatarUrl: string;
   memberSince: Date;
+  isGuest?: boolean;
 };
 
 export type PartnerStats = {
