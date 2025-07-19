@@ -1,15 +1,27 @@
+
 import { TruckCard } from "@/components/TruckCard";
 import { TruckSearchForm } from "@/components/TruckSearchForm";
-import { trucks } from "@/lib/data";
+import { getAllAvailableTrucks } from "@/lib/data";
 import { Suspense } from "react";
 
 function TruckList() {
+    const availableTrucks = getAllAvailableTrucks();
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {trucks.map(truck => (
-                <TruckCard key={truck.id} truck={truck} />
-            ))}
-        </div>
+        <>
+            {availableTrucks.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {availableTrucks.map(truck => (
+                        <TruckCard key={truck.id} truck={truck} />
+                    ))}
+                </div>
+            ) : (
+                <div className="text-center col-span-full py-16 border-2 border-dashed rounded-lg">
+                    <h2 className="text-2xl font-semibold mb-2">No Trucks Available</h2>
+                    <p className="text-muted-foreground">There are currently no trucks available. Please check back later.</p>
+                </div>
+            )}
+        </>
     );
 }
 

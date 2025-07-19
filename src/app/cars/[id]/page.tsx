@@ -5,16 +5,19 @@ import { notFound } from 'next/navigation';
 import { findCarById } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, CheckCircle, Gauge, GitBranch, MapPin, Users } from 'lucide-react';
+import { Briefcase, CheckCircle, Gauge, GitBranch, MapPin, Users, PersonStanding } from 'lucide-react';
 import { CostCalculator } from '@/components/CostCalculator';
 import { Separator } from '@/components/ui/separator';
+import { useMemo } from 'react';
 
 export default function CarDetailPage({ params }: { params: { id: string } }) {
-  const car = findCarById(Number(params.id));
+  const car = useMemo(() => findCarById(Number(params.id)), [params.id]);
 
   if (!car) {
     notFound();
   }
+
+  const isTwoWheeler = car.type === 'Bike' || car.type === 'Scooter';
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -51,20 +54,25 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground flex items-center gap-2"><Users className="w-4 h-4" /> Seats</span>
+                  <span className="text-muted-foreground flex items-center gap-2">
+                    {isTwoWheeler ? <PersonStanding className="w-4 h-4" /> : <Users className="w-4 h-4" />} 
+                    {isTwoWheeler ? 'Riders' : 'Seats'}
+                  </span>
                   <span className="font-medium">{car.seats}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground flex items-center gap-2"><Briefcase className="w-4 h-4" /> Luggage</span>
-                  <span className="font-medium">{car.luggage} bags</span>
-                </div>
+                 {!isTwoWheeler && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground flex items-center gap-2"><Briefcase className="w-4 h-4" /> Luggage</span>
+                    <span className="font-medium">{car.luggage} bags</span>
+                  </div>
+                 )}
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground flex items-center gap-2"><GitBranch className="w-4 h-4" /> Transmission</span>
                   <span className="font-medium">{car.transmission}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground flex items-center gap-2"><Gauge className="w-4 h-4" /> MPG</span>
-                  <span className="font-medium">{car.mpg}</span>
+                  <span className="text-muted-foreground flex items-center gap-2"><Gauge className="w-4 h-4" /> Efficiency</span>
+                  <span className="font-medium">{car.mpg} {car.type === 'Scooter' || car.type === 'Bike' && car.mpg > 100 ? 'km/charge' : 'kmpl'}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Type</span>

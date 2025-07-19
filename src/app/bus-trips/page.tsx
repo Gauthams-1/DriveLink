@@ -1,22 +1,32 @@
+
 import { BusCard } from "@/components/BusCard";
-import { buses } from "@/lib/data";
+import { getAllAvailableBuses } from "@/lib/data";
 import { Suspense } from "react";
 import { DatePickerWithRange } from "@/components/DatePickerWithRange";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Users } from "lucide-react";
 
-
 function BusList() {
+  const availableBuses = getAllAvailableBuses();
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {buses.map(bus => (
-        <BusCard key={bus.id} bus={bus} />
-      ))}
-    </div>
+     <>
+      {availableBuses.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {availableBuses.map(bus => (
+            <BusCard key={bus.id} bus={bus} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center col-span-full py-16 border-2 border-dashed rounded-lg">
+          <h2 className="text-2xl font-semibold mb-2">No Buses Available</h2>
+          <p className="text-muted-foreground">There are currently no buses available. Please check back later.</p>
+        </div>
+      )}
+    </>
   );
 }
 

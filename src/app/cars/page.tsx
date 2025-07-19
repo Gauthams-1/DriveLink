@@ -1,28 +1,29 @@
 
 import { CarCard } from "@/components/CarCard";
-import { cars } from "@/lib/data";
+import { getAllAvailableCars } from "@/lib/data";
 import { Car } from "@/lib/types";
-import { MapPin } from "lucide-react";
-import Link from "next/link";
 import { Suspense } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { CarSearchForm } from "@/components/CarSearchForm";
 
 type SearchParams = {
   location?: string;
   pickup?: string;
   dropoff?: string;
-  type?: 'Sedan' | 'SUV' | 'Minivan' | 'Convertible' | 'Coupe';
+  type?: 'Sedan' | 'SUV' | 'Minivan' | 'Convertible' | 'Coupe' | 'Bike' | 'Scooter';
 };
 
 function CarList({ searchParams }: { searchParams: SearchParams }) {
-  let filteredCars = cars;
+  const allCars = getAllAvailableCars();
+  let filteredCars: Car[] = allCars;
 
   if (searchParams.location) {
-    filteredCars = filteredCars.filter(car => car.location.toLowerCase().includes(searchParams.location!.toLowerCase()));
+    filteredCars = filteredCars.filter(car => car.location?.toLowerCase().includes(searchParams.location!.toLowerCase()));
   }
 
-  if (searchParams.type) {
+  if (searchParams.type && searchParams.type !== 'all') {
     filteredCars = filteredCars.filter(car => car.type === searchParams.type);
   }
 
@@ -44,40 +45,43 @@ function CarList({ searchParams }: { searchParams: SearchParams }) {
   );
 }
 
-
 export default function CarsPage({ searchParams }: { searchParams: SearchParams }) {
+  const displayLocation = searchParams.type ? `${searchParams.type}s` : 'All Vehicles';
+  
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold font-headline">Available Cars</h1>
-        <p className="text-muted-foreground">
-          Showing results for {searchParams.location || 'all locations'}
-          {searchParams.pickup && searchParams.dropoff && ` from ${searchParams.pickup} to ${searchParams.dropoff}`}.
-        </p>
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold font-headline">Rent a Car, Bike, or Scooter</h1>
+        <p className="text-muted-foreground mt-2 text-lg">Your perfect ride is just a search away. Find the best deals on wheels.</p>
+      </div>
+
+       <div className="mb-12">
+        <CarSearchForm />
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="lg:w-2/3">
+        <div className="lg:w-full">
+            <div className="mb-8">
+                <h2 className="text-3xl font-bold font-headline">Available Vehicles</h2>
+                <p className="text-muted-foreground">
+                Showing results for {displayLocation} {searchParams.location ? `in ${searchParams.location}` : ''}
+                </p>
+            </div>
           <Suspense fallback={<div>Loading cars...</div>}>
             <CarList searchParams={searchParams} />
           </Suspense>
         </div>
-        <aside className="lg:w-1/3">
+        <aside className="lg:w-1/3 hidden">
           <div className="sticky top-24">
             <Card>
                 <CardHeader>
-                    <CardTitle>Pickup Locations</CardTitle>
+                    <CardTitle>Can't decide?</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground mb-4">We have pickup locations across all major cities. Enter your route to find the nearest one.</p>
-                    <div className="flex flex-col gap-2">
-                        <Button variant="outline" asChild>
-                            <Link href="/locations">View All Locations</Link>
-                        </Button>
-                         <Button asChild>
-                            <Link href="/recommendations">Get AI Recommendation</Link>
-                        </Button>
-                    </div>
+                    <p className="text-muted-foreground mb-4">Let our AI find the perfect car for your trip based on your needs.</p>
+                     <Button asChild className="w-full">
+                        <Link href="/recommendations">Get AI Recommendation</Link>
+                    </Button>
                 </CardContent>
             </Card>
           </div>
