@@ -73,11 +73,11 @@ export default function Home() {
       <section className="relative w-full h-[70vh] md:h-[80vh]">
         <Image
           src="https://placehold.co/1800x900.png"
-          alt="A dynamic montage of various transportation options"
+          alt="A lineup of modern cars ready for rental"
           layout="fill"
           objectFit="cover"
           className="z-0"
-          data-ai-hint="transportation montage city"
+          data-ai-hint="modern cars"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
         <div className="relative z-20 flex flex-col items-center justify-end h-full text-center text-white px-4 pb-20">
