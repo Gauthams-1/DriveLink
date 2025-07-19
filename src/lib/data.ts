@@ -304,6 +304,7 @@ export const specializedVehicleReservations: SpecializedVehicleReservation[] = [
 const defaultUser: User = {
   name: "Guest User",
   email: "guest@example.com",
+  password: "", // Guest user doesn't need a password
   phone: "",
   address: "",
   licenseNumber: "",
@@ -368,6 +369,53 @@ export const findSpecializedVehicleReservations = (): SpecializedVehicleReservat
         })
         .filter((r): r is SpecializedVehicleReservationWithDetails => r !== null);
 };
+
+// --- User Management ---
+
+const getRegisteredUsers = (): User[] => {
+    if (typeof window === 'undefined') return [];
+    const users = localStorage.getItem('driveLinkRegisteredUsers');
+    return users ? JSON.parse(users) : [];
+}
+
+const saveRegisteredUsers = (users: User[]) => {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('driveLinkRegisteredUsers', JSON.stringify(users));
+    }
+}
+
+export function registerUser(details: Pick<User, 'name' | 'email' | 'password'>): User {
+    const users = getRegisteredUsers();
+    if (users.some(u => u.email === details.email)) {
+        throw new Error("A user with this email already exists.");
+    }
+
+    const newUser: User = {
+        ...defaultUser,
+        ...details,
+        isGuest: false,
+        memberSince: new Date(),
+        avatarUrl: `https://api.dicebear.com/8.x/initials/svg?seed=${details.name || 'U'}`
+    };
+
+    users.push(newUser);
+    saveRegisteredUsers(users);
+    saveUser(newUser); // Automatically log in the new user
+    return newUser;
+}
+
+export function authenticateUser(email: string, password?: string): User | null {
+    // In a real app, never compare passwords in plain text.
+    // This is for demonstration purposes only.
+    const users = getRegisteredUsers();
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (user) {
+        saveUser(user);
+        return user;
+    }
+    return null;
+}
 
 
 export function getCurrentUser(): User {

@@ -14,23 +14,60 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Logo } from './Logo';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { authenticateUser, registerUser } from '@/lib/data';
+import { useToast } from '@/hooks/use-toast';
 
 export function AuthPage({ onLoginSuccess }: { onLoginSuccess: (name: string, email: string) => void }) {
   const signInEmailRef = useRef<HTMLInputElement>(null);
+  const signInPasswordRef = useRef<HTMLInputElement>(null);
   const signUpNameRef = useRef<HTMLInputElement>(null);
   const signUpEmailRef = useRef<HTMLInputElement>(null);
+  const signUpPasswordRef = useRef<HTMLInputElement>(null);
+  
+  const { toast } = useToast();
 
   const handleSignIn = () => {
-    const email = signInEmailRef.current?.value || 'user@example.com';
-    const name = email.split('@')[0] || 'User';
-    onLoginSuccess(name, email);
+    const email = signInEmailRef.current?.value || '';
+    const password = signInPasswordRef.current?.value || '';
+    
+    const user = authenticateUser(email, password);
+
+    if (user) {
+      onLoginSuccess(user.name, user.email);
+    } else {
+        toast({
+            title: "Sign In Failed",
+            description: "Invalid email or password. Please try again.",
+            variant: "destructive",
+        });
+    }
   };
 
   const handleSignUp = () => {
     const name = signUpNameRef.current?.value || '';
     const email = signUpEmailRef.current?.value || '';
-    onLoginSuccess(name, email);
+    const password = signUpPasswordRef.current?.value || '';
+    
+    if (!name || !email || !password) {
+        toast({
+            title: "Sign Up Failed",
+            description: "Please fill in all fields.",
+            variant: "destructive",
+        });
+        return;
+    }
+    
+    try {
+        const newUser = registerUser({ name, email, password });
+        onLoginSuccess(newUser.name, newUser.email);
+    } catch (error: any) {
+        toast({
+            title: "Sign Up Failed",
+            description: error.message,
+            variant: "destructive",
+        });
+    }
   };
 
   return (
@@ -53,11 +90,11 @@ export function AuthPage({ onLoginSuccess }: { onLoginSuccess: (name: string, em
                     <CardContent className="space-y-4">
                         <div className="space-y-2 text-left">
                         <Label htmlFor="email-signin">Email</Label>
-                        <Input id="email-signin" type="email" placeholder="m@example.com" ref={signInEmailRef} />
+                        <Input id="email-signin" type="email" placeholder="m@example.com" ref={signInEmailRef} required />
                         </div>
                         <div className="space-y-2 text-left">
                         <Label htmlFor="password-signin">Password</Label>
-                        <Input id="password-signin" type="password" />
+                        <Input id="password-signin" type="password" ref={signInPasswordRef} required />
                         </div>
                     </CardContent>
                     <CardFooter>
@@ -76,15 +113,15 @@ export function AuthPage({ onLoginSuccess }: { onLoginSuccess: (name: string, em
                     <CardContent className="space-y-4">
                          <div className="space-y-2 text-left">
                            <Label htmlFor="name-signup">Name</Label>
-                           <Input id="name-signup" placeholder="Your Name" ref={signUpNameRef} />
+                           <Input id="name-signup" placeholder="Your Name" ref={signUpNameRef} required/>
                          </div>
                         <div className="space-y-2 text-left">
                            <Label htmlFor="email-signup">Email</Label>
-                           <Input id="email-signup" type="email" placeholder="m@example.com" ref={signUpEmailRef} />
+                           <Input id="email-signup" type="email" placeholder="m@example.com" ref={signUpEmailRef} required/>
                         </div>
                         <div className="space-y-2 text-left">
                            <Label htmlFor="password-signup">Password</Label>
-                           <Input id="password-signup" type="password" />
+                           <Input id="password-signup" type="password" ref={signUpPasswordRef} required/>
                         </div>
                     </CardContent>
                     <CardFooter>

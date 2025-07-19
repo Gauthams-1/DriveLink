@@ -87,6 +87,7 @@ export type SpecializedVehicle = {
 export type User = {
   name: string;
   email: string;
+  password?: string; // Should be hashed in a real app
   phone: string;
   address: string;
   licenseNumber: string;
