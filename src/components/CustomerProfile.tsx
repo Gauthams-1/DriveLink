@@ -48,14 +48,13 @@ export function CustomerProfile() {
     setCurrentUser(user);
     setFormData(user);
     
-    // Move side-effectful code to useEffect to ensure it runs only on the client
     if (typeof window !== 'undefined') {
-        setReservations(findCarReservations());
+        const carReservations = findCarReservations();
+        setReservations(carReservations);
     }
   }, []);
 
   useEffect(() => {
-    // When a new avatar is generated, update the form data
     if (avatarGenState.avatarDataUri) {
         setFormData(prev => ({ ...prev, avatarUrl: avatarGenState.avatarDataUri!}));
         toast({
@@ -118,7 +117,6 @@ export function CustomerProfile() {
     <div className="space-y-8">
        <div className="flex items-center justify-between mb-8">
         <div>
-            {/* Title moved to parent page */}
         </div>
         {!isEditing ? (
             <Button variant="outline" onClick={() => setIsEditing(true)}><Edit className="mr-2 h-4 w-4"/>Edit Profile</Button>

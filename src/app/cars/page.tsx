@@ -36,9 +36,9 @@ function CarList({ searchParams }: { searchParams: SearchParams }) {
           ))}
         </div>
       ) : (
-        <div className="text-center col-span-full py-16">
-          <h2 className="text-2xl font-semibold mb-2">No cars found</h2>
-          <p className="text-muted-foreground">Try adjusting your search filters or check back later.</p>
+        <div className="text-center col-span-full py-16 border-2 border-dashed rounded-lg">
+          <h2 className="text-2xl font-semibold mb-2">No Cars Found</h2>
+          <p className="text-muted-foreground">No partner vehicles are available for this search. Try different filters or check back later.</p>
         </div>
       )}
     </>
