@@ -8,12 +8,12 @@ import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { format } from "date-fns";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "./ui/separator";
-import { useFormState, useFormStatus } from "react-dom";
 import { generateAvatarAction } from "@/app/actions";
 import { Loader2, Sparkles } from "lucide-react";
 
@@ -37,7 +37,7 @@ export function CustomerProfile() {
   const reservations = findReservations();
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
-  const [avatarGenState, avatarFormAction] = useFormState(generateAvatarAction, initialAvatarState);
+  const [avatarGenState, avatarFormAction] = useActionState(generateAvatarAction, initialAvatarState);
   const [newAvatar, setNewAvatar] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
