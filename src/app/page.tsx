@@ -72,7 +72,7 @@ export default function Home() {
     <div className="flex flex-col">
       <section className="relative w-full h-[70vh] md:h-[80vh]">
         <Image
-          src="https://placehold.co/1800x900.png"
+          src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?q=80&w=1800&auto=format&fit=crop"
           alt="A lineup of modern cars ready for rental"
           layout="fill"
           objectFit="cover"
