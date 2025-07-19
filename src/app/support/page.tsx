@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { findMechanicAction } from '@/app/actions';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Wrench, Loader2, User, Star, Phone, MessageSquare, MapPin } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 
@@ -49,8 +48,9 @@ export default function SupportPage() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // In a real app, you'd use these coordinates.
-          // For this demo, we'll simulate a city name based on them.
+          // In a real app, you'd use a reverse geocoding service to get the address
+          // from position.coords.latitude and position.coords.longitude.
+          // For this demo, we'll simulate a city name.
           setLocation('Mumbai, MH');
           setLocationError('');
         },
@@ -64,7 +64,7 @@ export default function SupportPage() {
         }
       );
     } else {
-       setLocationError('Geolocation is not supported by this browser.');
+       setLocationError('Geolocation is not supported by this browser. Please enter your location manually.');
     }
   }, [toast]);
   
@@ -94,7 +94,7 @@ export default function SupportPage() {
                   name="location" 
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g., Andheri, Mumbai" 
+                  placeholder="Detecting your location..." 
                   required 
                   disabled={!!location && !locationError}
                 />
