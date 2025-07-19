@@ -553,8 +553,8 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password' |
           avgRating: 0,
           activeBookings: details.partnerType === 'owner' ? 0 : undefined,
           totalVehicles: details.partnerType === 'owner' ? 0 : undefined,
-          activeJobs: details.partnerType === 'mechanic' ? 0 : undefined,
-          completedJobs: details.partnerType === 'mechanic' ? 0 : undefined,
+          activeJobs: details.partnerType === 'mechanic' || details.partnerType === 'driver' ? 0 : undefined,
+          completedJobs: details.partnerType === 'mechanic' || details.partnerType === 'driver' ? 0 : undefined,
         },
     };
 

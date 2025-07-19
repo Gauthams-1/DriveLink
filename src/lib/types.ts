@@ -96,7 +96,7 @@ export type User = {
   memberSince: Date;
   isGuest?: boolean;
   isPartner?: boolean;
-  partnerType?: 'owner' | 'mechanic';
+  partnerType?: 'owner' | 'mechanic' | 'driver';
   vehicles?: PartnerVehicle[];
   jobs?: Job[];
   partnerStats?: PartnerStats;
