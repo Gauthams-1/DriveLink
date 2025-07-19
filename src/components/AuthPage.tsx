@@ -38,7 +38,7 @@ export function AuthPage({ onLoginSuccess }: { onLoginSuccess: (name: string, em
     } else {
         toast({
             title: "Sign In Failed",
-            description: "Invalid email or password. Please try again.",
+            description: "Invalid Owner ID or password. Please try again.",
             variant: "destructive",
         });
     }
@@ -89,8 +89,8 @@ export function AuthPage({ onLoginSuccess }: { onLoginSuccess: (name: string, em
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2 text-left">
-                        <Label htmlFor="email-signin">Email</Label>
-                        <Input id="email-signin" type="email" placeholder="m@example.com" ref={signInEmailRef} required />
+                        <Label htmlFor="email-signin">Owner ID</Label>
+                        <Input id="email-signin" type="email" placeholder="your-email@example.com" ref={signInEmailRef} required />
                         </div>
                         <div className="space-y-2 text-left">
                         <Label htmlFor="password-signin">Password</Label>
@@ -112,12 +112,12 @@ export function AuthPage({ onLoginSuccess }: { onLoginSuccess: (name: string, em
                     </CardHeader>
                     <CardContent className="space-y-4">
                          <div className="space-y-2 text-left">
-                           <Label htmlFor="name-signup">Name</Label>
+                           <Label htmlFor="name-signup">Owner ID (Name)</Label>
                            <Input id="name-signup" placeholder="Your Name" ref={signUpNameRef} required/>
                          </div>
                         <div className="space-y-2 text-left">
                            <Label htmlFor="email-signup">Email</Label>
-                           <Input id="email-signup" type="email" placeholder="m@example.com" ref={signUpEmailRef} required/>
+                           <Input id="email-signup" type="email" placeholder="your-email@example.com" ref={signUpEmailRef} required/>
                         </div>
                         <div className="space-y-2 text-left">
                            <Label htmlFor="password-signup">Password</Label>
