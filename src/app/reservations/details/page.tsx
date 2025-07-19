@@ -1,9 +1,6 @@
 
 'use client';
 
-// This page is no longer in use as the functionality has been moved to the confirm page.
-// It is kept to prevent 404 errors from old links but should be removed in a future update.
-
 import { useRouter, useSearchParams, Suspense } from "next/navigation";
 import { useEffect } from "react";
 
@@ -29,7 +26,6 @@ function Redirector() {
     );
 }
 
-// This page now uses Suspense to handle the useSearchParams hook correctly.
 export default function DeprecatedReservationDetailsPage() {
     return (
         <Suspense fallback={<div>Loading...</div>}>
