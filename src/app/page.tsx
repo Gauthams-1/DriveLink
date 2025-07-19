@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Handshake, Car } from "lucide-react";
+import { Handshake, Car, Accessibility } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { useRouter } from 'next/navigation';
@@ -25,11 +25,11 @@ export default function Home() {
           Welcome to DriveLink
         </h1>
         <p className="text-muted-foreground mt-2">
-          Your complete transportation solution. Please choose your role to continue.
+          Your complete transportation solution. Please choose your portal to continue.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
         <Card className="text-center hover:shadow-xl hover:-translate-y-1 transition-transform duration-300 flex flex-col">
            <CardHeader className="flex-grow">
             <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
@@ -47,6 +47,23 @@ export default function Home() {
           </CardContent>
         </Card>
         
+        <Card className="text-center hover:shadow-xl hover:-translate-y-1 transition-transform duration-300 flex flex-col">
+           <CardHeader className="flex-grow">
+            <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
+              <Accessibility className="h-10 w-10 text-primary" />
+            </div>
+            <CardTitle className="font-headline text-2xl">Specialized Services</CardTitle>
+             <CardDescription className="pt-2">
+              Safe travel for special needs, including wheelchair access and pet-friendly options.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+             <Button size="lg" className="w-full" asChild>
+                <Link href="/specialized">Explore Services</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
         <Card className="text-center hover:shadow-xl hover:-translate-y-1 transition-transform duration-300 flex flex-col">
            <CardHeader className="flex-grow">
             <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
