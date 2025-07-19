@@ -11,8 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { cars } from '@/lib/data';
+import { CarCard } from './CarCard';
+import Link from 'next/link';
 
 const initialState = {
   message: '',
@@ -36,13 +39,25 @@ export function RecommendationForm() {
 
   useEffect(() => {
     if (state.message && state.message !== 'success') {
+      const errorMessage = typeof state.message === 'string' ? state.message : "An error occurred. Please check your inputs.";
       toast({
         title: 'Error',
-        description: JSON.stringify(state.message),
+        description: errorMessage,
         variant: 'destructive',
       });
     }
   }, [state, toast]);
+  
+  const recommendedCar = useMemo(() => {
+    if (!state.recommendedCarType) return null;
+    const carType = state.recommendedCarType.toLowerCase();
+    
+    // Find a car that includes the recommended type in its own type string.
+    // e.g., AI says "SUV", finds a car of type "SUV".
+    return cars.find(car => car.type.toLowerCase().includes(carType)) || null;
+
+  }, [state.recommendedCarType]);
+
 
   return (
     <div>
@@ -96,9 +111,21 @@ export function RecommendationForm() {
         <Card className="mt-8 bg-primary/5">
           <CardHeader>
             <CardTitle>Our Recommendation: {state.recommendedCarType}</CardTitle>
+             <CardDescription>{state.reasoning}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">{state.reasoning}</p>
+            {recommendedCar ? (
+                <div className="max-w-sm mx-auto">
+                    <CarCard car={recommendedCar} />
+                </div>
+            ) : (
+                <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-4">We couldn't find a specific vehicle matching the AI recommendation, but you can browse all available cars.</p>
+                    <Button asChild>
+                        <Link href="/cars">Browse All Cars</Link>
+                    </Button>
+                </div>
+            )}
           </CardContent>
         </Card>
       )}
