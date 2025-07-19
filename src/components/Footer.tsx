@@ -7,7 +7,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <Logo />
           <p className="text-sm text-muted-foreground mt-4 md:mt-0">
-            &copy; {new Date().getFullYear()} AutoNomad. All rights reserved.
+            &copy; {new Date().getFullYear()} DriveLink. All rights reserved.
           </p>
         </div>
       </div>
