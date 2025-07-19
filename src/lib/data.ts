@@ -1,4 +1,4 @@
-import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle } from './types';
+import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck } from './types';
 
 export const cars: Car[] = [
   {
@@ -158,6 +158,39 @@ export const buses: Bus[] = [
   },
 ];
 
+export const trucks: Truck[] = [
+    {
+        id: 1,
+        name: 'City Mover',
+        size: 'Mini',
+        pricePerDay: 120,
+        payload: '1 Ton',
+        description: 'Perfect for small apartment moves and single-item delivery.',
+        images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+        driver: { name: 'Mike Johnson', rating: 4.7 },
+    },
+    {
+        id: 2,
+        name: 'Workhorse Hauler',
+        size: 'Medium',
+        pricePerDay: 180,
+        payload: '3 Ton',
+        description: 'Ideal for 2-3 bedroom house shifting and commercial equipment.',
+        images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+        driver: { name: 'David Chen', rating: 4.9 },
+    },
+    {
+        id: 3,
+        name: 'Heavy-Duty Freighter',
+        size: 'Large',
+        pricePerDay: 250,
+        payload: '5 Ton+',
+        description: 'The best choice for large house moves and heavy industrial equipment.',
+        images: ['https://placehold.co/600x400.png', 'https://placehold.co/600x400.png'],
+        driver: { name: 'Carlos Rodriguez', rating: 4.8 },
+    },
+];
+
 export const reservations: Reservation[] = [
     {
       id: 1,
@@ -208,6 +241,7 @@ export const findReservations = () => {
     }));
 };
 
-export const getCurrentUser = (): User => {
+export function getCurrentUser(): User {
+    // In a real app, you'd fetch this from your auth provider or database
     return user;
 };

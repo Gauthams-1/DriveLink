@@ -35,6 +35,20 @@ export type Bus = {
   };
 };
 
+export type Truck = {
+  id: number;
+  name: string;
+  size: 'Mini' | 'Medium' | 'Large';
+  pricePerDay: number;
+  payload: string;
+  description: string;
+  images: string[];
+  driver: {
+    name: string;
+    rating: number;
+  };
+};
+
 export type User = {
   name: string;
   email: string;
