@@ -11,13 +11,8 @@ import { CheckCircle, Calendar, Shield, Package, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
+import type { Car } from '@/lib/types';
 
-type ReservationCar = {
-  id: number;
-  name: string;
-  pricePerDay: number;
-  images: string[];
-};
 
 function ConfirmationContent() {
   const router = useRouter();
@@ -33,7 +28,7 @@ function ConfirmationContent() {
   const pickup = searchParams.get('pickup');
   const dropoff = searchParams.get('dropoff');
 
-  const car = findCarById(Number(carId)) as ReservationCar | undefined;
+  const car = findCarById(Number(carId));
 
   if (!car || !startDate || !endDate || !totalCost || !rentalDays) {
     return (

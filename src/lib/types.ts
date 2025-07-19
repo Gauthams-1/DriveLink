@@ -80,3 +80,8 @@ export type PartnerVehicle = {
   status: 'Available' | 'Rented' | 'Maintenance';
   pricePerDay: number;
 };
+
+
+// Types with joined details
+export type CarReservationWithDetails = Reservation & { car: Car };
+export type BusReservationWithDetails = BusReservation & { bus: Bus };

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { getCurrentUser, findReservations } from "@/lib/data";
+import { getCurrentUser, findCarReservations } from "@/lib/data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "./ui/button";
@@ -35,7 +35,7 @@ function GenerateAvatarButton() {
 
 
 export function CustomerProfile() {
-  const reservations = findReservations();
+  const reservations = findCarReservations();
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const [avatarGenState, avatarFormAction] = useActionState(generateAvatarAction, initialAvatarState);

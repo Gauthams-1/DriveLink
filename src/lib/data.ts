@@ -1,4 +1,4 @@
-import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck } from './types';
+import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails } from './types';
 
 export const cars: Car[] = [
   {
@@ -247,7 +247,7 @@ export const trucks: Truck[] = [
     },
 ];
 
-export const reservations: Reservation[] = [
+export const carReservations: Reservation[] = [
     {
       id: 1,
       carId: 2,
@@ -262,6 +262,18 @@ export const reservations: Reservation[] = [
       endDate: new Date('2024-09-04'),
       totalCost: 18000,
     },
+];
+
+export const busReservations: BusReservation[] = [
+  {
+    id: 1,
+    busId: 2,
+    groupName: "Corporate Event",
+    contactName: "Priya Singh",
+    startDate: new Date('2024-08-20'),
+    endDate: new Date('2024-08-22'),
+    totalCost: 66000,
+  },
 ];
 
 const user: User = {
@@ -291,14 +303,24 @@ export const findCarById = (id: number) => cars.find(car => car.id === id);
 export const findBusById = (id: number) => buses.find(bus => bus.id === id);
 export const findTruckById = (id: number) => trucks.find(truck => truck.id === id);
 
-export const findReservations = () => {
-    return reservations
-        .map(r => ({
-            ...r,
-            car: findCarById(r.carId),
-        }))
-        .filter(r => r.car); // Filter out reservations where car is not found
+export const findCarReservations = (): CarReservationWithDetails[] => {
+    return carReservations
+        .map(r => {
+            const car = findCarById(r.carId);
+            return car ? { ...r, car } : null;
+        })
+        .filter((r): r is CarReservationWithDetails => r !== null);
 };
+
+export const findBusReservations = (): BusReservationWithDetails[] => {
+    return busReservations
+        .map(r => {
+            const bus = findBusById(r.busId);
+            return bus ? { ...r, bus } : null;
+        })
+        .filter((r): r is BusReservationWithDetails => r !== null);
+};
+
 
 export function getCurrentUser(): User {
     // In a real app, you'd fetch this from your auth provider or database
