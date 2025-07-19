@@ -2,7 +2,7 @@
 'use client';
 
 import { getCurrentUser, findCarReservations, saveUser } from "@/lib/data";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
@@ -14,7 +14,7 @@ import { Label } from "./ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { generateAvatarAction } from "@/app/actions";
 import { Loader2, Sparkles, UserCheck, UserX, ShieldCheck, Mail, Phone, MapPin, Edit, X, Upload, Car } from "lucide-react";
-import type { User } from "@/lib/types";
+import type { User, CarReservationWithDetails } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { Textarea } from "./ui/textarea";
 
@@ -35,7 +35,7 @@ function GenerateAvatarButton() {
 
 
 export function CustomerProfile() {
-  const [reservations, setReservations] = useState<any[]>([]);
+  const [reservations, setReservations] = useState<CarReservationWithDetails[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const [avatarGenState, avatarFormAction] = useActionState(generateAvatarAction, initialAvatarState);
@@ -47,11 +47,23 @@ export function CustomerProfile() {
     const user = getCurrentUser();
     setCurrentUser(user);
     setFormData(user);
-    // Move side-effectful code to useEffect
+    
+    // Move side-effectful code to useEffect to ensure it runs only on the client
     if (typeof window !== 'undefined') {
         setReservations(findCarReservations());
     }
   }, []);
+
+  useEffect(() => {
+    // When a new avatar is generated, update the form data
+    if (avatarGenState.avatarDataUri) {
+        setFormData(prev => ({ ...prev, avatarUrl: avatarGenState.avatarDataUri!}));
+        toast({
+            title: "Avatar updated!",
+            description: "Click 'Save Changes' to keep it."
+        })
+    }
+  }, [avatarGenState.avatarDataUri, toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -70,7 +82,7 @@ export function CustomerProfile() {
         licenseNumber: formData.licenseNumber || currentUser.licenseNumber,
         aadhaarNumber: formData.aadhaarNumber || currentUser.aadhaarNumber,
         isVerified: !!(formData.licenseNumber && formData.aadhaarNumber),
-        avatarUrl: avatarGenState.avatarDataUri || formData.avatarUrl || currentUser.avatarUrl,
+        avatarUrl: formData.avatarUrl || currentUser.avatarUrl,
     };
     
     saveUser(updatedUser);
@@ -87,16 +99,6 @@ export function CustomerProfile() {
         setFormData(currentUser);
     }
     setIsEditing(false);
-  }
-
-  const handleUseAvatar = () => {
-    if (avatarGenState.avatarDataUri) {
-        setFormData(prev => ({ ...prev, avatarUrl: avatarGenState.avatarDataUri!}));
-      toast({
-        title: "Avatar updated!",
-        description: "Click 'Save Changes' to keep it."
-      })
-    }
   }
 
   if (!currentUser) {
@@ -133,6 +135,7 @@ export function CustomerProfile() {
             <Card>
                 <CardHeader className="text-center">
                     <Avatar className="h-24 w-24 border-4 border-background ring-4 ring-primary mx-auto">
+                        <AvatarImage src={isEditing ? formData.avatarUrl : currentUser.avatarUrl} alt={currentUser.name} />
                       <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <CardTitle className="pt-4">{isEditing ? formData.name : currentUser.name}</CardTitle>
@@ -163,11 +166,11 @@ export function CustomerProfile() {
                   
                   {avatarGenState.avatarDataUri && (
                     <div className="mt-4 text-center">
-                      <p className="font-semibold mb-2">Generated Avatar</p>
-                      <div className="w-24 h-24 rounded-full mx-auto bg-muted flex items-center justify-center">
-                        <Sparkles className="w-12 h-12 text-muted-foreground" />
-                      </div>
-                      <Button variant="outline" size="sm" className="mt-2" onClick={handleUseAvatar}>Use this Avatar</Button>
+                      <p className="font-semibold mb-2">Generated Avatar Preview</p>
+                      <Avatar className="h-24 w-24 mx-auto">
+                        <AvatarImage src={avatarGenState.avatarDataUri} />
+                        <AvatarFallback><Sparkles/></AvatarFallback>
+                      </Avatar>
                     </div>
                   )}
                 </CardContent>

@@ -579,8 +579,7 @@ export const addPartnerVehicle = (vehicle: Omit<PartnerVehicle, 'id'>): User => 
 
     const newVehicle = {
         ...vehicle,
-        // Generate a new ID based on existing vehicles for this user only
-        id: currentVehicles.length > 0 ? Math.max(...currentVehicles.map(v => v.id)) + 1 : 1, 
+        id: Date.now(), // Use a timestamp for a more unique ID
     };
     
     currentUser.vehicles = [...currentVehicles, newVehicle as PartnerVehicle];
