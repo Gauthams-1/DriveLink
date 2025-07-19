@@ -51,7 +51,7 @@ function CarList() {
 
           // Check if ANY reservation for this car overlaps with the search dates
           const isBookedDuringSearch = carReservations.some(reservation => 
-              isOverlapping(reservation.startDate, reservation.endDate, searchFrom, searchTo)
+              isOverlapping(new Date(reservation.startDate), new Date(reservation.endDate), searchFrom, searchTo)
           );
           
           return !isBookedDuringSearch; // The car is available if it's NOT booked during the search period
