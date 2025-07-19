@@ -233,6 +233,7 @@ export const partnerVehicles: PartnerVehicle[] = [
 
 export const findCarById = (id: number) => cars.find(car => car.id === id);
 export const findBusById = (id: number) => buses.find(bus => bus.id === id);
+export const findTruckById = (id: number) => trucks.find(truck => truck.id === id);
 
 export const findReservations = () => {
     return reservations.map(r => ({
