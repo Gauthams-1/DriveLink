@@ -73,7 +73,7 @@ function CarPaymentContent() {
         pickup,
         dropoff,
         carName: car.name,
-        carImage: car.images[0],
+        carImage: car.images && car.images.length > 0 ? car.images[0] : '',
     });
 
     router.push(`/reservations/trip-details?${tripParams.toString()}`);
