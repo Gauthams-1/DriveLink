@@ -4,7 +4,7 @@ import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, 
 export const cars: Car[] = [
   {
     id: 1,
-    name: 'Maruti Suzuki Swift',
+    name: 'Maruti Suzuki Swift Dzire',
     type: 'Sedan',
     pricePerDay: 2500,
     seats: 5,
@@ -12,7 +12,7 @@ export const cars: Car[] = [
     transmission: 'Automatic',
     mpg: 22, // kmpl
     location: 'Mumbai, MH',
-    images: ["https://placehold.co/600x400.png"],
+    images: ["https://images.unsplash.com/photo-1619769873427-6c634a01b757?q=80&w=600&auto=format&fit=crop"],
     description: 'A reliable and fuel-efficient hatchback, perfect for city driving and small families.',
     features: ['Bluetooth', 'Backup Camera', 'Apple CarPlay'],
   },
