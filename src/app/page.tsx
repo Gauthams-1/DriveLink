@@ -72,27 +72,27 @@ const partnerOptions = [
     {
         icon: Car,
         title: "Car Owner",
-        href: "/profile"
+        href: "/partner"
     },
     {
         icon: Bus,
         title: "Bus Owner",
-        href: "/profile"
+        href: "/partner"
     },
     {
         icon: Wrench,
         title: "Mechanic",
-        href: "/profile"
+        href: "/partner"
     },
     {
         icon: UserCircle,
         title: "Driver",
-        href: "/profile"
+        href: "/partner"
     },
     {
         icon: Truck,
         title: "Truck Service",
-        href: "/profile"
+        href: "/partner"
     }
 ]
 
@@ -176,32 +176,39 @@ export default function Home() {
       <section className="py-16 md:py-24 bg-muted">
          <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div className="text-center md:text-left max-w-3xl mx-auto">
+                <div>
+                  <Image 
+                    src="https://images.unsplash.com/photo-1517672651691-24622a91b24d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    alt="Mechanic working on a car"
+                    width={800}
+                    height={600}
+                    className="rounded-lg shadow-xl"
+                    data-ai-hint="mechanic car"
+                  />
+                </div>
+                <div className="text-center md:text-left">
                     <h2 className="text-3xl md:text-4xl font-headline font-bold">Become a DriveLink Partner</h2>
                     <p className="text-lg text-muted-foreground mt-4">Have a vehicle, a garage, or driving skills? Join our network and start earning. We provide the tools and support you need to grow your business.</p>
-                     <Button asChild size="lg" className="mt-6">
-                        <Link href="/profile">Get Started</Link>
-                    </Button>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {partnerOptions.slice(0, 5).map((option) => (
-                        <Card key={option.title} className="text-center p-4 hover:shadow-lg hover:-translate-y-1 transition-transform duration-200 bg-card">
-                            <Link href={option.href} className="flex flex-col items-center justify-center h-full">
-                                <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-3">
-                                    <option.icon className="h-8 w-8 text-primary" />
-                                </div>
-                                <h3 className="font-bold font-headline text-sm">{option.title}</h3>
-                            </Link>
-                        </Card>
-                    ))}
-                    <Card className="text-center p-4 hover:shadow-lg hover:-translate-y-1 transition-transform duration-200 bg-card col-span-2 sm:col-span-1">
-                        <Link href="/profile" className="flex flex-col items-center justify-center h-full">
-                             <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-3">
-                                <Handshake className="h-8 w-8 text-primary" />
-                            </div>
-                            <h3 className="font-bold font-headline text-sm">And more...</h3>
-                        </Link>
-                    </Card>
+                     <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      {partnerOptions.slice(0, 5).map((option) => (
+                          <Card key={option.title} className="text-center p-4 hover:shadow-lg hover:-translate-y-1 transition-transform duration-200 bg-card">
+                              <Link href={option.href} className="flex flex-col items-center justify-center h-full">
+                                  <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-3">
+                                      <option.icon className="h-8 w-8 text-primary" />
+                                  </div>
+                                  <h3 className="font-bold font-headline text-sm">{option.title}</h3>
+                              </Link>
+                          </Card>
+                      ))}
+                      <Card className="text-center p-4 hover:shadow-lg hover:-translate-y-1 transition-transform duration-200 bg-card col-span-2 sm:col-span-1">
+                          <Link href="/partner" className="flex flex-col items-center justify-center h-full">
+                              <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-3">
+                                  <Handshake className="h-8 w-8 text-primary" />
+                              </div>
+                              <h3 className="font-bold font-headline text-sm">And more...</h3>
+                          </Link>
+                      </Card>
+                  </div>
                 </div>
             </div>
          </div>
