@@ -11,7 +11,8 @@ import { Separator } from '@/components/ui/separator';
 import { useMemo } from 'react';
 
 export default function CarDetailPage({ params }: { params: { id: string } }) {
-  const car = useMemo(() => findCarById(Number(params.id)), [params.id]);
+  const { id } = params;
+  const car = useMemo(() => findCarById(Number(id)), [id]);
 
   if (!car) {
     notFound();
