@@ -7,7 +7,7 @@ import { findCarById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Shield, Package } from 'lucide-react';
+import { CheckCircle, Calendar, Shield, Package, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
@@ -30,6 +30,8 @@ function ConfirmationContent() {
   const totalCost = searchParams.get('totalCost');
   const rentalDays = searchParams.get('rentalDays');
   const addons = searchParams.get('addons')?.split(',') || [];
+  const pickup = searchParams.get('pickup');
+  const dropoff = searchParams.get('dropoff');
 
   const car = findCarById(Number(carId)) as ReservationCar | undefined;
 
@@ -86,6 +88,17 @@ function ConfirmationContent() {
                 <span className="flex items-center gap-2 text-muted-foreground"><Calendar className="h-4 w-4"/> Total Days</span>
                 <span className="font-medium">{rentalDays}</span>
             </div>
+            
+            {(pickup || dropoff) && (
+              <div>
+                <Separator className="my-4" />
+                <h3 className="font-semibold mb-2 flex items-center gap-2"><MapPin className="h-4 w-4" />Route Details</h3>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  {pickup && <p><strong>Pickup:</strong> {pickup}</p>}
+                  {dropoff && <p><strong>Drop-off:</strong> {dropoff}</p>}
+                </div>
+              </div>
+            )}
             
             {addons.length > 0 && (
                 <div>

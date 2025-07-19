@@ -64,7 +64,7 @@ export function CostCalculator({ car }: { car: Car }) {
         addons: selectedAddons.join(','),
     });
 
-    return `/reservations/confirm?${params.toString()}`;
+    return `/reservations/details?${params.toString()}`;
   }
   
   return (
