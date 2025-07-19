@@ -5,14 +5,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Menu } from 'lucide-react';
+import { Menu, Car, Bus, Truck, Wrench } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
-  { href: '/', label: 'Search' },
-  { href: '/recommendations', label: 'AI Assistant' },
-  { href: '/reservations', label: 'My Reservations' },
+  { href: '/cars', label: 'Rentals', icon: Car },
+  { href: '/bus-trips', label: 'Bus Trips', icon: Bus },
+  { href: '/trucks', label: 'Trucks', icon: Truck },
+  { href: '/support', label: 'Support', icon: Wrench },
+  { href: '/reservations', label: 'My Bookings' },
 ];
 
 export function Header() {
@@ -25,10 +27,11 @@ export function Header() {
           key={link.href}
           href={link.href}
           className={cn(
-            'text-sm font-medium transition-colors hover:text-primary',
-            pathname === link.href ? 'text-primary' : 'text-muted-foreground'
+            'text-sm font-medium transition-colors hover:text-primary flex items-center gap-2',
+            pathname.startsWith(link.href) ? 'text-primary' : 'text-muted-foreground'
           )}
         >
+          {link.icon && <link.icon className="h-4 w-4" />}
           {link.label}
         </Link>
       ))}
@@ -42,7 +45,7 @@ export function Header() {
             <Logo />
         </Link>
         <div className="ml-auto flex items-center gap-6">
-            <div className="md:flex hidden">
+            <div className="hidden md:flex">
               <NavLinks />
             </div>
             <div className="flex items-center justify-end md:hidden">
