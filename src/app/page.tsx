@@ -156,7 +156,7 @@ export default function Home() {
                   </Button>
                </div>
                <div className="relative h-[400px] rounded-lg overflow-hidden">
-                  <Image src="https://images.unsplash.com/photo-1568605117036-5fe5e7185743?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Partner driving a car" layout="fill" objectFit="cover" data-ai-hint="person driving" />
+                  <Image src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?q=80&w=2025&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Partner with a car" layout="fill" objectFit="cover" data-ai-hint="partner car" />
                </div>
             </div>
          </div>
