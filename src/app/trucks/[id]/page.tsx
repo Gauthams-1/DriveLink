@@ -28,10 +28,7 @@ export default function TruckDetailPage({ params }: { params: { id: string } }) 
 
   const handleBooking = () => {
     if (user && !user.isGuest) {
-      // In a real app, this would go to a truck booking confirmation page.
-      // For now, we can show an alert or redirect to a placeholder.
-      alert('Truck booking flow not implemented yet. Redirecting to profile.');
-      router.push('/profile');
+      router.push(`/trucks/confirm?truckId=${truck.id}`);
     } else {
       router.push('/profile');
     }

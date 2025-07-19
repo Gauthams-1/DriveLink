@@ -91,7 +91,7 @@ export default function SpecializedVehicleDetailPage({ params }: { params: { id:
                  <div className="space-y-2">
                     {vehicle.features.map(feature => (
                     <div key={feature} className="flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        <CheckCircle className="w-5 h-5 text-accent" />
                         <span>{feature}</span>
                     </div>
                     ))}
