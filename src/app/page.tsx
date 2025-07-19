@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Car, Bus, Truck, Wrench, Bike, Ambulance, Users, Package, ShieldCheck, Route, Wallet } from "lucide-react";
+import { Car, Bus, Truck, Wrench, Users, Ambulance, ShieldCheck, Route, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
