@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Car, Bus, Truck, Wrench, Users, Ambulance, ShieldCheck, Route, Wallet } from "lucide-react";
@@ -72,12 +73,12 @@ export default function Home() {
     <div className="flex flex-col">
       <section className="relative w-full h-[70vh] md:h-[80vh]">
         <Image
-          src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?q=80&w=1800&auto=format&fit=crop"
-          alt="A lineup of modern cars ready for rental"
+          src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070&auto=format&fit=crop"
+          alt="A modern sports car on the road"
           layout="fill"
           objectFit="cover"
           className="z-0"
-          data-ai-hint="modern cars"
+          data-ai-hint="sports car"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
         <div className="relative z-20 flex flex-col items-center justify-end h-full text-center text-white px-4 pb-20">
