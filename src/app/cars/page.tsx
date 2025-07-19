@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { CarSearchForm } from "@/components/CarSearchForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams } from "next/navigation";
-import { isWithinInterval, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 
 function CarList() {
   const searchParams = useSearchParams();
@@ -38,6 +38,8 @@ function CarList() {
       const allReservations = findCarReservations();
       
       const isOverlapping = (start1: Date, end1: Date, start2: Date, end2: Date) => {
+        // This condition checks if one range starts before the other one ends, and vice-versa.
+        // It correctly handles all overlapping cases.
         return start1 < end2 && start2 < end1;
       }
       
@@ -47,11 +49,12 @@ function CarList() {
               return true; // No reservations, so it's available
           }
 
-          const isBooked = carReservations.some(reservation => 
+          // Check if ANY reservation for this car overlaps with the search dates
+          const isBookedDuringSearch = carReservations.some(reservation => 
               isOverlapping(searchFrom, searchTo, reservation.startDate, reservation.endDate)
           );
           
-          return !isBooked;
+          return !isBookedDuringSearch; // The car is available if it's NOT booked during the search period
       });
     }
 
