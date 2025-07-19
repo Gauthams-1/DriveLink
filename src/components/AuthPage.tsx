@@ -23,7 +23,8 @@ export function AuthPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   };
 
   const handleSignUp = () => {
-    alert('Sign up functionality not implemented.');
+    // For this demo, we'll simulate a successful sign-up by logging the user in.
+    onLoginSuccess();
   };
 
   return (
@@ -50,7 +51,7 @@ export function AuthPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
                         </div>
                         <div className="space-y-2 text-left">
                         <Label htmlFor="password-signin">Password</Label>
-                        <Input id="password-signin" type="password" placeholder="********" />
+                        <Input id="password-signin" type="password" />
                         </div>
                     </CardContent>
                     <CardFooter>
