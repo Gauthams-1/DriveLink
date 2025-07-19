@@ -21,18 +21,18 @@ function CarPaymentContent() {
   const { toast } = useToast();
   
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [pickup, setPickup] = useState('');
+  const [dropoff, setDropoff] = useState('');
 
   const carId = searchParams.get('carId');
   const startDate = searchParams.get('startDate');
   const endDate = searchParams.get('endDate');
   const totalCost = searchParams.get('totalCost');
   const rentalDays = searchParams.get('rentalDays');
-  const pickup = searchParams.get('pickup');
-  const dropoff = searchParams.get('dropoff');
 
   const car = findCarById(Number(carId));
 
-  if (!car || !startDate || !endDate || !totalCost || !rentalDays || !pickup || !dropoff) {
+  if (!car || !startDate || !endDate || !totalCost || !rentalDays) {
     return (
       <Card>
         <CardHeader>
@@ -48,9 +48,16 @@ function CarPaymentContent() {
   
   const handleConfirm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!pickup || !dropoff) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both pickup and drop-off locations.",
+        variant: "destructive",
+      });
+      return;
+    }
     
-    // In a real app, you would process payment and save the reservation.
-    // For this demo, we'll store it in localStorage.
     const newReservation = {
         id: Date.now(),
         carId: car.id,
@@ -93,34 +100,43 @@ function CarPaymentContent() {
                             <p className="text-muted-foreground">{car.type}</p>
                         </div>
                     </div>
+                     <Separator className="my-4" />
+                     <div className="space-y-2 text-sm">
+                        <div className="flex items-center justify-between">
+                            <span className="flex items-center gap-2 text-muted-foreground"><Calendar className="h-4 w-4"/> Travel Dates</span>
+                            <span className="font-medium text-right">
+                                {format(new Date(startDate), 'MMM d')} - {format(new Date(endDate), 'MMM d, yyyy')} ({rentalDays} days)
+                            </span>
+                        </div>
+                        <div className="flex items-center justify-between text-lg font-bold">
+                            <span>Total Cost</span>
+                            <span>₹{parseFloat(totalCost).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                    </div>
                 </CardContent>
            </Card>
            
            <Card>
             <CardHeader>
                 <CardTitle>Trip Details</CardTitle>
+                <CardDescription>Where should we pick up and drop off the car?</CardDescription>
             </CardHeader>
-             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-muted-foreground"><Calendar className="h-4 w-4"/> Travel Dates</span>
-                  <span className="font-medium text-right">
-                    {format(new Date(startDate), 'MMM d')} - {format(new Date(endDate), 'MMM d, yyyy')} ({rentalDays} days)
-                  </span>
-              </div>
-              <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-muted-foreground"><MapPin className="h-4 w-4"/> Pickup</span>
-                  <span className="font-medium text-right">{pickup}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-muted-foreground"><MapPin className="h-4 w-4"/> Drop-off</span>
-                  <span className="font-medium text-right">{dropoff}</span>
-              </div>
-              <Separator />
-               <div className="flex items-center justify-between text-xl font-bold">
-                  <span>Total Cost</span>
-                  <span>₹{parseFloat(totalCost).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </div>
-             </CardContent>
+            <CardContent className="space-y-4">
+                 <div className="space-y-2">
+                    <Label htmlFor="pickup">Pickup Location</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input id="pickup" name="pickup" placeholder="e.g., Chhatrapati Shivaji Maharaj Int'l Airport" required className="pl-10" value={pickup} onChange={(e) => setPickup(e.target.value)} />
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="dropoff">Drop-off Location</Label>
+                     <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input id="dropoff" name="dropoff" placeholder="e.g., The Taj Mahal Palace, Mumbai" required className="pl-10" value={dropoff} onChange={(e) => setDropoff(e.target.value)} />
+                    </div>
+                </div>
+            </CardContent>
            </Card>
         </div>
         <Card>

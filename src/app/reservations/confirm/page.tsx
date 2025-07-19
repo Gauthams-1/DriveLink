@@ -28,9 +28,6 @@ function ConfirmationContent() {
   const rentalDays = searchParams.get('rentalDays');
   const addons = searchParams.get('addons')?.split(',') || [];
   
-  const [pickup, setPickup] = useState('');
-  const [dropoff, setDropoff] = useState('');
-
   const car = findCarById(Number(carId));
   
   useEffect(() => {
@@ -56,22 +53,8 @@ function ConfirmationContent() {
   }
 
   const getPaymentUrl = () => {
-    if (!pickup || !dropoff) return '#';
     const params = new URLSearchParams(searchParams.toString());
-    params.set('pickup', pickup);
-    params.set('dropoff', dropoff);
     return `/reservations/payment?${params.toString()}`;
-  }
-  
-  const handleProceedToPayment = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!pickup || !dropoff) {
-      e.preventDefault();
-      toast({
-        title: "Missing Information",
-        description: "Please enter both pickup and drop-off locations.",
-        variant: "destructive",
-      });
-    }
   }
 
   const addonDetails = [
@@ -83,7 +66,7 @@ function ConfirmationContent() {
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <div>
-        <Card className="mb-6">
+        <Card>
           <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CarIcon className="w-6 h-6" />
@@ -92,33 +75,11 @@ function ConfirmationContent() {
               <CardDescription>{car.type}</CardDescription>
           </CardHeader>
         </Card>
-        <Card>
-            <CardHeader>
-                <CardTitle>Route Details</CardTitle>
-                <CardDescription>Where should we pick up and drop off the car?</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="space-y-2">
-                    <Label htmlFor="pickup">Pickup Location</Label>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input id="pickup" name="pickup" placeholder="e.g., Chhatrapati Shivaji Maharaj Int'l Airport" required className="pl-10" value={pickup} onChange={(e) => setPickup(e.target.value)} />
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="dropoff">Drop-off Location</Label>
-                     <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input id="dropoff" name="dropoff" placeholder="e.g., The Taj Mahal Palace, Mumbai" required className="pl-10" value={dropoff} onChange={(e) => setDropoff(e.target.value)} />
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
       </div>
       <Card>
         <CardHeader>
           <CardTitle>Confirm Your Booking</CardTitle>
-          <CardDescription>Please review the details below before confirming.</CardDescription>
+          <CardDescription>Please review the details below before proceeding.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
@@ -151,7 +112,7 @@ function ConfirmationContent() {
         </CardContent>
         <CardFooter>
           <Button className="w-full" size="lg" asChild>
-            <Link href={getPaymentUrl()} onClick={handleProceedToPayment}>
+            <Link href={getPaymentUrl()}>
               <CheckCircle className="mr-2 h-5 w-5" />
               Proceed to Payment
             </Link>
