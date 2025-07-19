@@ -60,7 +60,7 @@ export default function ReservationsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Car</TableHead>
+              <TableHead>Vehicle</TableHead>
               <TableHead>Rental Period</TableHead>
               <TableHead className="text-right">Total Cost</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -70,15 +70,15 @@ export default function ReservationsPage() {
             {reservations.map((reservation) => (
               <TableRow key={reservation.id}>
                 <TableCell>
-                  <div className="flex items-center gap-4">
+                  <Link href={`/cars/${reservation.car.id}`} className="flex items-center gap-4 group">
                     <div className="relative w-24 h-16 rounded-md overflow-hidden">
                       <Image src={reservation.car.images[0]} alt={reservation.car.name} layout="fill" objectFit="cover" data-ai-hint="car" />
                     </div>
                     <div>
-                      <div className="font-medium">{reservation.car.name}</div>
+                      <div className="font-medium group-hover:underline">{reservation.car.name}</div>
                       <div className="text-sm text-muted-foreground">{reservation.car.type}</div>
                     </div>
-                  </div>
+                  </Link>
                 </TableCell>
                 <TableCell>
                   {format(reservation.startDate, 'MMM d, yyyy')} - {format(reservation.endDate, 'MMM d, yyyy')}
@@ -86,9 +86,11 @@ export default function ReservationsPage() {
                 <TableCell className="text-right">₹{reservation.totalCost.toFixed(2)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-4 w-4" />
-                      <span className="sr-only">Modify</span>
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href={`/cars/${reservation.car.id}`}>
+                        <Pencil className="h-4 w-4" />
+                        <span className="sr-only">Modify</span>
+                      </Link>
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
