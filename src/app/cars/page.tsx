@@ -37,9 +37,9 @@ function CarList() {
       const searchTo = parseISO(dropoffDateStr);
       const allReservations = findCarReservations();
       
+      // A car is unavailable if a reservation's start is before the search's end,
+      // AND the reservation's end is after the search's start.
       const isOverlapping = (reservationStart: Date, reservationEnd: Date, searchStart: Date, searchEnd: Date) => {
-        // Correct logic: A reservation conflicts if it starts before the search ends,
-        // AND it ends after the search starts.
         return reservationStart < searchEnd && reservationEnd > searchStart;
       }
       
