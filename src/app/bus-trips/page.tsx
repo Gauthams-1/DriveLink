@@ -30,15 +30,15 @@ export default function BusTripsPage() {
 
       <Card className="mb-12 shadow-lg">
         <CardContent className="p-4 md:p-6">
-           <form className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-4 items-end">
-              <div className="lg:col-span-4 space-y-2">
+           <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
+              <div className="md:col-span-2 lg:col-span-4 space-y-2">
                 <Label htmlFor="destination">Destination</Label>
                  <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input id="destination" placeholder="e.g., Goa" className="pl-10" />
                  </div>
               </div>
-              <div className="lg:col-span-4 space-y-2">
+              <div className="md:col-span-2 lg:col-span-4 space-y-2">
                 <Label>Travel Dates</Label>
                 <DatePickerWithRange />
               </div>
