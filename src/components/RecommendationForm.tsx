@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useActionState, useFormStatus } from 'react';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { getCarRecommendation } from '@/app/actions';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -37,7 +38,7 @@ export function RecommendationForm() {
     if (state.message && state.message !== 'success') {
       toast({
         title: 'Error',
-        description: state.message,
+        description: JSON.stringify(state.message),
         variant: 'destructive',
       });
     }
