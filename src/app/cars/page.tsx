@@ -1,3 +1,4 @@
+
 import { CarCard } from "@/components/CarCard";
 import { cars } from "@/lib/data";
 import { Car } from "@/lib/types";
