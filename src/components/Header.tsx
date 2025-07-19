@@ -41,24 +41,26 @@ export function Header() {
         <Link href="/">
             <Logo />
         </Link>
-        <div className="md:flex items-center gap-6 ml-auto hidden">
-            <NavLinks />
-        </div>
-        <div className="flex flex-1 items-center justify-end md:hidden">
-             <Sheet>
-                <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                    <Menu className="h-6 w-6" />
-                    <span className="sr-only">Toggle navigation menu</span>
-                </Button>
-                </SheetTrigger>
-                <SheetContent side="left">
-                <div className="flex flex-col gap-4 p-4">
-                    <Logo />
-                    <NavLinks className="flex-col space-x-0 space-y-2 items-start" />
-                </div>
-                </SheetContent>
-            </Sheet>
+        <div className="ml-auto flex items-center gap-6">
+            <div className="md:flex hidden">
+              <NavLinks />
+            </div>
+            <div className="flex items-center justify-end md:hidden">
+                <Sheet>
+                    <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <Menu className="h-6 w-6" />
+                        <span className="sr-only">Toggle navigation menu</span>
+                    </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left">
+                    <div className="flex flex-col gap-4 p-4">
+                        <Logo />
+                        <NavLinks className="flex-col space-x-0 space-y-2 items-start" />
+                    </div>
+                    </SheetContent>
+                </Sheet>
+            </div>
         </div>
       </div>
     </header>
