@@ -4,23 +4,25 @@
 import { CarCard } from "@/components/CarCard";
 import { getAllAvailableCars } from "@/lib/data";
 import type { Car } from "@/lib/types";
-import { Suspense, useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { CarSearchForm } from "@/components/CarSearchForm";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSearchParams } from "next/navigation";
 
 type SearchParams = {
   location?: string;
   type?: 'Sedan' | 'SUV' | 'Minivan' | 'Convertible' | 'Coupe' | 'Bike' | 'Scooter';
 };
 
-function CarList({ location, type }: { location?: string; type?: string }) {
+function CarList() {
+  const searchParams = useSearchParams();
+  const location = searchParams.get('location');
+  const type = searchParams.get('type');
+  
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Data fetching must happen on the client
     const allCars = getAllAvailableCars();
     let filteredCars: Car[] = allCars;
 
@@ -69,9 +71,10 @@ function CarList({ location, type }: { location?: string; type?: string }) {
   );
 }
 
-export default function CarsPage({ searchParams }: { searchParams: SearchParams }) {
-  const location = searchParams.location;
-  const type = searchParams.type;
+export default function CarsPage() {
+  const searchParams = useSearchParams();
+  const location = searchParams.get('location');
+  const type = searchParams.get('type');
 
   const displayLocation = type ? `${type}s` : 'All Vehicles';
   
@@ -94,9 +97,7 @@ export default function CarsPage({ searchParams }: { searchParams: SearchParams 
                 Showing results for {displayLocation} {location ? `in ${location}` : ''}
                 </p>
             </div>
-          <Suspense fallback={<div>Loading cars...</div>}>
-            <CarList location={location} type={type} />
-          </Suspense>
+          <CarList />
         </div>
       </div>
     </div>
