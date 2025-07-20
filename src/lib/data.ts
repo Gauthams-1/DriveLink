@@ -355,16 +355,15 @@ export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id'>, cat
     
     if (!db) {
         console.warn("Firestore not initialized. Vehicle not added to DB. This is a local-only operation.");
-        return {
-            ...vehicleData,
-            id: `temp-${Date.now()}`,
-            ownerId: ownerId,
-            status: 'Available',
-            category,
-        } as AnyVehicle;
+        return null;
     };
     
-    const finalVehicleData = { ...vehicleData, ownerId, status: 'Available', category };
+    const finalVehicleData: Omit<AnyVehicle, 'id'> = {
+        ...vehicleData,
+        ownerId,
+        status: 'Available',
+        category, // This is the provided category, e.g., 'Car', 'Bus', 'Truck', 'Bike', 'Scooter'
+    };
 
     // Remove temporary ID if it exists (e.g., from AI generation)
     if ('id' in finalVehicleData) {
@@ -373,8 +372,13 @@ export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id'>, cat
 
     const docRef = await addDoc(collection(db, 'vehicles'), finalVehicleData);
     
-    const newVehicle = await findVehicleById(docRef.id);
-    return newVehicle || null;
+    // Fetch the newly created document to return it with its generated ID
+    const newDocSnap = await getDoc(docRef);
+    if (newDocSnap.exists()) {
+        return { ...newDocSnap.data(), id: newDocSnap.id } as AnyVehicle;
+    }
+    
+    return null;
 };
 
 export async function getVehiclesForPartner(ownerId: string): Promise<AnyVehicle[]> {
