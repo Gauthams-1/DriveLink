@@ -4,12 +4,48 @@
 import { notFound } from 'next/navigation';
 import { findVehicleById } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, CheckCircle, Gauge, GitBranch, MapPin, Users, PersonStanding, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Briefcase, CheckCircle, Gauge, GitBranch, MapPin, Users, PersonStanding, Loader2, DollarSign, Route } from 'lucide-react';
 import { CostCalculator } from '@/components/CostCalculator';
 import { Separator } from '@/components/ui/separator';
 import { useEffect, useState } from 'react';
 import type { Car } from '@/lib/types';
+
+function PricingDetailsCard({ car }: { car: Car }) {
+    if (!car.pricing) return null;
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Pricing Details</CardTitle>
+                <CardDescription>This vehicle's rental rates.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {car.pricing.method === 'perDay' ? (
+                    <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground flex items-center gap-2"><DollarSign className="w-4 h-4" /> Rate</span>
+                        <span className="font-medium">₹{car.pricing.perDayRate?.toLocaleString()}/day</span>
+                    </div>
+                ) : (
+                     <div className='space-y-2'>
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground flex items-center gap-2"><DollarSign className="w-4 h-4" /> Fixed Rate</span>
+                            <span className="font-medium">₹{car.pricing.fixedKmPackage?.rate.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-muted-foreground flex items-center gap-2 pl-6">Included Kilometers</span>
+                            <span className="font-medium">{car.pricing.fixedKmPackage?.km} km</span>
+                        </div>
+                         <div className="flex justify-between items-center text-sm">
+                            <span className="text-muted-foreground flex items-center gap-2 pl-6">Extra</span>
+                            <span className="font-medium">₹{car.pricing.perKmCharge}/km</span>
+                        </div>
+                     </div>
+                )}
+            </CardContent>
+        </Card>
+    )
+}
 
 export default function CarDetailPage({ params: { id } }: { params: { id: string } }) {
   const [car, setCar] = useState<Car | null>(null);
@@ -98,6 +134,8 @@ export default function CarDetailPage({ params: { id } }: { params: { id: string
                 </div>
               </CardContent>
             </Card>
+
+            <PricingDetailsCard car={car} />
 
             <CostCalculator vehicle={car} />
           </div>

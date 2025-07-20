@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { addPartnerVehicle, updatePartnerVehicle, getVehiclesForPartner } from '@/lib/data';
-import type { AnyVehicle, User, Car, Bus, Truck, SpecializedVehicle, VehicleCategory } from '@/lib/types';
+import type { AnyVehicle, User, Car, Bus, Truck, SpecializedVehicle, VehicleCategory, Pricing } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,11 +43,16 @@ const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck' | 'Special
             };
         case 'Car':
         default:
-            return { // Car/Bike/Scooter
-                name: '', type: 'Sedan', pricePerDay: 2500, pricePerKm: 12, seats: 4,
+             const defaultCar: Partial<Car> = {
+                name: '', type: 'Sedan', pricePerDay: 2500, seats: 4,
                 luggage: 2, transmission: 'Automatic', mpg: 20, description: '',
                 features: [], status: 'Available', category: 'Car',
+                pricing: {
+                    method: 'perDay',
+                    perDayRate: 2500,
+                }
             };
+            return defaultCar;
     }
 };
 
@@ -83,6 +88,44 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
         setFormData(prev => ({ ...prev, [name]: isNumber ? Number(value) : value }));
     };
 
+    const handlePricingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const carData = formData as Partial<Car>;
+        const currentPricing = carData.pricing || { method: 'perDay' };
+
+        let updatedPricing: Pricing;
+
+        if (name === 'perDayRate') {
+            updatedPricing = { ...currentPricing, perDayRate: Number(value) };
+        } else if (name === 'fixedKm') {
+            updatedPricing = { ...currentPricing, fixedKmPackage: { ...currentPricing.fixedKmPackage, km: Number(value) } as any };
+        } else if (name === 'fixedRate') {
+            updatedPricing = { ...currentPricing, fixedKmPackage: { ...currentPricing.fixedKmPackage, rate: Number(value) } as any };
+        } else if (name === 'perKmCharge') {
+             updatedPricing = { ...currentPricing, perKmCharge: Number(value) };
+        } else {
+            updatedPricing = currentPricing;
+        }
+        
+        // Also update the base pricePerDay for consistency
+        const basePrice = updatedPricing.method === 'perDay' ? updatedPricing.perDayRate : updatedPricing.fixedKmPackage?.rate;
+
+        setFormData(prev => ({ ...prev, pricing: updatedPricing, pricePerDay: basePrice }));
+    };
+
+     const handlePricingMethodChange = (value: 'perDay' | 'fixedKm') => {
+        const carData = formData as Partial<Car>;
+        const currentPricing = carData.pricing || {};
+        const updatedPricing: Pricing = { 
+            ...currentPricing, 
+            method: value,
+            perDayRate: currentPricing.perDayRate || 0,
+            fixedKmPackage: currentPricing.fixedKmPackage || { km: 100, rate: 2000 },
+            perKmCharge: currentPricing.perKmCharge || 10,
+        };
+        setFormData(prev => ({ ...prev, pricing: updatedPricing }));
+    };
+
     const handleDriverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -107,14 +150,22 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.name || !formData.pricePerDay) {
+        
+        let finalData = { ...formData };
+        if (finalData.pricing?.method === 'perDay') {
+            finalData.pricePerDay = finalData.pricing.perDayRate || 0;
+        } else if (finalData.pricing?.method === 'fixedKm') {
+            finalData.pricePerDay = finalData.pricing.fixedKmPackage?.rate || 0;
+        }
+
+        if (!finalData.name || !finalData.pricePerDay) {
             alert('Please fill in all required fields.');
             return;
         }
 
         let finalCategory: VehicleCategory = vehicleCategory;
-        if (vehicleCategory === 'Car' && (formData as Car).type) {
-            const carType = (formData as Car).type;
+        if (vehicleCategory === 'Car' && (finalData as Car).type) {
+            const carType = (finalData as Car).type;
             if (carType === 'Bike' || carType === 'Scooter') {
                 finalCategory = carType;
             } else {
@@ -122,9 +173,11 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
             }
         }
         
-        const finalData = { ...formData, category: finalCategory };
+        finalData = { ...finalData, category: finalCategory };
         onSave(finalData as AnyVehicle, finalCategory);
     };
+
+    const currentPricing = (formData as Car).pricing;
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto p-2">
@@ -188,14 +241,39 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                             </Select>
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="pricePerDay">Price Per Day (₹)</Label>
-                            <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay || ''} onChange={handleChange} required />
-                        </div>
-                         <div className="space-y-1">
-                            <Label htmlFor="pricePerKm">Price Per Kilometer (₹)</Label>
-                            <Input id="pricePerKm" name="pricePerKm" type="number" value={(formData as Car).pricePerKm || ''} onChange={handleChange} />
+                             <Label>Pricing Method</Label>
+                            <Select name="pricingMethod" value={currentPricing?.method || 'perDay'} onValueChange={(val) => handlePricingMethodChange(val as 'perDay' | 'fixedKm')}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="perDay">Per Day</SelectItem>
+                                    <SelectItem value="fixedKm">Fixed Km Package</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
+                     
+                    {currentPricing?.method === 'perDay' ? (
+                        <div className="space-y-1">
+                            <Label htmlFor="perDayRate">Price Per Day (₹)</Label>
+                            <Input id="perDayRate" name="perDayRate" type="number" value={currentPricing.perDayRate || ''} onChange={handlePricingChange} required />
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-4 border p-4 rounded-md">
+                            <div className="space-y-1">
+                                <Label htmlFor="fixedKm">Fixed Km</Label>
+                                <Input id="fixedKm" name="fixedKm" type="number" value={currentPricing.fixedKmPackage?.km || ''} onChange={handlePricingChange} placeholder="e.g. 150"/>
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="fixedRate">Package Rate (₹)</Label>
+                                <Input id="fixedRate" name="fixedRate" type="number" value={currentPricing.fixedKmPackage?.rate || ''} onChange={handlePricingChange} placeholder="e.g. 3000"/>
+                            </div>
+                             <div className="space-y-1">
+                                <Label htmlFor="perKmCharge">Extra per Km (₹)</Label>
+                                <Input id="perKmCharge" name="perKmCharge" type="number" value={currentPricing.perKmCharge || ''} onChange={handlePricingChange} placeholder="e.g. 12"/>
+                            </div>
+                        </div>
+                    )}
+
                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="seats">Seats</Label>
@@ -409,6 +487,35 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: AnyVehicle, onEdit: (v: Any
     if (isSpecialized) return (vehicle as SpecializedVehicle).type;
     return (vehicle as Car).type;
   }
+  
+  const renderPricing = () => {
+    if (!isCar) {
+        return (
+            <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-muted-foreground" />
+                <span className="font-bold text-lg">₹{vehicle.pricePerDay}</span>
+                <span className="text-muted-foreground">/day</span>
+            </div>
+        );
+    }
+    const car = vehicle as Car;
+    if (car.pricing.method === 'fixedKm' && car.pricing.fixedKmPackage) {
+        return (
+             <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-muted-foreground" />
+                <span className="font-bold text-lg">₹{car.pricing.fixedKmPackage.rate}</span>
+                <span className="text-muted-foreground">for {car.pricing.fixedKmPackage.km}km</span>
+            </div>
+        )
+    }
+    return (
+        <div className="flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-muted-foreground" />
+            <span className="font-bold text-lg">₹{car.pricing.perDayRate}</span>
+            <span className="text-muted-foreground">/day</span>
+        </div>
+    );
+  }
 
   return (
     <Card className="flex flex-col">
@@ -423,16 +530,12 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: AnyVehicle, onEdit: (v: Any
         </CardHeader>
         <CardContent className="space-y-4 flex-grow">
             <div className="flex items-center justify-between text-sm p-3 bg-muted rounded-md">
-                <div className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-muted-foreground" />
-                    <span className="font-bold text-lg">₹{vehicle.pricePerDay}</span>
-                    <span className="text-muted-foreground">/day</span>
-                </div>
-                {isCar && (vehicle as Car).pricePerKm && (
+                {renderPricing()}
+                {isCar && (vehicle as Car).pricing.method === 'fixedKm' && (
                 <div className="flex items-center gap-2">
                     <Route className="w-4 h-4 text-muted-foreground" />
-                    <span className="font-bold text-lg">₹{(vehicle as Car).pricePerKm}</span>
-                    <span className="text-muted-foreground">/km</span>
+                    <span className="font-bold text-lg">₹{(vehicle as Car).pricing.perKmCharge}</span>
+                    <span className="text-muted-foreground">/extra km</span>
                 </div>
                 )}
             </div>

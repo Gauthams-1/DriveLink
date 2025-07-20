@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Car as CarType } from '@/lib/types';
-import { Users, Briefcase, Gauge, GitBranch, Zap, Fuel, PersonStanding, Car as CarIcon } from 'lucide-react';
+import { Users, Briefcase, Gauge, GitBranch, Zap, Fuel, PersonStanding, Car as CarIcon, Route } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface CarCardProps {
@@ -12,6 +12,23 @@ interface CarCardProps {
 
 export function CarCard({ car }: CarCardProps) {
   const isTwoWheeler = car.type === 'Bike' || car.type === 'Scooter';
+
+  const renderPricing = () => {
+    if (car.pricing?.method === 'fixedKm' && car.pricing.fixedKmPackage) {
+        return (
+            <div>
+                <span className="text-2xl font-bold">₹{car.pricing.fixedKmPackage.rate.toLocaleString()}</span>
+                <span className="text-sm text-muted-foreground"> / {car.pricing.fixedKmPackage.km}km</span>
+            </div>
+        )
+    }
+    return (
+        <div>
+            <span className="text-2xl font-bold">₹{(car.pricing?.perDayRate || car.pricePerDay).toLocaleString()}</span>
+            <span className="text-sm text-muted-foreground">/day</span>
+        </div>
+    );
+  }
 
   return (
     <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
@@ -45,15 +62,18 @@ export function CarCard({ car }: CarCardProps) {
                   <div className="flex items-center gap-2"><Gauge className="w-4 h-4 text-primary" /> {car.mpg} KMPL</div>
                 )}
             </div>
+             {car.pricing?.method === 'fixedKm' && car.pricing.perKmCharge && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                    <Route className="w-4 h-4 text-primary" />
+                    <span>₹{car.pricing.perKmCharge}/km extra</span>
+                </div>
+             )}
             </CardContent>
             <CardFooter className="p-4 flex justify-between items-center bg-muted/50 mt-auto">
-            <div>
-                <span className="text-2xl font-bold">₹{car.pricePerDay}</span>
-                <span className="text-sm text-muted-foreground">/day</span>
-            </div>
-            <Button variant="outline" asChild>
-                <span>View Details</span>
-            </Button>
+                {renderPricing()}
+                <Button variant="outline" asChild>
+                    <span>View Details</span>
+                </Button>
             </CardFooter>
         </Link>
     </Card>

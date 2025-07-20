@@ -1,14 +1,21 @@
 
-
-
-
 export type VehicleCategory = 'Car' | 'Bike' | 'Scooter' | 'Bus' | 'Truck' | 'Specialized';
+
+export type Pricing = {
+  method: 'perDay' | 'fixedKm';
+  perDayRate?: number;
+  fixedKmPackage?: {
+    km: number;
+    rate: number;
+  };
+  perKmCharge?: number; // For extra kms
+};
 
 export type BaseVehicle = {
   id: string; // Firestore document ID
   name: string;
   category: VehicleCategory;
-  pricePerDay: number;
+  pricePerDay: number; // Base price, used for Bus/Truck/Specialized and as a fallback
   images: string[];
   description: string;
   status: 'Available' | 'Rented' | 'Maintenance';
@@ -24,13 +31,13 @@ export type BaseVehicle = {
 export type Car = BaseVehicle & {
   category: 'Car' | 'Bike' | 'Scooter';
   type: 'Sedan' | 'SUV' | 'Minivan' | 'Convertible' | 'Coupe' | 'Bike' | 'Scooter';
-  pricePerKm?: number;
   seats: number;
   luggage: number; // in bags
   transmission: 'Automatic' | 'Manual';
   mpg: number; // kmpl or km/charge
   location?: string;
   features: string[];
+  pricing: Pricing;
 };
 
 export type Bus = BaseVehicle & {
