@@ -47,7 +47,8 @@ function PricingDetailsCard({ car }: { car: Car }) {
     )
 }
 
-export default function CarDetailPage({ params: { id } }: { params: { id: string } }) {
+export default function CarDetailPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const [car, setCar] = useState<Car | null>(null);
   const [loading, setLoading] = useState(true);
 
