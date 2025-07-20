@@ -2,16 +2,34 @@
 'use client';
 
 import { notFound } from 'next/navigation';
-import { findCarById } from '@/lib/data';
+import { findVehicleById } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, CheckCircle, Gauge, GitBranch, MapPin, Users, PersonStanding } from 'lucide-react';
+import { Briefcase, CheckCircle, Gauge, GitBranch, MapPin, Users, PersonStanding, Loader2 } from 'lucide-react';
 import { CostCalculator } from '@/components/CostCalculator';
 import { Separator } from '@/components/ui/separator';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
+import type { Car } from '@/lib/types';
 
 export default function CarDetailPage({ params }: { params: { id: string } }) {
-  const car = useMemo(() => findCarById(Number(params.id)), [params.id]);
+  const [car, setCar] = useState<Car | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (params.id) {
+      findVehicleById(params.id)
+        .then(vehicle => {
+          if (vehicle && (vehicle.category === 'Car' || vehicle.category === 'Bike' || vehicle.category === 'Scooter')) {
+            setCar(vehicle as Car);
+          }
+          setLoading(false);
+        });
+    }
+  }, [params.id]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin"/></div>;
+  }
 
   if (!car) {
     notFound();
@@ -20,7 +38,7 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
   const isTwoWheeler = car.type === 'Bike' || car.type === 'Scooter';
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 animate-fade-in">
       <div className="grid lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
           <h1 className="text-4xl font-bold font-headline mb-2">{car.name}</h1>
@@ -81,7 +99,7 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
               </CardContent>
             </Card>
 
-            <CostCalculator car={car} />
+            <CostCalculator vehicle={car} />
           </div>
         </div>
       </div>

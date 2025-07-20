@@ -1,7 +1,7 @@
 
 'use client';
 
-import { getCurrentUser, findCarReservations, saveUser } from "@/lib/data";
+import { getCurrentUser, getReservationsForUser, saveUser } from "@/lib/data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "./ui/button";
@@ -14,7 +14,7 @@ import { Label } from "./ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { generateAvatarAction } from "@/app/actions";
 import { Loader2, Sparkles, UserCheck, UserX, ShieldCheck, Mail, Phone, MapPin, Edit, X, Upload, Car } from "lucide-react";
-import type { User, CarReservationWithDetails } from "@/lib/types";
+import type { User, ReservationWithVehicle } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { Textarea } from "./ui/textarea";
 
@@ -35,22 +35,25 @@ function GenerateAvatarButton() {
 
 
 export function CustomerProfile() {
-  const [reservations, setReservations] = useState<CarReservationWithDetails[]>([]);
+  const [reservations, setReservations] = useState<ReservationWithVehicle[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const [avatarGenState, avatarFormAction] = useActionState(generateAvatarAction, initialAvatarState);
   
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<Partial<User>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const user = getCurrentUser();
-    setCurrentUser(user);
-    setFormData(user);
-    
-    if (typeof window !== 'undefined') {
-        const carReservations = findCarReservations();
-        setReservations(carReservations);
+    if (user && !user.isGuest) {
+      setCurrentUser(user);
+      setFormData(user);
+      getReservationsForUser(user.email)
+        .then(setReservations)
+        .finally(() => setLoading(false));
+    } else {
+        setLoading(false);
     }
   }, []);
 
@@ -69,7 +72,7 @@ export function CustomerProfile() {
     setFormData(prev => ({...prev, [name]: value}));
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!currentUser) return;
     
     const updatedUser: User = {
@@ -84,7 +87,7 @@ export function CustomerProfile() {
         avatarUrl: formData.avatarUrl || currentUser.avatarUrl,
     };
     
-    saveUser(updatedUser);
+    await saveUser(updatedUser);
     setCurrentUser(updatedUser);
     setIsEditing(false);
     toast({
@@ -100,8 +103,8 @@ export function CustomerProfile() {
     setIsEditing(false);
   }
 
-  if (!currentUser) {
-    return (
+  if (loading) {
+     return (
         <Card>
             <CardHeader>
                 <CardTitle>Loading Profile...</CardTitle>
@@ -111,6 +114,10 @@ export function CustomerProfile() {
             </CardContent>
         </Card>
     )
+  }
+
+  if (!currentUser) {
+    return null; // or redirect, handled by profile page
   }
 
   return (
@@ -188,7 +195,7 @@ export function CustomerProfile() {
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <div className="space-y-1">
                                     <Label htmlFor="email">Email</Label>
-                                    <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
+                                    <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} disabled/>
                                 </div>
                                 <div className="space-y-1">
                                     <Label htmlFor="phone">Phone</Label>
@@ -272,8 +279,8 @@ export function CustomerProfile() {
                                     <Car className="w-6 h-6 text-muted-foreground" />
                                 </div>
                                 <div>
-                                <div className="font-medium">{reservation.car.name}</div>
-                                <div className="text-sm text-muted-foreground">{reservation.car.type}</div>
+                                <div className="font-medium">{reservation.vehicleName}</div>
+                                <div className="text-sm text-muted-foreground">{(reservation.vehicle as Car).type}</div>
                                 </div>
                             </div>
                             </TableCell>

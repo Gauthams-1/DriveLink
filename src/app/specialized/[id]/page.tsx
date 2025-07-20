@@ -2,23 +2,37 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
-import { findSpecializedVehicleById, getCurrentUser } from '@/lib/data';
+import { findVehicleById, getCurrentUser } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Users, Star, Accessibility } from 'lucide-react';
+import { CheckCircle, Users, Star, Accessibility, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useEffect, useMemo, useState } from 'react';
-import type { User } from '@/lib/types';
+import { useEffect, useState } from 'react';
+import type { User, SpecializedVehicle } from '@/lib/types';
 
 
 export default function SpecializedVehicleDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const vehicle = useMemo(() => findSpecializedVehicleById(Number(params.id)), [params.id]);
+  const [vehicle, setVehicle] = useState<SpecializedVehicle | null>(null);
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     setUser(getCurrentUser());
-  }, []);
+    if (params.id) {
+        findVehicleById(params.id)
+            .then(v => {
+                if (v && v.category === 'Specialized') {
+                    setVehicle(v as SpecializedVehicle);
+                }
+                setLoading(false);
+            })
+    }
+  }, [params.id]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin"/></div>;
+  }
 
   if (!vehicle) {
     notFound();
@@ -33,7 +47,7 @@ export default function SpecializedVehicleDetailPage({ params }: { params: { id:
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 animate-fade-in">
       <div className="grid lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
            <div className="bg-muted rounded-lg p-8 flex items-center justify-center mb-8">

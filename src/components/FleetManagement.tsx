@@ -1,10 +1,9 @@
 
-
 'use client';
 
-import { useState } from 'react';
-import { addPartnerVehicle, updatePartnerVehicle } from '@/lib/data';
-import type { PartnerVehicle, User, Car, Bus, Truck } from '@/lib/types';
+import { useState, useEffect } from 'react';
+import { addPartnerVehicle, updatePartnerVehicle, getVehiclesForPartner } from '@/lib/data';
+import type { AnyVehicle, User, Car, Bus, Truck } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,52 +12,53 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Edit, Car as CarIcon, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route, Bus as BusIcon, Truck as TruckIcon, Weight, UserCircle } from 'lucide-react';
+import { PlusCircle, Edit, Car as CarIcon, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route, Bus as BusIcon, Truck as TruckIcon, Weight, UserCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 
 type VehicleFormProps = { 
-    vehicle: Partial<PartnerVehicle> | null, 
-    onSave: (v: PartnerVehicle) => void, 
+    vehicle: Partial<AnyVehicle> | null, 
+    onSave: (v: AnyVehicle) => void, 
     onCancel: () => void 
 }
 
 function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
     const isEditing = !!vehicle?.id;
     
-    const getInitialCategory = (): 'Car/Bike' | 'Bus' | 'Truck' => {
-        if (!vehicle) return 'Car/Bike';
-        if ('amenities' in vehicle) return 'Bus';
-        if ('payload' in vehicle) return 'Truck';
-        return 'Car/Bike';
+    const getInitialCategory = (): 'Car' | 'Bus' | 'Truck' | 'Specialized' => {
+        if (!vehicle || !vehicle.category) return 'Car';
+        if (vehicle.category === 'Bus') return 'Bus';
+        if (vehicle.category === 'Truck') return 'Truck';
+        if (vehicle.category === 'Specialized') return 'Specialized';
+        return 'Car';
     }
 
-    const [vehicleCategory, setVehicleCategory] = useState<'Car/Bike' | 'Bus' | 'Truck'>(getInitialCategory());
+    const [vehicleCategory, setVehicleCategory] = useState<'Car' | 'Bus' | 'Truck' | 'Specialized'>(getInitialCategory());
     
-    const getDefaultStateForCategory = (category: 'Car/Bike' | 'Bus' | 'Truck'): Partial<PartnerVehicle> => {
+    const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck' | 'Specialized'): Partial<AnyVehicle> => {
         if (category === 'Bus') {
             return {
                 name: '', type: 'Seater', seats: 45, pricePerDay: 15000,
-                amenities: ['Air Conditioning', 'Wi-Fi'],
+                amenities: ['Air Conditioning', 'Wi-Fi'], category: 'Bus',
                 driver: { name: '', phone: '' }, status: 'Available',
             };
         }
         if (category === 'Truck') {
             return {
                 name: '', size: 'Medium', pricePerDay: 7000, payload: '3 Ton',
-                description: '', status: 'Available',
+                description: '', status: 'Available', category: 'Truck',
             }
         }
-        return {
+        return { // Car/Bike/Scooter
             name: '', type: 'Sedan', pricePerDay: 2500, pricePerKm: 12, seats: 4,
             luggage: 2, transmission: 'Automatic', mpg: 20, description: '',
-            features: [], status: 'Available',
+            features: [], status: 'Available', category: 'Car',
         };
     };
 
-    const [formData, setFormData] = useState<Partial<PartnerVehicle>>(vehicle || getDefaultStateForCategory(vehicleCategory));
+    const [formData, setFormData] = useState<Partial<AnyVehicle>>(vehicle || getDefaultStateForCategory(vehicleCategory));
 
-    const handleCategoryChange = (value: 'Car/Bike' | 'Bus' | 'Truck') => {
+    const handleCategoryChange = (value: 'Car' | 'Bus' | 'Truck' | 'Specialized') => {
         setVehicleCategory(value);
         if (!isEditing) {
             setFormData(getDefaultStateForCategory(value));
@@ -100,7 +100,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
             alert('Please fill in all required fields.');
             return;
         }
-        onSave(formData as PartnerVehicle);
+        onSave(formData as AnyVehicle);
     };
 
     return (
@@ -110,8 +110,8 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                     <Label>Vehicle Category</Label>
                     <RadioGroup defaultValue={vehicleCategory} onValueChange={handleCategoryChange as any} className="grid grid-cols-3 gap-4">
                         <div>
-                            <RadioGroupItem value="Car/Bike" id="Car/Bike" className="peer sr-only" />
-                            <Label htmlFor="Car/Bike" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                            <RadioGroupItem value="Car" id="Car" className="peer sr-only" />
+                            <Label htmlFor="Car" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
                                 <CarIcon className="mb-3 h-6 w-6" />
                                 Car / Bike
                             </Label>
@@ -139,12 +139,12 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                 <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
             </div>
 
-            {vehicleCategory === 'Car/Bike' && (
+            {vehicleCategory === 'Car' && (
                 <>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="type">Type</Label>
-                            <Select name="type" value={formData.type} onValueChange={(val) => handleSelectChange('type', val)}>
+                            <Select name="type" value={(formData as Car).type} onValueChange={(val) => handleSelectChange('type', val)}>
                                 <SelectTrigger><SelectValue/></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Sedan">Sedan</SelectItem>
@@ -169,7 +169,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="seats">Seats</Label>
-                            <Input id="seats" name="seats" type="number" value={formData.seats} onChange={handleChange} />
+                            <Input id="seats" name="seats" type="number" value={(formData as Car).seats} onChange={handleChange} />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="luggage">Luggage (bags)</Label>
@@ -206,7 +206,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="type">Type</Label>
-                            <Select name="type" value={formData.type} onValueChange={(val) => handleSelectChange('type', val)}>
+                            <Select name="type" value={(formData as Bus).type} onValueChange={(val) => handleSelectChange('type', val)}>
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Seater">Seater</SelectItem>
@@ -223,7 +223,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="seats">Seats</Label>
-                            <Input id="seats" name="seats" type="number" value={formData.seats} onChange={handleChange} />
+                            <Input id="seats" name="seats" type="number" value={(formData as Bus).seats} onChange={handleChange} />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="driverRating">Driver Rating</Label>
@@ -288,7 +288,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
 
              <div className="space-y-1">
                 <Label htmlFor="status">Status</Label>
-                <Select name="status" value={formData.status} onValueChange={(val) => handleSelectChange('status', val as PartnerVehicle['status'])}>
+                <Select name="status" value={formData.status} onValueChange={(val) => handleSelectChange('status', val as AnyVehicle['status'])}>
                     <SelectTrigger><SelectValue/></SelectTrigger>
                     <SelectContent>
                         <SelectItem value="Available">Available</SelectItem>
@@ -308,9 +308,9 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
     );
 }
 
-function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v: PartnerVehicle) => void }) {
+function VehicleCard({ vehicle, onEdit }: { vehicle: AnyVehicle, onEdit: (v: AnyVehicle) => void }) {
     
-  const getStatusBadge = (status: PartnerVehicle['status']) => {
+  const getStatusBadge = (status: AnyVehicle['status']) => {
     switch (status) {
         case 'Available':
             return 'bg-green-100 text-green-800 border-green-200';
@@ -332,8 +332,8 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
   }
   
   const getVehicleType = () => {
-    if (isTruck) return vehicle.size;
-    return vehicle.type;
+    if (isTruck) return (vehicle as Truck).size;
+    return (vehicle as Car).type;
   }
 
   return (
@@ -354,10 +354,10 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
                     <span className="font-bold text-lg">₹{vehicle.pricePerDay}</span>
                     <span className="text-muted-foreground">/day</span>
                 </div>
-                {isCar && vehicle.pricePerKm && (
+                {isCar && (vehicle as Car).pricePerKm && (
                 <div className="flex items-center gap-2">
                     <Route className="w-4 h-4 text-muted-foreground" />
-                    <span className="font-bold text-lg">₹{vehicle.pricePerKm}</span>
+                    <span className="font-bold text-lg">₹{(vehicle as Car).pricePerKm}</span>
                     <span className="text-muted-foreground">/km</span>
                 </div>
                 )}
@@ -365,26 +365,26 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
             
             {isCar && (
                 <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>
-                    <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> {vehicle.luggage} Bags</div>
-                    <div className="flex items-center gap-2"><Gauge className="w-4 h-4 text-primary" /> {vehicle.mpg} KMPL</div>
-                    <div className="flex items-center gap-2"><GitBranch className="w-4 h-4 text-primary" /> {vehicle.transmission}</div>
+                    <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {(vehicle as Car).seats} Seats</div>
+                    <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> {(vehicle as Car).luggage} Bags</div>
+                    <div className="flex items-center gap-2"><Gauge className="w-4 h-4 text-primary" /> {(vehicle as Car).mpg} KMPL</div>
+                    <div className="flex items-center gap-2"><GitBranch className="w-4 h-4 text-primary" /> {(vehicle as Car).transmission}</div>
                 </div>
             )}
             
             {isBus && (
                 <>
                     <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {vehicle.seats} Seats</div>
+                        <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {(vehicle as Bus).seats} Seats</div>
                         <div className="flex flex-wrap gap-1 col-span-2">
-                            {vehicle.amenities.slice(0, 3).map(a => <Badge key={a} variant="outline">{a}</Badge>)}
+                            {(vehicle as Bus).amenities.slice(0, 3).map(a => <Badge key={a} variant="outline">{a}</Badge>)}
                         </div>
                     </div>
-                    {vehicle.driver && (
+                    {(vehicle as Bus).driver && (
                         <div className="text-sm space-y-1 border-t pt-2 mt-2">
                             <p className="font-semibold flex items-center gap-2"><UserCircle className="w-4 h-4" /> Driver Details</p>
-                            <div className="flex items-center gap-2 text-muted-foreground"><UserIcon className="w-3 h-3"/> {vehicle.driver.name}</div>
-                            <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-3 h-3"/> {vehicle.driver.phone}</div>
+                            <div className="flex items-center gap-2 text-muted-foreground"><UserIcon className="w-3 h-3"/> {(vehicle as Bus).driver?.name}</div>
+                            <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-3 h-3"/> {(vehicle as Bus).driver?.phone}</div>
                         </div>
                     )}
                 </>
@@ -392,8 +392,8 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
 
             {isTruck && (
                  <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2"><TruckIcon className="w-4 h-4 text-primary" /> {vehicle.size}</div>
-                    <div className="flex items-center gap-2"><Weight className="w-4 h-4 text-primary" /> {vehicle.payload}</div>
+                    <div className="flex items-center gap-2"><TruckIcon className="w-4 h-4 text-primary" /> {(vehicle as Truck).size}</div>
+                    <div className="flex items-center gap-2"><Weight className="w-4 h-4 text-primary" /> {(vehicle as Truck).payload}</div>
                  </div>
             )}
             
@@ -422,12 +422,19 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: PartnerVehicle, onEdit: (v:
 
 export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUpdate: (user: User) => void }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingVehicle, setEditingVehicle] = useState<PartnerVehicle | null>(null);
+  const [editingVehicle, setEditingVehicle] = useState<AnyVehicle | null>(null);
+  const [vehicles, setVehicles] = useState<AnyVehicle[]>([]);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  
-  const vehicles = user.vehicles || [];
 
-  const handleEdit = (vehicle: PartnerVehicle) => {
+  useEffect(() => {
+    getVehiclesForPartner(user.email).then(data => {
+        setVehicles(data);
+        setLoading(false);
+    });
+  }, [user.email]);
+
+  const handleEdit = (vehicle: AnyVehicle) => {
     setEditingVehicle(vehicle);
     setIsDialogOpen(true);
   };
@@ -437,19 +444,29 @@ export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUp
     setIsDialogOpen(true);
   };
 
-  const handleSave = (vehicleData: PartnerVehicle) => {
-    let updatedUser;
-    if (vehicleData.id) { // Editing existing
-      updatedUser = updatePartnerVehicle(vehicleData);
-      toast({ title: "Vehicle Updated!", description: `${vehicleData.name} has been updated.` });
-    } else { // Adding new
-      updatedUser = addPartnerVehicle(vehicleData);
-      toast({ title: "Vehicle Added!", description: `${vehicleData.name} has been added to your fleet.` });
+  const handleSave = async (vehicleData: AnyVehicle) => {
+    try {
+        if (vehicleData.id) { // Editing existing
+            await updatePartnerVehicle(vehicleData);
+            setVehicles(prev => prev.map(v => v.id === vehicleData.id ? vehicleData : v));
+            toast({ title: "Vehicle Updated!", description: `${vehicleData.name} has been updated.` });
+        } else { // Adding new
+            await addPartnerVehicle(vehicleData);
+            // Re-fetch to get the new vehicle with its ID
+            getVehiclesForPartner(user.email).then(setVehicles);
+            toast({ title: "Vehicle Added!", description: `${vehicleData.name} has been added to your fleet.` });
+        }
+        setIsDialogOpen(false);
+        setEditingVehicle(null);
+    } catch (error) {
+        console.error("Failed to save vehicle", error);
+        toast({ title: "Save Failed", description: "Could not save vehicle details.", variant: "destructive" });
     }
-    onFleetUpdate(updatedUser);
-    setIsDialogOpen(false);
-    setEditingVehicle(null);
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
 
   return (
     <div className="space-y-6">

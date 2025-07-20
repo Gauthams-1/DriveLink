@@ -3,11 +3,11 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { findSpecializedVehicleById } from '@/lib/data';
+import { findVehicleById, createReservation, getCurrentUser } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Users, Briefcase, User, Mail, Phone, Banknote, CreditCard, HeartHandshake, Accessibility } from 'lucide-react';
+import { CheckCircle, Calendar, Banknote, CreditCard, HeartHandshake, Accessibility, Loader2 } from 'lucide-react';
 import { addDays, differenceInDays, format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { DatePickerWithRange } from '@/components/DatePickerWithRange';
@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
+import type { SpecializedVehicle } from '@/lib/types';
 
 const CARETAKER_PRICE_PER_DAY = 2000;
 
@@ -26,7 +27,8 @@ function SpecializedVehicleConfirmationContent() {
   const { toast } = useToast();
 
   const vehicleId = searchParams.get('vehicleId');
-  const vehicle = findSpecializedVehicleById(Number(vehicleId));
+  const [vehicle, setVehicle] = useState<SpecializedVehicle | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
@@ -36,6 +38,20 @@ function SpecializedVehicleConfirmationContent() {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [caretakerAssistance, setCaretakerAssistance] = useState(false);
   
+  useEffect(() => {
+    if (vehicleId) {
+      findVehicleById(vehicleId)
+        .then(v => {
+          if (v?.category === 'Specialized') {
+            setVehicle(v as SpecializedVehicle);
+          }
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [vehicleId]);
+
   const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) : 0;
   const caretakerCost = caretakerAssistance && rentalDays > 0 ? rentalDays * CARETAKER_PRICE_PER_DAY : 0;
 
@@ -48,6 +64,10 @@ function SpecializedVehicleConfirmationContent() {
       setTotalCost(0);
     }
   }, [dateRange, vehicle, rentalDays, caretakerAssistance]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
 
   if (!vehicle) {
     return (
@@ -63,9 +83,10 @@ function SpecializedVehicleConfirmationContent() {
     );
   }
   
-  const handleConfirm = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleConfirm = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const currentUser = getCurrentUser();
     
     if (!dateRange?.from || !dateRange?.to) {
         toast({
@@ -76,26 +97,35 @@ function SpecializedVehicleConfirmationContent() {
         return;
     }
     
-    // In a real app, you would process payment and save the reservation.
-    // For this demo, we'll store it in localStorage.
+    if (currentUser.isGuest) {
+      toast({ title: "Please Login", description: "You need to be logged in to make a reservation.", variant: "destructive" });
+      router.push('/login');
+      return;
+    }
+
     const newReservation = {
-        id: Date.now(),
+        userId: currentUser.email,
         vehicleId: vehicle.id,
+        vehicleName: vehicle.name,
+        vehicleCategory: vehicle.category,
         startDate: dateRange.from,
         endDate: dateRange.to,
         totalCost: totalCost,
-        contactName: formData.get('contactName'),
+        contactName: formData.get('contactName') as string,
         caretakerAssistance: caretakerAssistance,
     };
     
-    const existingReservations = JSON.parse(localStorage.getItem('specializedVehicleReservations') || '[]');
-    localStorage.setItem('specializedVehicleReservations', JSON.stringify([...existingReservations, newReservation]));
-
-    toast({
-        title: "Booking Confirmed!",
-        description: `Your trip with the ${vehicle.name} is booked.`,
-    });
-    router.push('/reservations');
+    try {
+      await createReservation(newReservation);
+      toast({
+          title: "Booking Confirmed!",
+          description: `Your trip with the ${vehicle.name} is booked.`,
+      });
+      router.push('/reservations');
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Booking Failed", description: "Could not save reservation.", variant: "destructive" });
+    }
   }
 
   return (
@@ -270,7 +300,7 @@ function SpecializedVehicleConfirmationContent() {
 
 export default function SpecializedVehicleConfirmPage() {
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <div className="container mx-auto py-8 px-4 max-w-6xl animate-fade-in">
        <div className="text-center mb-12">
             <h1 className="text-4xl font-bold font-headline">Book Your Specialized Ride</h1>
             <p className="text-muted-foreground mt-2 text-lg">

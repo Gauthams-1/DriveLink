@@ -12,8 +12,9 @@ function CarList() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setCars(getAllAvailableCars());
-    setLoading(false);
+    getAllAvailableCars()
+      .then(setCars)
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
@@ -52,7 +53,7 @@ function CarList() {
 
 function CarsPageContent() {
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 animate-fade-in">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold font-headline">Rent a Car, Bike, or Scooter</h1>
         <p className="text-muted-foreground mt-2 text-lg">Your perfect ride is just a click away. Find the best deals on wheels.</p>

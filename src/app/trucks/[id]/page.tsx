@@ -2,23 +2,37 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
-import { findTruckById, getCurrentUser } from '@/lib/data';
+import { findVehicleById, getCurrentUser } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Truck as TruckIcon, Weight, Star } from 'lucide-react';
+import { Truck as TruckIcon, Weight, Star, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { useEffect, useMemo, useState } from 'react';
-import type { User } from '@/lib/types';
+import { useEffect, useState } from 'react';
+import type { User, Truck } from '@/lib/types';
 
 export default function TruckDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const truck = useMemo(() => findTruckById(Number(params.id)), [params]);
+  const [truck, setTruck] = useState<Truck | null>(null);
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     setUser(getCurrentUser());
-  }, []);
+    if (params.id) {
+        findVehicleById(params.id)
+            .then(v => {
+                if (v?.category === 'Truck') {
+                    setTruck(v as Truck);
+                }
+                setLoading(false);
+            })
+    }
+  }, [params.id]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin"/></div>;
+  }
 
   if (!truck) {
     notFound();
@@ -33,7 +47,7 @@ export default function TruckDetailPage({ params }: { params: { id: string } }) 
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 animate-fade-in">
       <div className="grid lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
           <div className="bg-muted rounded-lg p-8 flex items-center justify-center mb-8">

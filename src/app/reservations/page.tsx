@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { findCarById, findBusById, findSpecializedVehicleById, getCurrentUser, saveUser } from '@/lib/data';
+import { getReservationsForUser, getCurrentUser, cancelReservation } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -23,106 +23,71 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Car, Pencil, Trash2, Bus, Accessibility, HeartHandshake, User as UserIcon } from 'lucide-react';
+import { Car, Pencil, Trash2, Bus, Accessibility, HeartHandshake, User as UserIcon, Loader2, Truck } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import type { CarReservationWithDetails, BusReservationWithDetails, Reservation, BusReservation, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, User } from '@/lib/types';
+import type { ReservationWithVehicle, User } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
-import { findOwnerOfVehicle } from '@/lib/data';
-
-type UnifiedReservation = (CarReservationWithDetails & { type: 'car' }) | (BusReservationWithDetails & { type: 'bus' }) | (SpecializedVehicleReservationWithDetails & { type: 'specialized' });
 
 export default function ReservationsPage() {
-  const [reservations, setReservations] = useState<UnifiedReservation[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [reservations, setReservations] = useState<ReservationWithVehicle[]>([]);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    // In a real app, this would be an API call.
-    // We're using localStorage to simulate persistence.
-    const storedCarReservations: Reservation[] = JSON.parse(localStorage.getItem('carReservations') || '[]');
-    const storedBusReservations: BusReservation[] = JSON.parse(localStorage.getItem('busReservations') || '[]');
-    const storedSpecializedReservations: SpecializedVehicleReservation[] = JSON.parse(localStorage.getItem('specializedVehicleReservations') || '[]');
+    const currentUser = getCurrentUser();
+    setUser(currentUser);
 
-    const carReservationsWithDetails: CarReservationWithDetails[] = storedCarReservations
-      .map(r => {
-        const car = findCarById(r.carId);
-        return car ? { ...r, car, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
-      })
-      .filter((r): r is CarReservationWithDetails => r !== null);
-    
-    const busReservationsWithDetails: BusReservationWithDetails[] = storedBusReservations
-      .map(r => {
-        const bus = findBusById(r.busId);
-        return bus ? { ...r, bus, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
-      })
-      .filter((r): r is BusReservationWithDetails => r !== null);
-
-    const specializedReservationsWithDetails: SpecializedVehicleReservationWithDetails[] = storedSpecializedReservations
-      .map(r => {
-        const vehicle = findSpecializedVehicleById(r.vehicleId);
-        return vehicle ? { ...r, vehicle, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
-      })
-      .filter((r): r is SpecializedVehicleReservationWithDetails => r !== null);
-
-    const allReservations: UnifiedReservation[] = [
-      ...carReservationsWithDetails.map(r => ({ ...r, type: 'car' as const })),
-      ...busReservationsWithDetails.map(r => ({ ...r, type: 'bus' as const })),
-      ...specializedReservationsWithDetails.map(r => ({ ...r, type: 'specialized' as const })),
-    ];
-    
-    setReservations(allReservations);
+    if (currentUser && !currentUser.isGuest) {
+      getReservationsForUser(currentUser.email)
+        .then(setReservations)
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const handleCancelReservation = (reservation: UnifiedReservation) => {
-    let storageKey = '';
-    let vehicleId: number;
-
-    switch (reservation.type) {
-      case 'car':
-        storageKey = 'carReservations';
-        vehicleId = reservation.carId;
-        break;
-      case 'bus':
-        storageKey = 'busReservations';
-        vehicleId = reservation.busId;
-        break;
-      case 'specialized':
-        storageKey = 'specializedVehicleReservations';
-        vehicleId = reservation.vehicleId;
-        break;
+  const handleCancelReservation = async (reservation: ReservationWithVehicle) => {
+    try {
+        await cancelReservation(reservation.id, reservation.vehicleId);
+        setReservations(prev => prev.filter(r => r.id !== reservation.id));
+        toast({
+          title: "Reservation Cancelled",
+          description: "Your booking has been successfully cancelled.",
+        });
+    } catch (error) {
+        console.error(error);
+        toast({
+          title: "Cancellation Failed",
+          description: "There was a problem cancelling your reservation.",
+          variant: "destructive",
+        });
     }
-    
-    // Remove the reservation from localStorage
-    const storedReservations = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    const updatedStoredReservations = storedReservations.filter((r: {id: number}) => r.id !== reservation.id);
-    localStorage.setItem(storageKey, JSON.stringify(updatedStoredReservations));
-
-    // Update the vehicle status to 'Available' in the owner's fleet
-    const owner = findOwnerOfVehicle(vehicleId);
-    if (owner && owner.vehicles) {
-        const vehicleIndex = owner.vehicles.findIndex(v => v.id === vehicleId);
-        if (vehicleIndex > -1) {
-            owner.vehicles[vehicleIndex].status = 'Available';
-            owner.vehicles[vehicleIndex].renter = null;
-            saveUser(owner); // This will update the user in the main user list as well
-        }
-    }
-
-    // Update the UI state
-    const updatedReservations = reservations.filter(r => r.id !== reservation.id || r.type !== reservation.type);
-    setReservations(updatedReservations);
-
-    toast({
-      title: "Reservation Cancelled",
-      description: "Your booking has been successfully cancelled and the vehicle is now available.",
-    });
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-[60vh]"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
   
-  const sortedReservations = reservations.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+  if (!user || user.isGuest) {
+     return (
+        <div className="container mx-auto py-16 px-4 text-center">
+            <UserIcon className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+            <h1 className="text-3xl font-bold font-headline">Access Your Bookings</h1>
+            <p className="text-muted-foreground mt-2 text-lg">
+                Please log in or create an account to view your reservations.
+            </p>
+            <Button asChild className="mt-6">
+                <Link href="/login">Login or Sign Up</Link>
+            </Button>
+        </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 animate-fade-in">
       <div className="mb-8">
         <h1 className="text-3xl font-bold font-headline">My Reservations</h1>
         <p className="text-muted-foreground">
@@ -130,7 +95,7 @@ export default function ReservationsPage() {
         </p>
       </div>
       
-      {sortedReservations.length > 0 ? (
+      {reservations.length > 0 ? (
         <div className="border rounded-lg">
         <Table>
           <TableHeader>
@@ -142,37 +107,46 @@ export default function ReservationsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedReservations.map((reservation) => {
-              let vehicle, vehicleUrl, icon;
+            {reservations.map((reservation) => {
+              const { vehicle } = reservation;
+              let vehicleUrl, icon;
               
-              if (reservation.type === 'car') {
-                vehicle = reservation.car;
-                vehicleUrl = `/cars/${vehicle.id}`;
-                icon = <Car className="h-5 w-5 mr-2 text-muted-foreground" />;
-              } else if (reservation.type === 'bus') {
-                vehicle = reservation.bus;
-                vehicleUrl = `/bus-trips/${vehicle.id}`;
-                icon = <Bus className="h-5 w-5 mr-2 text-muted-foreground" />;
-              } else { // specialized
-                vehicle = reservation.vehicle;
-                vehicleUrl = `/specialized/${vehicle.id}`;
-                icon = <Accessibility className="h-5 w-5 mr-2 text-muted-foreground" />;
+              switch (vehicle.category) {
+                  case 'Car':
+                  case 'Bike':
+                  case 'Scooter':
+                      vehicleUrl = `/cars/${vehicle.id}`;
+                      icon = <Car className="h-5 w-5 mr-2 text-muted-foreground" />;
+                      break;
+                  case 'Bus':
+                      vehicleUrl = `/bus-trips/${vehicle.id}`;
+                      icon = <Bus className="h-5 w-5 mr-2 text-muted-foreground" />;
+                      break;
+                  case 'Truck':
+                      vehicleUrl = `/trucks/${vehicle.id}`;
+                      icon = <Truck className="h-5 w-5 mr-2 text-muted-foreground" />;
+                      break;
+                  case 'Specialized':
+                      vehicleUrl = `/specialized/${vehicle.id}`;
+                      icon = <Accessibility className="h-5 w-5 mr-2 text-muted-foreground" />;
+                      break;
               }
+              
 
               return (
-                <TableRow key={`${reservation.type}-${reservation.id}`}>
+                <TableRow key={reservation.id}>
                   <TableCell>
                     <Link href={vehicleUrl} className="flex items-center gap-4 group">
                       <div>
                         <div className="font-medium group-hover:underline flex items-center">{icon} {vehicle.name}</div>
                         <div className="text-sm text-muted-foreground ml-7">{vehicle.type}</div>
-                        {reservation.type === 'specialized' && reservation.caretakerAssistance && (
+                        {reservation.caretakerAssistance && (
                            <Badge variant="outline" className="mt-1 ml-7 bg-blue-100 text-blue-800 border-blue-200">
                                 <HeartHandshake className="h-3 w-3 mr-1" />
                                 Caretaker
                            </Badge>
                         )}
-                         {reservation.type === 'car' && reservation.driverAssistance && (
+                         {reservation.driverAssistance && (
                            <Badge variant="outline" className="mt-1 ml-7 bg-purple-100 text-purple-800 border-purple-200">
                                 <UserIcon className="h-3 w-3 mr-1" />
                                 Driver

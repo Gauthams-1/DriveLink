@@ -3,17 +3,18 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { findCarById, isCarAvailable } from '@/lib/data';
+import { findVehicleById, isVehicleAvailable, createReservation, getCurrentUser, updatePartnerVehicle } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Banknote, CreditCard, MapPin, Car as CarIcon } from 'lucide-react';
+import { CheckCircle, Calendar, Banknote, CreditCard, MapPin, Car as CarIcon, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Image from 'next/image';
+import type { AnyVehicle } from '@/lib/types';
 
 function CarPaymentContent() {
   const router = useRouter();
@@ -23,8 +24,10 @@ function CarPaymentContent() {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [pickup, setPickup] = useState('');
   const [dropoff, setDropoff] = useState('');
+  const [vehicle, setVehicle] = useState<AnyVehicle | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const carId = searchParams.get('carId');
+  const vehicleId = searchParams.get('vehicleId');
   const startDateStr = searchParams.get('startDate');
   const endDateStr = searchParams.get('endDate');
   const totalCost = searchParams.get('totalCost');
@@ -32,12 +35,94 @@ function CarPaymentContent() {
   const addons = searchParams.get('addons')?.split(',') || [];
   const driverAssistance = addons.includes('driver');
 
-  const car = findCarById(Number(carId));
-  
+  useEffect(() => {
+    if (vehicleId) {
+      findVehicleById(vehicleId)
+        .then(setVehicle)
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [vehicleId]);
+
   const startDate = startDateStr ? new Date(startDateStr) : null;
   const endDate = endDateStr ? new Date(endDateStr) : null;
 
-  if (!car || !startDate || !endDate || !totalCost || !rentalDays) {
+  const handleConfirm = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const currentUser = getCurrentUser();
+
+    if (!pickup || !dropoff) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both pickup and drop-off locations.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!vehicle || !startDate || !endDate || !totalCost || currentUser.isGuest) {
+      toast({ title: "Error", description: "Invalid booking details or not logged in.", variant: "destructive" });
+      return;
+    }
+    
+    // Final availability check before creating reservation
+    const available = await isVehicleAvailable(vehicle.id, startDate, endDate);
+    if (!available) {
+        toast({
+            title: "Booking Conflict",
+            description: "Sorry, this car has just been booked for the selected dates. Please try different dates.",
+            variant: "destructive",
+        });
+        router.push('/cars');
+        return;
+    }
+    
+    const newReservation = {
+        userId: currentUser.email,
+        vehicleId: vehicle.id,
+        vehicleName: vehicle.name,
+        vehicleCategory: vehicle.category,
+        startDate: startDate,
+        endDate: endDate,
+        totalCost: parseFloat(totalCost),
+        pickup: pickup,
+        dropoff: dropoff,
+        driverAssistance: driverAssistance,
+    };
+    
+    try {
+      await createReservation(newReservation);
+      
+      // Update vehicle status
+      vehicle.status = 'Rented';
+      await updatePartnerVehicle(vehicle);
+
+      toast({
+          title: "Booking Confirmed!",
+          description: `Your trip with the ${vehicle.name} is booked.`,
+      });
+      
+      const tripParams = new URLSearchParams({
+          pickup,
+          dropoff,
+          carName: vehicle.name,
+          carImage: (vehicle.images && vehicle.images.length > 0) ? vehicle.images[0] : '',
+      });
+
+      router.push(`/reservations/trip-details?${tripParams.toString()}`);
+
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Booking Failed", description: "Could not save your reservation. Please try again.", variant: "destructive" });
+    }
+  }
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
+  
+  if (!vehicle || !startDate || !endDate || !totalCost || !rentalDays) {
     return (
       <Card>
         <CardHeader>
@@ -50,58 +135,6 @@ function CarPaymentContent() {
       </Card>
     );
   }
-  
-  const handleConfirm = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!pickup || !dropoff) {
-      toast({
-        title: "Missing Information",
-        description: "Please enter both pickup and drop-off locations.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Final availability check before creating reservation
-    if (!isCarAvailable(car.id, startDate, endDate)) {
-        toast({
-            title: "Booking Conflict",
-            description: "Sorry, this car has just been booked for the selected dates. Please try different dates.",
-            variant: "destructive",
-        });
-        router.push('/cars');
-        return;
-    }
-    
-    const newReservation = {
-        id: Date.now(),
-        carId: car.id,
-        startDate: startDate,
-        endDate: endDate,
-        totalCost: parseFloat(totalCost),
-        pickup: pickup,
-        dropoff: dropoff,
-        driverAssistance: driverAssistance,
-    };
-    
-    const existingReservations = JSON.parse(localStorage.getItem('carReservations') || '[]');
-    localStorage.setItem('carReservations', JSON.stringify([...existingReservations, newReservation]));
-
-    toast({
-        title: "Booking Confirmed!",
-        description: `Your trip with the ${car.name} is booked.`,
-    });
-    
-    const tripParams = new URLSearchParams({
-        pickup,
-        dropoff,
-        carName: car.name,
-        carImage: (car.images && car.images.length > 0) ? car.images[0] : '',
-    });
-
-    router.push(`/reservations/trip-details?${tripParams.toString()}`);
-  }
 
   return (
     <form onSubmit={handleConfirm}>
@@ -113,8 +146,8 @@ function CarPaymentContent() {
                     <div className="flex gap-4 items-center">
                         <CarIcon className="h-10 w-10 text-primary" />
                         <div>
-                            <h3 className="font-bold text-lg">{car.name}</h3>
-                            <p className="text-muted-foreground">{car.type}</p>
+                            <h3 className="font-bold text-lg">{vehicle.name}</h3>
+                            <p className="text-muted-foreground">{(vehicle as any).type}</p>
                         </div>
                     </div>
                      <Separator className="my-4" />
@@ -239,7 +272,7 @@ function CarPaymentContent() {
 
 export default function CarPaymentPage() {
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <div className="container mx-auto py-8 px-4 max-w-6xl animate-fade-in">
        <div className="text-center mb-12">
             <h1 className="text-4xl font-bold font-headline">Complete Your Booking</h1>
             <p className="text-muted-foreground mt-2 text-lg">

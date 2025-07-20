@@ -1,14 +1,30 @@
 
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Badge } from "./ui/badge";
-import { Car, Star } from "lucide-react";
-import type { User } from "@/lib/types";
+import { Car, Star, Loader2 } from "lucide-react";
+import type { User, AnyVehicle } from "@/lib/types";
+import { getVehiclesForPartner } from "@/lib/data";
+import { useState, useEffect } from "react";
 
 export function PartnerDashboard({ user }: { user: User }) {
-  const fleet = user.vehicles || [];
+  const [fleet, setFleet] = useState<AnyVehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getVehiclesForPartner(user.email)
+      .then(setFleet)
+      .finally(() => setLoading(false));
+  }, [user.email]);
+
   const activeBookings = fleet.filter(v => v.status === 'Rented').length;
   const stats = user.partnerStats || { totalRevenue: 0, avgRating: 0 };
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
 
   return (
     <div className="space-y-8">
@@ -81,7 +97,7 @@ export function PartnerDashboard({ user }: { user: User }) {
                     {fleet.slice(0, 5).map((vehicle) => (
                         <TableRow key={vehicle.id}>
                         <TableCell className="font-medium">{vehicle.name}</TableCell>
-                        <TableCell>{vehicle.type}</TableCell>
+                        <TableCell>{(vehicle as any).type || vehicle.category}</TableCell>
                         <TableCell>
                             <Badge variant={vehicle.status === 'Available' ? 'secondary' : 'default'} className={vehicle.status === 'Rented' ? 'bg-orange-500' : 'bg-green-500'}>
                             {vehicle.status}

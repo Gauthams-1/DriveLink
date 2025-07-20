@@ -3,27 +3,22 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { findCarById } from '@/lib/data';
+import { findVehicleById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { CheckCircle, Calendar, Shield, Package, MapPin, Car as CarIcon, Loader2, User } from 'lucide-react';
 import { format } from 'date-fns';
-import { useToast } from '@/hooks/use-toast';
-import type { Car } from '@/lib/types';
+import type { AnyVehicle } from '@/lib/types';
 import Link from 'next/link';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-
 
 function ConfirmationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
 
-  const [car, setCar] = useState<Car | null | undefined>(undefined);
+  const [vehicle, setVehicle] = useState<AnyVehicle | null | undefined>(undefined);
   
-  const carId = searchParams.get('carId');
+  const vehicleId = searchParams.get('vehicleId');
   const startDate = searchParams.get('startDate');
   const endDate = searchParams.get('endDate');
   const totalCost = searchParams.get('totalCost');
@@ -31,13 +26,12 @@ function ConfirmationContent() {
   const addons = searchParams.get('addons')?.split(',') || [];
   
   useEffect(() => {
-    if (carId) {
-      const foundCar = findCarById(Number(carId));
-      setCar(foundCar);
+    if (vehicleId) {
+      findVehicleById(vehicleId).then(setVehicle);
     }
-  }, [carId]);
+  }, [vehicleId]);
 
-  if (car === undefined) {
+  if (vehicle === undefined) {
     return (
         <div className="flex justify-center items-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -45,7 +39,7 @@ function ConfirmationContent() {
     );
   }
 
-  if (!car || !startDate || !endDate || !totalCost || !rentalDays) {
+  if (!vehicle || !startDate || !endDate || !totalCost || !rentalDays) {
     return (
       <Card>
         <CardHeader>
@@ -78,9 +72,9 @@ function ConfirmationContent() {
           <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CarIcon className="w-6 h-6" />
-                <span>{car.name}</span>
+                <span>{vehicle.name}</span>
               </CardTitle>
-              <CardDescription>{car.type}</CardDescription>
+              <CardDescription>{(vehicle as any).type}</CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -134,7 +128,7 @@ function ConfirmationContent() {
 
 export default function ReservationConfirmPage() {
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="container mx-auto py-8 px-4 max-w-4xl animate-fade-in">
        <div className="text-center mb-12">
             <h1 className="text-4xl font-bold font-headline">Almost There!</h1>
             <p className="text-muted-foreground mt-2 text-lg">

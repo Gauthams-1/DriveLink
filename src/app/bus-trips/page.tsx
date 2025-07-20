@@ -12,8 +12,9 @@ function BusList() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setBuses(getAllAvailableBuses());
-    setLoading(false);
+    getAllAvailableBuses()
+      .then(setBuses)
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
@@ -53,7 +54,7 @@ function BusList() {
 
 export default function BusTripsPage() {
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 animate-fade-in">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold font-headline">Book Your Group Trip</h1>
         <p className="text-muted-foreground mt-2 text-lg">Find the perfect bus for your next adventure.</p>

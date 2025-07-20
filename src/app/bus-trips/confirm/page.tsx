@@ -3,11 +3,11 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { findBusById } from '@/lib/data';
+import { findVehicleById, createReservation, getCurrentUser } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Users, Briefcase, User, Mail, Phone, Banknote, CreditCard, Bus as BusIcon } from 'lucide-react';
+import { CheckCircle, Calendar, Banknote, CreditCard, Bus as BusIcon, Loader2 } from 'lucide-react';
 import { addDays, differenceInDays, format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { DatePickerWithRange } from '@/components/DatePickerWithRange';
@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Image from 'next/image';
+import type { Bus } from '@/lib/types';
 
 function BusConfirmationContent() {
   const router = useRouter();
@@ -23,7 +24,8 @@ function BusConfirmationContent() {
   const { toast } = useToast();
 
   const busId = searchParams.get('busId');
-  const bus = findBusById(Number(busId));
+  const [bus, setBus] = useState<Bus | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
@@ -32,6 +34,21 @@ function BusConfirmationContent() {
   const [totalCost, setTotalCost] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('card');
   
+  useEffect(() => {
+    if (busId) {
+      findVehicleById(busId)
+        .then(v => {
+          if (v?.category === 'Bus') {
+            setBus(v as Bus);
+          }
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [busId]);
+
+
   const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) : 0;
 
   useEffect(() => {
@@ -41,6 +58,10 @@ function BusConfirmationContent() {
       setTotalCost(0);
     }
   }, [dateRange, bus, rentalDays]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
 
   if (!bus) {
     return (
@@ -56,9 +77,10 @@ function BusConfirmationContent() {
     );
   }
   
-  const handleConfirm = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleConfirm = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const currentUser = getCurrentUser();
     
     if (!dateRange?.from || !dateRange?.to) {
         toast({
@@ -68,27 +90,36 @@ function BusConfirmationContent() {
         });
         return;
     }
+
+    if (currentUser.isGuest) {
+      toast({ title: "Please Login", description: "You need to be logged in to make a reservation.", variant: "destructive" });
+      router.push('/login');
+      return;
+    }
     
-    // In a real app, you would process payment and save the reservation.
-    // For this demo, we'll store it in localStorage.
     const newReservation = {
-        id: Date.now(),
-        busId: bus.id,
+        userId: currentUser.email,
+        vehicleId: bus.id,
+        vehicleName: bus.name,
+        vehicleCategory: bus.category,
         startDate: dateRange.from,
         endDate: dateRange.to,
         totalCost: totalCost,
-        groupName: formData.get('groupName'),
-        contactName: formData.get('contactName'),
+        groupName: formData.get('groupName') as string,
+        contactName: formData.get('contactName') as string,
     };
     
-    const existingReservations = JSON.parse(localStorage.getItem('busReservations') || '[]');
-    localStorage.setItem('busReservations', JSON.stringify([...existingReservations, newReservation]));
-
-    toast({
-        title: "Booking Confirmed!",
-        description: `Your group trip with the ${bus.name} is booked.`,
-    });
-    router.push('/reservations');
+    try {
+      await createReservation(newReservation);
+      toast({
+          title: "Booking Confirmed!",
+          description: `Your group trip with the ${bus.name} is booked.`,
+      });
+      router.push('/reservations');
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Booking Failed", description: "Could not save reservation.", variant: "destructive" });
+    }
   }
 
   return (
@@ -246,7 +277,7 @@ function BusConfirmationContent() {
 
 export default function BusReservationConfirmPage() {
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <div className="container mx-auto py-8 px-4 max-w-6xl animate-fade-in">
        <div className="text-center mb-12">
             <h1 className="text-4xl font-bold font-headline">Book Your Group Trip</h1>
             <p className="text-muted-foreground mt-2 text-lg">

@@ -2,13 +2,13 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
-import { findBusById, getCurrentUser } from '@/lib/data';
+import { findVehicleById, getCurrentUser } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Users, Star, Wifi, Thermometer, Tv, Sofa, Bus as BusIcon } from 'lucide-react';
+import { CheckCircle, Users, Star, Wifi, Thermometer, Tv, Sofa, Bus as BusIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useEffect, useMemo, useState } from 'react';
-import type { User } from '@/lib/types';
+import { useEffect, useState } from 'react';
+import type { User, Bus } from '@/lib/types';
 
 const amenityIcons: { [key: string]: React.ReactNode } = {
   'air conditioning': <Thermometer className="w-5 h-5 text-accent" />,
@@ -22,12 +22,26 @@ const amenityIcons: { [key: string]: React.ReactNode } = {
 
 export default function BusDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const bus = useMemo(() => findBusById(Number(params.id)), [params.id]);
+  const [bus, setBus] = useState<Bus | null>(null);
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     setUser(getCurrentUser());
-  }, []);
+    if (params.id) {
+      findVehicleById(params.id)
+        .then(vehicle => {
+          if (vehicle && vehicle.category === 'Bus') {
+            setBus(vehicle as Bus);
+          }
+          setLoading(false);
+        });
+    }
+  }, [params.id]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin"/></div>;
+  }
 
   if (!bus) {
     notFound();
@@ -42,7 +56,7 @@ export default function BusDetailPage({ params }: { params: { id: string } }) {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 animate-fade-in">
       <div className="grid lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
           <div className="bg-muted rounded-lg p-8 flex items-center justify-center mb-8">

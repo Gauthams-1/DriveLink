@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { addDays, differenceInDays, format } from 'date-fns';
-import type { Car, User } from '@/lib/types';
+import type { AnyVehicle, User } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Label } from './ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -23,7 +23,7 @@ const ADDONS = [
   { id: 'driver', label: 'Driver Assistance', price: 2000 },
 ];
 
-export function CostCalculator({ car }: { car: Car }) {
+export function CostCalculator({ vehicle }: { vehicle: AnyVehicle }) {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 4),
@@ -40,18 +40,18 @@ export function CostCalculator({ car }: { car: Car }) {
 
   useEffect(() => {
     if (dateRange?.from && dateRange?.to) {
-      const carCost = rentalDays > 0 ? rentalDays * car.pricePerDay : 0;
+      const vehicleCost = rentalDays > 0 ? rentalDays * vehicle.pricePerDay : 0;
       
       const addonsCost = selectedAddons.reduce((total, addonId) => {
         const addon = ADDONS.find(a => a.id === addonId);
         return total + (addon ? addon.price * rentalDays : 0);
       }, 0);
 
-      setTotalCost(carCost + addonsCost);
+      setTotalCost(vehicleCost + addonsCost);
     } else {
       setTotalCost(0);
     }
-  }, [dateRange, selectedAddons, car.pricePerDay, rentalDays]);
+  }, [dateRange, selectedAddons, vehicle.pricePerDay, rentalDays]);
 
   const handleAddonToggle = (addonId: string) => {
     setSelectedAddons(prev => 
@@ -63,7 +63,7 @@ export function CostCalculator({ car }: { car: Car }) {
     if (!dateRange?.from || !dateRange?.to) return '';
     
     const params = new URLSearchParams({
-        carId: car.id.toString(),
+        vehicleId: vehicle.id.toString(),
         startDate: dateRange.from.toISOString(),
         endDate: dateRange.to.toISOString(),
         totalCost: totalCost.toFixed(2),
@@ -123,31 +123,33 @@ export function CostCalculator({ car }: { car: Car }) {
           </Popover>
         </div>
         
-        <div className="space-y-2">
-          <Label>Add-ons</Label>
-          <div className="space-y-2">
-            {ADDONS.map(addon => (
-              <div key={addon.id} className="flex items-center space-x-2">
-                <Checkbox 
-                  id={addon.id}
-                  onCheckedChange={() => handleAddonToggle(addon.id)}
-                />
-                <Label htmlFor={addon.id} className="font-normal flex justify-between w-full">
-                  <span className="flex items-center gap-2">
-                    {addon.id === 'driver' && <UserIcon className="w-4 h-4" />}
-                    {addon.label}
-                  </span>
-                  <span className="text-muted-foreground">₹{addon.price}/day</span>
-                </Label>
-              </div>
-            ))}
-          </div>
-        </div>
+        {vehicle.category !== 'Bus' && vehicle.category !== 'Truck' && (
+            <div className="space-y-2">
+            <Label>Add-ons</Label>
+            <div className="space-y-2">
+                {ADDONS.map(addon => (
+                <div key={addon.id} className="flex items-center space-x-2">
+                    <Checkbox 
+                    id={addon.id}
+                    onCheckedChange={() => handleAddonToggle(addon.id)}
+                    />
+                    <Label htmlFor={addon.id} className="font-normal flex justify-between w-full">
+                    <span className="flex items-center gap-2">
+                        {addon.id === 'driver' && <UserIcon className="w-4 h-4" />}
+                        {addon.label}
+                    </span>
+                    <span className="text-muted-foreground">₹{addon.price}/day</span>
+                    </Label>
+                </div>
+                ))}
+            </div>
+            </div>
+        )}
 
         <div className="space-y-2 pt-4 border-t">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Base price ({rentalDays} days)</span>
-            <span>₹{(rentalDays * car.pricePerDay).toFixed(2)}</span>
+            <span>₹{(rentalDays * vehicle.pricePerDay).toFixed(2)}</span>
           </div>
            {selectedAddons.map(addonId => {
               const addon = ADDONS.find(a => a.id === addonId);

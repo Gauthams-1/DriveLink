@@ -3,11 +3,11 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { findTruckById } from '@/lib/data';
+import { findVehicleById, createReservation, getCurrentUser } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Banknote, CreditCard, MapPin, Truck as TruckIcon } from 'lucide-react';
+import { CheckCircle, Calendar, Banknote, CreditCard, Truck as TruckIcon, Loader2 } from 'lucide-react';
 import { addDays, differenceInDays, format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { DatePickerWithRange } from '@/components/DatePickerWithRange';
@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Image from 'next/image';
+import type { Truck } from '@/lib/types';
 
 function TruckConfirmationContent() {
   const router = useRouter();
@@ -23,7 +24,8 @@ function TruckConfirmationContent() {
   const { toast } = useToast();
 
   const truckId = searchParams.get('truckId');
-  const truck = findTruckById(Number(truckId));
+  const [truck, setTruck] = useState<Truck | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
@@ -32,6 +34,21 @@ function TruckConfirmationContent() {
   const [totalCost, setTotalCost] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('card');
   
+  useEffect(() => {
+    if (truckId) {
+      findVehicleById(truckId)
+        .then(v => {
+          if (v?.category === 'Truck') {
+            setTruck(v as Truck);
+          }
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [truckId]);
+
+
   const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) : 0;
 
   useEffect(() => {
@@ -41,6 +58,10 @@ function TruckConfirmationContent() {
       setTotalCost(0);
     }
   }, [dateRange, truck, rentalDays]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
 
   if (!truck) {
     return (
@@ -56,8 +77,9 @@ function TruckConfirmationContent() {
     );
   }
   
-  const handleConfirm = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleConfirm = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const currentUser = getCurrentUser();
     
     if (!dateRange?.from || !dateRange?.to) {
         toast({
@@ -68,13 +90,33 @@ function TruckConfirmationContent() {
         return;
     }
     
-    // In a real app, you would process payment and save the reservation.
-    // This is a placeholder for the demo.
-    toast({
-        title: "Booking Confirmed!",
-        description: `Your booking for the ${truck.name} is confirmed.`,
-    });
-    router.push('/reservations'); // Redirect to a unified reservations page
+    if (currentUser.isGuest) {
+      toast({ title: "Please Login", description: "You need to be logged in to make a reservation.", variant: "destructive" });
+      router.push('/login');
+      return;
+    }
+
+    const newReservation = {
+        userId: currentUser.email,
+        vehicleId: truck.id,
+        vehicleName: truck.name,
+        vehicleCategory: truck.category,
+        startDate: dateRange.from,
+        endDate: dateRange.to,
+        totalCost: totalCost,
+    };
+    
+    try {
+      await createReservation(newReservation);
+      toast({
+          title: "Booking Confirmed!",
+          description: `Your booking for the ${truck.name} is confirmed.`,
+      });
+      router.push('/reservations');
+    } catch (error) {
+       console.error(error);
+       toast({ title: "Booking Failed", description: "Could not save reservation.", variant: "destructive" });
+    }
   }
 
   return (
@@ -226,7 +268,7 @@ function TruckConfirmationContent() {
 
 export default function TruckConfirmPage() {
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <div className="container mx-auto py-8 px-4 max-w-6xl animate-fade-in">
        <div className="text-center mb-12">
             <h1 className="text-4xl font-bold font-headline">Book Your Truck</h1>
             <p className="text-muted-foreground mt-2 text-lg">

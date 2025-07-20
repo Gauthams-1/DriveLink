@@ -12,8 +12,9 @@ function TruckList() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setTrucks(getAllAvailableTrucks());
-        setLoading(false);
+        getAllAvailableTrucks()
+            .then(setTrucks)
+            .finally(() => setLoading(false));
     }, []);
     
     if (loading) {
@@ -52,7 +53,7 @@ function TruckList() {
 
 export default function TrucksPage() {
     return (
-        <div className="container mx-auto py-8 px-4">
+        <div className="container mx-auto py-8 px-4 animate-fade-in">
             <div className="text-center mb-12">
                 <h1 className="text-4xl font-bold font-headline">Book a Truck</h1>
                 <p className="text-muted-foreground mt-2 text-lg">For house shifting, large equipment, and all your heavy-duty needs.</p>
