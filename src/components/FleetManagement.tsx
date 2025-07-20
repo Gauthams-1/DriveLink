@@ -109,7 +109,13 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
             return;
         }
 
-        const finalCategory: VehicleCategory = vehicleCategory;
+        let finalCategory: VehicleCategory = vehicleCategory;
+        if (vehicleCategory === 'Car' && (formData as Car).type) {
+            const carType = (formData as Car).type;
+            if (carType === 'Bike' || carType === 'Scooter') {
+                finalCategory = carType;
+            }
+        }
 
         const finalData = { ...formData, category: finalCategory };
         onSave(finalData as AnyVehicle, finalCategory);
