@@ -465,10 +465,11 @@ export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUp
             setVehicles(prev => prev.map(v => v.id === vehicleData.id ? {...vehicleData, category} : v));
             toast({ title: "Vehicle Updated!", description: `${vehicleData.name} has been updated.` });
         } else { // Adding new
-            await addPartnerVehicle(vehicleData, category);
-            // Re-fetch to get the new vehicle with its ID
-            getVehiclesForPartner(user.email).then(setVehicles);
-            toast({ title: "Vehicle Added!", description: `${vehicleData.name} has been added to your fleet.` });
+            const newVehicle = await addPartnerVehicle(vehicleData, category);
+            if (newVehicle) {
+                setVehicles(prev => [...prev, newVehicle]);
+                toast({ title: "Vehicle Added!", description: `${newVehicle.name} has been added to your fleet.` });
+            }
         }
         setIsDialogOpen(false);
         setEditingVehicle(null);

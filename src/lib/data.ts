@@ -345,16 +345,24 @@ export async function updatePartnerVehicle(vehicle: AnyVehicle): Promise<void> {
     await updateDoc(vehicleRef, { ...vehicle });
 };
 
-export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>, category: VehicleCategory): Promise<void> {
+export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>, category: VehicleCategory): Promise<AnyVehicle | null> {
     const currentUser = getCurrentUser();
     if (!currentUser.isPartner) {
         throw new Error("User is not a partner.");
     }
     if (!db) {
         console.warn("Firestore not initialized. Vehicle not added to DB. This is a local-only operation.");
-        return;
+        // Return a locally-created object for immediate UI update, but with a temporary ID.
+        return {
+            ...vehicle,
+            id: `temp-${Date.now()}`,
+            ownerId: currentUser.email,
+            category: category
+        };
     };
-    await addDoc(collection(db, 'vehicles'), { ...vehicle, ownerId: currentUser.email, category: category });
+    const vehicleData = { ...vehicle, ownerId: currentUser.email, category: category };
+    const docRef = await addDoc(collection(db, 'vehicles'), vehicleData);
+    return { ...vehicleData, id: docRef.id };
 };
 
 export async function getVehiclesForPartner(ownerId: string): Promise<AnyVehicle[]> {
