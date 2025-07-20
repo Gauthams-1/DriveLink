@@ -210,45 +210,6 @@ export const sampleDriverTrips: Trip[] = [
     }
 ];
 
-export const mechanics: Mechanic[] = [
-    {
-        id: 1,
-        name: 'Rajesh Kumar',
-        location: 'Andheri, Mumbai, MH',
-        phone: '9876543210',
-        rating: 4.8,
-        specialty: 'General Car Repair & Maintenance',
-        avatarUrl: '',
-    },
-    {
-        id: 2,
-        name: 'Suresh Singh',
-        location: 'Dadar, Mumbai, MH',
-        phone: '9876543211',
-        rating: 4.9,
-        specialty: 'Engine & Transmission Expert',
-        avatarUrl: '',
-    },
-    {
-        id: 3,
-        name: 'Anil Patel',
-        location: 'Bandra, Mumbai, MH',
-        phone: '9876543212',
-        rating: 4.7,
-        specialty: 'Tire & Brakes Specialist',
-        avatarUrl: '',
-    },
-    {
-        id: 4,
-        name: 'Vikas Sharma',
-        location: 'Connaught Place, Delhi, DL',
-        phone: '9876543213',
-        rating: 4.9,
-        specialty: 'Luxury Car Specialist',
-        avatarUrl: '',
-    },
-];
-
 export const specializedVehicles: SpecializedVehicle[] = [
   {
     id: 1,
@@ -298,102 +259,71 @@ export const specializedVehicles: SpecializedVehicle[] = [
 
 
 // --- User Management & Data Access ---
-let registeredUsers: User[] | null = null;
+
+// This flag will ensure default partners are created only once per session.
 let defaultPartnersCreated = false;
 
+// This function acts as the single source of truth for user data.
 const getRegisteredUsers = (): User[] => {
-    if (typeof window === 'undefined') {
-        if (!registeredUsers) {
-            // Server-side: Initialize with default partners
-            registeredUsers = [];
-            createDefaultPartners();
-        }
-        return registeredUsers;
-    }
+    let users: User[] = [];
 
-    // Client-side: Load from localStorage
-    if (registeredUsers === null) {
+    // On the client-side, localStorage is the source of truth.
+    if (typeof window !== 'undefined') {
         const usersJson = localStorage.getItem('driveLinkRegisteredUsers');
         if (usersJson) {
-            registeredUsers = JSON.parse(usersJson).map((user: User) => ({
-                ...user,
-                memberSince: new Date(user.memberSince)
-            }));
-            defaultPartnersCreated = true;
-        } else {
-            // First time client is loading, create defaults and save
-            registeredUsers = [];
-            createDefaultPartners();
-            saveRegisteredUsers(registeredUsers);
+            try {
+                users = JSON.parse(usersJson).map((user: User) => ({
+                    ...user,
+                    memberSince: new Date(user.memberSince)
+                }));
+            } catch (e) {
+                console.error("Error parsing users from localStorage", e);
+                users = [];
+            }
+        }
+    }
+
+    // Create default partners if they don't exist. This check ensures that even if localStorage is empty or corrupted,
+    // the default partners are added. It also handles the initial server-side case.
+    const hasPartners = users.some(u => u.isPartner);
+    if (!hasPartners) {
+        const defaultOwnerPartner: User = {
+            name: "Default Owner Partner",
+            email: "owner@example.com", password: "password", phone: "1234567890", address: "123 Partner Lane, Mumbai",
+            licenseNumber: "MH123456789", aadhaarNumber: "123456789012", isVerified: true, avatarUrl: "",
+            memberSince: new Date(), isGuest: false, isPartner: true, partnerType: 'owner',
+            vehicles: samplePartnerVehicles,
+            partnerStats: { totalRevenue: 850000, avgRating: 4.9, activeBookings: 1, totalVehicles: samplePartnerVehicles.length },
+        };
+        const defaultMechanicPartner: User = {
+            name: "Rajesh Kumar",
+            email: "mechanic@example.com", password: "password", phone: "0987654321", address: "Andheri, Mumbai, MH",
+            licenseNumber: "MH0987654321", aadhaarNumber: "987654321098", isVerified: true, avatarUrl: "",
+            memberSince: new Date(), isGuest: false, isPartner: true, partnerType: 'mechanic',
+            specialty: 'General Car Repair & Maintenance',
+            jobs: sampleMechanicJobs,
+            partnerStats: { totalRevenue: 48000, avgRating: 4.8, activeJobs: 1, completedJobs: 2 },
+        };
+         const defaultDriverPartner: User = {
+            name: "Default Driver Partner",
+            email: "driver@example.com", password: "password", phone: "9988776655", address: "789 Driver's Quarters, Delhi",
+            licenseNumber: "DL987654321", aadhaarNumber: "567890123456", isVerified: true, avatarUrl: "",
+            memberSince: new Date(), isGuest: false, isPartner: true, partnerType: 'driver',
+            trips: sampleDriverTrips,
+            partnerStats: { totalRevenue: 155000, avgRating: 4.9, totalTrips: 25 },
+        };
+        users.push(defaultOwnerPartner, defaultMechanicPartner, defaultDriverPartner);
+        
+        // If on client, save the updated list back to localStorage.
+        if (typeof window !== 'undefined') {
+            saveRegisteredUsers(users);
         }
     }
     
-    return registeredUsers;
-}
-
-const createDefaultPartners = () => {
-    if (defaultPartnersCreated || !registeredUsers) return;
-
-    const defaultOwnerPartner: User = {
-        name: "Default Owner Partner",
-        email: "owner@example.com",
-        password: "password",
-        phone: "1234567890",
-        address: "123 Partner Lane, Mumbai",
-        licenseNumber: "MH123456789",
-        aadhaarNumber: "123456789012",
-        isVerified: true,
-        avatarUrl: "",
-        memberSince: new Date(),
-        isGuest: false,
-        isPartner: true,
-        partnerType: 'owner',
-        vehicles: samplePartnerVehicles,
-        partnerStats: { totalRevenue: 850000, avgRating: 4.9, activeBookings: 1, totalVehicles: samplePartnerVehicles.length },
-    };
-    const defaultMechanicPartner: User = {
-        name: "Default Mechanic Partner",
-        email: "mechanic@example.com",
-        password: "password",
-        phone: "0987654321",
-        address: "456 Garage Street, Pune",
-        licenseNumber: "MH0987654321",
-        aadhaarNumber: "987654321098",
-        isVerified: true,
-        avatarUrl: "",
-        memberSince: new Date(),
-        isGuest: false,
-        isPartner: true,
-        partnerType: 'mechanic',
-        specialty: 'General Repair',
-        jobs: sampleMechanicJobs,
-        partnerStats: { totalRevenue: 48000, avgRating: 4.8, activeJobs: 1, completedJobs: 2 },
-    };
-    const defaultDriverPartner: User = {
-        name: "Default Driver Partner",
-        email: "driver@example.com",
-        password: "password",
-        phone: "9988776655",
-        address: "789 Driver's Quarters, Delhi",
-        licenseNumber: "DL987654321",
-        aadhaarNumber: "567890123456",
-        isVerified: true,
-        avatarUrl: "",
-        memberSince: new Date(),
-        isGuest: false,
-        isPartner: true,
-        partnerType: 'driver',
-        trips: sampleDriverTrips,
-        partnerStats: { totalRevenue: 155000, avgRating: 4.9, totalTrips: 25 },
-    };
-    
-    registeredUsers.push(defaultOwnerPartner, defaultMechanicPartner, defaultDriverPartner);
-    defaultPartnersCreated = true;
-}
-
+    return users;
+};
 
 const saveRegisteredUsers = (users: User[]) => {
-    registeredUsers = users; // Update in-memory cache
     if (typeof window !== 'undefined') {
         localStorage.setItem('driveLinkRegisteredUsers', JSON.stringify(users));
     }
@@ -430,7 +360,7 @@ export function getAllAvailableTrucks(): Truck[] {
   ) as Truck[];
 }
 
-export function getAllRegisteredMechanics(): Mechanic[] {
+export async function getAllRegisteredMechanics(): Promise<Mechanic[]> {
     const users = getRegisteredUsers();
     return users
         .filter(u => u.isPartner && u.partnerType === 'mechanic')
@@ -594,7 +524,7 @@ export function saveUser(user: User) {
 
     // Also update the user in the registered users list if they are not a guest
     if (!user.isGuest) {
-      const users = getRegisteredUsers();
+      let users = getRegisteredUsers();
       const userIndex = users.findIndex(u => u.email === user.email);
       if (userIndex !== -1) {
         users[userIndex] = user;
@@ -650,5 +580,3 @@ export const findOwnerOfVehicle = (vehicleId: number): User | undefined => {
     const users = getRegisteredUsers();
     return users.find(u => u.isPartner && u.vehicles?.some(v => v.id === vehicleId));
 };
-
-    

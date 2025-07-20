@@ -67,7 +67,7 @@ const findMechanicsFlow = ai.defineFlow(
   },
   async (input) => {
     // Fetch registered mechanics from the user data system.
-    const allMechanics = getAllRegisteredMechanics();
+    const allMechanics = await getAllRegisteredMechanics();
     const availableMechanics = JSON.stringify(allMechanics, null, 2);
 
     const { output } = await prompt({
@@ -78,4 +78,3 @@ const findMechanicsFlow = ai.defineFlow(
     return output!;
   }
 );
-
