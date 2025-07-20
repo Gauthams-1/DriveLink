@@ -11,13 +11,13 @@ import { Separator } from '@/components/ui/separator';
 import { useEffect, useState } from 'react';
 import type { Car } from '@/lib/types';
 
-export default function CarDetailPage({ params }: { params: { id: string } }) {
+export default function CarDetailPage({ params: { id } }: { params: { id: string } }) {
   const [car, setCar] = useState<Car | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (params.id) {
-      findVehicleById(params.id)
+    if (id) {
+      findVehicleById(id)
         .then(vehicle => {
           if (vehicle && (vehicle.category === 'Car' || vehicle.category === 'Bike' || vehicle.category === 'Scooter')) {
             setCar(vehicle as Car);
@@ -25,7 +25,7 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
           setLoading(false);
         });
     }
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin"/></div>;
