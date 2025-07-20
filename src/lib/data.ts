@@ -77,6 +77,7 @@ export async function getAllAvailableSpecializedVehicles(): Promise<SpecializedV
 
 export async function getAllRegisteredMechanics(): Promise<Mechanic[]> {
     const users = await getRegisteredUsers();
+    if (users.length === 0) return [];
     return users
         .filter(u => u.isPartner && u.partnerType === 'mechanic')
         .map((u, index) => ({
@@ -167,19 +168,6 @@ export async function isVehicleAvailable(vehicleId: string, startDate: Date, end
 }
 
 export async function registerUser(details: Pick<User, 'name' | 'email' | 'password' | 'partnerType' | 'isPartner'>): Promise<User> {
-    if (!db) {
-        console.error("Firestore not initialized. Cannot register user.");
-        throw new Error("Database is not configured. Please contact support.");
-    }
-    
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("email", "==", details.email));
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-        throw new Error("A user with this email already exists.");
-    }
-
     const newUser: User = {
         ...defaultUser,
         name: details.name,
@@ -195,6 +183,19 @@ export async function registerUser(details: Pick<User, 'name' | 'email' | 'passw
         partnerStats: { totalRevenue: 0, avgRating: 0 },
         specialty: details.partnerType === 'mechanic' ? 'General Repair' : undefined,
     };
+    
+    if (!db) {
+        console.warn("Firestore not initialized. Cannot register user to DB. Saving locally.");
+        return newUser;
+    }
+    
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("email", "==", details.email));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+        throw new Error("A user with this email already exists.");
+    }
     
     // Save to Firestore
     await setDoc(doc(db, "users", newUser.email), newUser);
