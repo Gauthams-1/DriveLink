@@ -358,18 +358,27 @@ export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id'>, cat
         return null;
     };
     
-    const finalVehicleData = {
-        ...vehicleData,
-        ownerId,
-        status: 'Available',
-        category,
-    };
-
     // IMPORTANT: Remove any temporary ID property before sending to Firestore
     // to allow Firestore to generate a unique ID.
-    if ('id' in finalVehicleData) {
-        delete (finalVehicleData as Partial<AnyVehicle>).id;
+    const dataToSave = { ...vehicleData };
+    if ('id' in dataToSave) {
+        delete (dataToSave as Partial<AnyVehicle>).id;
     }
+    
+    // Re-assign the category based on type for Car-like vehicles
+    if (category === 'Car' && (dataToSave as Car).type) {
+        const carType = (dataToSave as Car).type;
+        if (carType === 'Bike' || carType === 'Scooter') {
+            category = carType;
+        }
+    }
+
+    const finalVehicleData = {
+        ...dataToSave,
+        ownerId,
+        status: 'Available',
+        category: category, // Use the determined category
+    };
 
     const docRef = await addDoc(collection(db, 'vehicles'), finalVehicleData);
     
