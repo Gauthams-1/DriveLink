@@ -9,8 +9,8 @@
  * - FindMechanicOutput - The return type for the findMechanics function.
  */
 
-import { getAllRegisteredMechanics } from '@/lib/data';
 import { z } from 'zod';
+import type { Mechanic } from '@/lib/types';
 
 const FindMechanicInputSchema = z.object({
   location: z.string().describe('The current location of the user who needs help (e.g., "Andheri, Mumbai").'),
@@ -31,10 +31,36 @@ export type FindMechanicOutput = z.infer<typeof FindMechanicOutputSchema>;
 
 
 export async function findMechanics(input: FindMechanicInput): Promise<FindMechanicOutput> {
-  // Directly fetch registered mechanics, bypassing AI.
-  const mechanics = await getAllRegisteredMechanics();
-  
-  // In a real application, you might filter mechanics by location or specialty here.
-  // For now, we'll return a subset of the available mechanics.
-  return mechanics.slice(0, 3);
+  // For demonstration, return a hardcoded list of mechanics.
+  const sampleMechanics: Mechanic[] = [
+    {
+      id: 1,
+      name: 'Ravi\'s Reliable Repairs',
+      location: 'Andheri, Mumbai',
+      phone: '9876543210',
+      rating: 4.8,
+      specialty: 'Engine & Transmission Expert',
+      avatarUrl: 'https://placehold.co/100x100.png',
+    },
+    {
+      id: 2,
+      name: 'Speedy Singh\'s Servicing',
+      location: 'Bandra, Mumbai',
+      phone: '9876543211',
+      rating: 4.7,
+      specialty: 'Brakes & Suspension Specialist',
+      avatarUrl: 'https://placehold.co/100x100.png',
+    },
+    {
+      id: 3,
+      name: 'Anil\'s Auto Care',
+      location: 'Dadar, Mumbai',
+      phone: '9876543212',
+      rating: 4.9,
+      specialty: 'General Maintenance & Electrical',
+      avatarUrl: 'https://placehold.co/100x100.png',
+    }
+  ];
+
+  return sampleMechanics;
 }
