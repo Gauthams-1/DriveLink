@@ -351,7 +351,7 @@ export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>): Promis
         throw new Error("User is not a partner.");
     }
     if (!db) {
-        console.error("Firestore not initialized. Cannot add vehicle.");
+        console.warn("Firestore not initialized. Vehicle not added to DB. This is a local-only operation.");
         return;
     };
     await addDoc(collection(db, 'vehicles'), { ...vehicle, ownerId: currentUser.email });
