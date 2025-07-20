@@ -39,11 +39,11 @@ export function AuthPage() {
     router.push('/partner');
   };
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     const email = signInEmailRef.current?.value || '';
     const password = signInPasswordRef.current?.value || '';
     
-    const user = authenticateUser(email, password);
+    const user = await authenticateUser(email, password);
 
     if (user && user.isPartner) {
       handleLoginSuccess(user);
@@ -56,7 +56,7 @@ export function AuthPage() {
     }
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     const name = signUpNameRef.current?.value || '';
     const email = signUpEmailRef.current?.value || '';
     const password = signUpPasswordRef.current?.value || '';
@@ -71,7 +71,7 @@ export function AuthPage() {
     }
     
     try {
-        const newUser = registerUser({ name, email, password, partnerType });
+        const newUser = await registerUser({ name, email, password, partnerType, isPartner: true });
         handleLoginSuccess(newUser);
     } catch (error: any) {
         toast({
