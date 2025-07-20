@@ -129,16 +129,82 @@ export async function getAllAvailableCars(): Promise<Car[]> {
 
 export async function getAllAvailableBuses(): Promise<Bus[]> {
   const allVehicles = await getAllVehicles();
-  return allVehicles.filter(v => 
+  const firestoreBuses = allVehicles.filter(v => 
     v.status === 'Available' && v.category === 'Bus'
   ) as Bus[];
+
+  const sampleBuses: Bus[] = [
+    {
+      id: 'sample-bus-1',
+      name: 'Deluxe Voyager',
+      category: 'Bus',
+      type: 'Sleeper',
+      pricePerDay: 18000,
+      images: [],
+      description: 'Luxury sleeper bus for long-distance travel. Fully equipped with comfortable berths, personal screens, and on-board restroom.',
+      status: 'Available',
+      ownerId: 'system@drivelink.com',
+      seats: 38,
+      amenities: ['Air Conditioning', 'Wi-Fi', 'Personal TV', 'Restroom'],
+      driverRating: 4.8,
+      driver: { name: 'Suresh P.', phone: '9876543210' }
+    },
+    {
+      id: 'sample-bus-2',
+      name: 'City Commuter',
+      category: 'Bus',
+      type: 'Seater',
+      pricePerDay: 12000,
+      images: [],
+      description: 'An efficient and comfortable seater bus perfect for corporate outings or city tours. Ample legroom and panoramic windows.',
+      status: 'Available',
+      ownerId: 'system@drivelink.com',
+      seats: 45,
+      amenities: ['Air Conditioning', 'Reading Lights', 'PA System'],
+      driverRating: 4.7,
+      driver: { name: 'Manoj K.', phone: '9876543211' }
+    }
+  ];
+
+  return [...sampleBuses, ...firestoreBuses];
 }
 
 export async function getAllAvailableTrucks(): Promise<Truck[]> {
   const allVehicles = await getAllVehicles();
-  return allVehicles.filter(v => 
+  const firestoreTrucks = allVehicles.filter(v => 
     v.status === 'Available' && v.category === 'Truck'
   ) as Truck[];
+
+  const sampleTrucks: Truck[] = [
+    {
+      id: 'sample-truck-1',
+      name: 'Mighty Mover',
+      category: 'Truck',
+      size: 'Medium',
+      pricePerDay: 8500,
+      images: [],
+      description: 'A reliable medium-sized truck, perfect for house shifting or delivering medium to large-sized goods.',
+      status: 'Available',
+      ownerId: 'system@drivelink.com',
+      payload: '5 Ton',
+      driverRating: 4.6
+    },
+    {
+      id: 'sample-truck-2',
+      name: 'Mini Transporter',
+      category: 'Truck',
+      size: 'Mini',
+      pricePerDay: 4500,
+      images: [],
+      description: 'Compact and efficient mini truck for small-scale logistics and last-mile delivery in the city.',
+      status: 'Available',
+      ownerId: 'system@drivelink.com',
+      payload: '1 Ton',
+      driverRating: 4.8
+    }
+  ];
+
+  return [...sampleTrucks, ...firestoreTrucks];
 }
 
 const staticSpecializedVehicles: SpecializedVehicle[] = [
@@ -227,7 +293,10 @@ export async function findVehicleById(id: string): Promise<AnyVehicle | undefine
     }
      if (id.startsWith('sample-')) {
         const sampleCars = await getAllAvailableCars();
-        return sampleCars.find(v => v.id === id);
+        const sampleBuses = await getAllAvailableBuses();
+        const sampleTrucks = await getAllAvailableTrucks();
+        const allSamples = [...sampleCars, ...sampleBuses, ...sampleTrucks];
+        return allSamples.find(v => v.id === id);
     }
     if (!db) {
         console.warn("Firestore is not initialized. Cannot find vehicle.");
@@ -426,7 +495,7 @@ export async function updatePartnerVehicle(vehicle: AnyVehicle): Promise<void> {
     await updateDoc(vehicleRef, { ...vehicle });
 };
 
-export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id' | 'category'>, category: VehicleCategory, owner?: string): Promise<AnyVehicle> {
+export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id'>, category: VehicleCategory, owner?: string): Promise<AnyVehicle> {
     const currentUser = getCurrentUser();
     const ownerId = owner || currentUser.email;
 
@@ -438,18 +507,15 @@ export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id' | 'ca
         throw new Error("Firestore not initialized. Vehicle not added to DB.");
     };
 
-    let finalCategory: VehicleCategory = category;
     const dataToSave: any = { ...vehicleData };
     
     if (dataToSave.id) {
       delete dataToSave.id;
     }
     
-    if (category === 'Car' && (dataToSave as Car).type) {
-        const carType = (dataToSave as Car).type;
-        if (carType === 'Bike' || carType === 'Scooter') {
-            finalCategory = carType;
-        }
+    let finalCategory: VehicleCategory = category;
+    if (category === 'Car' && dataToSave.type && ['Bike', 'Scooter'].includes(dataToSave.type)) {
+        finalCategory = dataToSave.type;
     }
     
     const finalVehicleData = {
