@@ -19,8 +19,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-muted/40 p-4">
-      <div className="mb-12 text-center">
-        <Logo className="justify-center" />
+      <div className="w-full max-w-6xl mb-12">
+        <Logo />
         <h1 className="text-3xl md:text-4xl font-headline font-bold mt-4">
           Welcome to DriveLink
         </h1>
