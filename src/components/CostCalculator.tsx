@@ -20,7 +20,7 @@ const ADDONS = [
   { id: 'insurance', label: 'Full Insurance', price: 1500 },
   { id: 'gps', label: 'GPS Navigation', price: 500 },
   { id: 'child-seat', label: 'Child Seat', price: 400 },
-  { id: 'driver', label: 'Driver Assistance', price: 2500 },
+  { id: 'driver', label: 'Driver Assistance', price: 2000 },
 ];
 
 export function CostCalculator({ car }: { car: Car }) {
