@@ -24,6 +24,7 @@ export type Reservation = {
   totalCost: number;
   pickup: string;
   dropoff: string;
+  driverAssistance?: boolean;
 };
 
 export type BusReservation = {
@@ -166,4 +167,3 @@ export type Trip = {
 export type CarReservationWithDetails = Reservation & { car: Car };
 export type BusReservationWithDetails = BusReservation & { bus: Bus };
 export type SpecializedVehicleReservationWithDetails = SpecializedVehicleReservation & { vehicle: SpecializedVehicle };
-

@@ -9,7 +9,7 @@ import { Label } from './ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, User as UserIcon } from 'lucide-react';
 import { Calendar } from './ui/calendar';
 import { Checkbox } from './ui/checkbox';
 import type { DateRange } from 'react-day-picker';
@@ -20,6 +20,7 @@ const ADDONS = [
   { id: 'insurance', label: 'Full Insurance', price: 1500 },
   { id: 'gps', label: 'GPS Navigation', price: 500 },
   { id: 'child-seat', label: 'Child Seat', price: 400 },
+  { id: 'driver', label: 'Driver Assistance', price: 2500 },
 ];
 
 export function CostCalculator({ car }: { car: Car }) {
@@ -132,7 +133,10 @@ export function CostCalculator({ car }: { car: Car }) {
                   onCheckedChange={() => handleAddonToggle(addon.id)}
                 />
                 <Label htmlFor={addon.id} className="font-normal flex justify-between w-full">
-                  <span>{addon.label}</span>
+                  <span className="flex items-center gap-2">
+                    {addon.id === 'driver' && <UserIcon className="w-4 h-4" />}
+                    {addon.label}
+                  </span>
                   <span className="text-muted-foreground">₹{addon.price}/day</span>
                 </Label>
               </div>

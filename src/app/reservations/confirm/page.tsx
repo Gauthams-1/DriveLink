@@ -7,7 +7,7 @@ import { findCarById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Shield, Package, MapPin, Car as CarIcon, Loader2 } from 'lucide-react';
+import { CheckCircle, Calendar, Shield, Package, MapPin, Car as CarIcon, Loader2, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import type { Car } from '@/lib/types';
@@ -68,6 +68,7 @@ function ConfirmationContent() {
       { id: 'insurance', label: 'Full Insurance' },
       { id: 'gps', label: 'GPS Navigation' },
       { id: 'child-seat', label: 'Child Seat' },
+      { id: 'driver', label: 'Driver Assistance' },
   ];
 
   return (

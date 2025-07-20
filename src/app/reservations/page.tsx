@@ -23,7 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Car, Pencil, Trash2, Bus, Accessibility, HeartHandshake } from 'lucide-react';
+import { Car, Pencil, Trash2, Bus, Accessibility, HeartHandshake, User as UserIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
@@ -170,6 +170,12 @@ export default function ReservationsPage() {
                            <Badge variant="outline" className="mt-1 ml-7 bg-blue-100 text-blue-800 border-blue-200">
                                 <HeartHandshake className="h-3 w-3 mr-1" />
                                 Caretaker
+                           </Badge>
+                        )}
+                         {reservation.type === 'car' && reservation.driverAssistance && (
+                           <Badge variant="outline" className="mt-1 ml-7 bg-purple-100 text-purple-800 border-purple-200">
+                                <UserIcon className="h-3 w-3 mr-1" />
+                                Driver
                            </Badge>
                         )}
                       </div>

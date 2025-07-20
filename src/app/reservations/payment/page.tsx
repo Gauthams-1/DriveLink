@@ -29,6 +29,8 @@ function CarPaymentContent() {
   const endDateStr = searchParams.get('endDate');
   const totalCost = searchParams.get('totalCost');
   const rentalDays = searchParams.get('rentalDays');
+  const addons = searchParams.get('addons')?.split(',') || [];
+  const driverAssistance = addons.includes('driver');
 
   const car = findCarById(Number(carId));
   
@@ -80,6 +82,7 @@ function CarPaymentContent() {
         totalCost: parseFloat(totalCost),
         pickup: pickup,
         dropoff: dropoff,
+        driverAssistance: driverAssistance,
     };
     
     const existingReservations = JSON.parse(localStorage.getItem('carReservations') || '[]');
