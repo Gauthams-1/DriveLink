@@ -114,7 +114,8 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
             finalCategory = (formData as Car).type as VehicleCategory;
         }
 
-        onSave(formData as AnyVehicle, finalCategory);
+        const finalData = { ...formData, category: finalCategory };
+        onSave(finalData as AnyVehicle, finalCategory);
     };
 
     return (
@@ -442,6 +443,7 @@ export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUp
   const { toast } = useToast();
 
   useEffect(() => {
+    setLoading(true);
     getVehiclesForPartner(user.email).then(data => {
         setVehicles(data);
         setLoading(false);
