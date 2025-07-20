@@ -2,7 +2,6 @@
 'use client';
 
 import { TruckCard } from "@/components/TruckCard";
-import { TruckSearchForm } from "@/components/TruckSearchForm";
 import { getAllAvailableTrucks } from "@/lib/data";
 import type { Truck } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -57,10 +56,6 @@ export default function TrucksPage() {
             <div className="text-center mb-12">
                 <h1 className="text-4xl font-bold font-headline">Book a Truck</h1>
                 <p className="text-muted-foreground mt-2 text-lg">For house shifting, large equipment, and all your heavy-duty needs.</p>
-            </div>
-
-            <div className="mb-12">
-                <TruckSearchForm />
             </div>
 
             <div className="mb-8">
