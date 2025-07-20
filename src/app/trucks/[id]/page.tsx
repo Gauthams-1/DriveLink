@@ -13,7 +13,7 @@ import type { User } from '@/lib/types';
 
 export default function TruckDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const truck = useMemo(() => findTruckById(Number(params.id)), [params.id]);
+  const truck = useMemo(() => findTruckById(Number(params.id)), [params]);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
