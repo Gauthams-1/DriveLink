@@ -345,35 +345,36 @@ export async function updatePartnerVehicle(vehicle: AnyVehicle): Promise<void> {
     await updateDoc(vehicleRef, { ...vehicle });
 };
 
-export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>, category: VehicleCategory, owner?: string): Promise<AnyVehicle | null> {
+export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id'>, category: VehicleCategory, owner?: string): Promise<AnyVehicle | null> {
     const currentUser = getCurrentUser();
     const ownerId = owner || currentUser.email;
-    
-    if (!ownerId && !currentUser.isPartner) {
-        throw new Error("User is not a partner.");
-    }
 
+    if (!ownerId || (currentUser.isGuest && !owner)) {
+        throw new Error("User must be a logged-in partner to add a vehicle.");
+    }
+    
     if (!db) {
         console.warn("Firestore not initialized. Vehicle not added to DB. This is a local-only operation.");
         return {
-            ...vehicle,
+            ...vehicleData,
             id: `temp-${Date.now()}`,
             ownerId: ownerId,
-            category: category,
             status: 'Available',
+            category,
         } as AnyVehicle;
     };
     
-    // The category is now explicitly passed in, ensuring correctness.
-    const vehicleData = { ...vehicle, ownerId, category: category, status: 'Available' };
-    
-    // Remove the temporary ID from AI-generated cars before saving
-    if ('id' in vehicleData) {
-        delete (vehicleData as Partial<AnyVehicle>).id;
+    const finalVehicleData = { ...vehicleData, ownerId, status: 'Available', category };
+
+    // Remove temporary ID if it exists (e.g., from AI generation)
+    if ('id' in finalVehicleData) {
+        delete (finalVehicleData as Partial<AnyVehicle>).id;
     }
 
-    const docRef = await addDoc(collection(db, 'vehicles'), vehicleData);
-    return { ...vehicleData, id: docRef.id } as AnyVehicle;
+    const docRef = await addDoc(collection(db, 'vehicles'), finalVehicleData);
+    
+    const newVehicle = await findVehicleById(docRef.id);
+    return newVehicle || null;
 };
 
 export async function getVehiclesForPartner(ownerId: string): Promise<AnyVehicle[]> {
