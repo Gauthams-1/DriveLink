@@ -6,6 +6,7 @@ export type VehicleCategory = 'Car' | 'Bike' | 'Scooter' | 'Bus' | 'Truck' | 'Sp
 export type BaseVehicle = {
   id: string; // Firestore document ID
   name: string;
+  category: VehicleCategory;
   pricePerDay: number;
   images: string[];
   description: string;

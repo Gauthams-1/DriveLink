@@ -1,5 +1,5 @@
 
-import type { User, Mechanic, Job, Trip, DB, AnyVehicle, Car, Bus, Truck, SpecializedVehicle, Reservation, ReservationWithVehicle } from './types';
+import type { User, Mechanic, Job, Trip, DB, AnyVehicle, Car, Bus, Truck, SpecializedVehicle, Reservation, ReservationWithVehicle, VehicleCategory } from './types';
 import { db } from './firebase';
 import { collection, doc, getDoc, getDocs, setDoc, query, where, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
@@ -345,7 +345,7 @@ export async function updatePartnerVehicle(vehicle: AnyVehicle): Promise<void> {
     await updateDoc(vehicleRef, { ...vehicle });
 };
 
-export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>): Promise<void> {
+export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>, category: VehicleCategory): Promise<void> {
     const currentUser = getCurrentUser();
     if (!currentUser.isPartner) {
         throw new Error("User is not a partner.");
@@ -354,7 +354,7 @@ export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>): Promis
         console.warn("Firestore not initialized. Vehicle not added to DB. This is a local-only operation.");
         return;
     };
-    await addDoc(collection(db, 'vehicles'), { ...vehicle, ownerId: currentUser.email });
+    await addDoc(collection(db, 'vehicles'), { ...vehicle, ownerId: currentUser.email, category: category });
 };
 
 export async function getVehiclesForPartner(ownerId: string): Promise<AnyVehicle[]> {

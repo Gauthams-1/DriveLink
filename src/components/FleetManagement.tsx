@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { addPartnerVehicle, updatePartnerVehicle, getVehiclesForPartner } from '@/lib/data';
-import type { AnyVehicle, User, Car, Bus, Truck } from '@/lib/types';
+import type { AnyVehicle, User, Car, Bus, Truck, VehicleCategory } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,7 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 
 type VehicleFormProps = { 
     vehicle: Partial<AnyVehicle> | null, 
-    onSave: (v: AnyVehicle) => void, 
+    onSave: (v: AnyVehicle, category: VehicleCategory) => void, 
     onCancel: () => void 
 }
 
@@ -30,12 +30,17 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
         if (vehicle.category === 'Bus') return 'Bus';
         if (vehicle.category === 'Truck') return 'Truck';
         if (vehicle.category === 'Specialized') return 'Specialized';
+        // Default to car for Bike/Scooter types
+        if (vehicle.category === 'Bike' || vehicle.category === 'Scooter') return 'Car';
         return 'Car';
     }
 
-    const [vehicleCategory, setVehicleCategory] = useState<'Car' | 'Bus' | 'Truck' | 'Specialized'>(getInitialCategory());
+    const [vehicleCategory, setVehicleCategory] = useState<'Car' | 'Bus' | 'Truck'>(() => {
+        const cat = getInitialCategory();
+        return cat === 'Specialized' ? 'Car' : cat;
+    });
     
-    const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck' | 'Specialized'): Partial<AnyVehicle> => {
+    const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck'): Partial<AnyVehicle> => {
         if (category === 'Bus') {
             return {
                 name: '', type: 'Seater', seats: 45, pricePerDay: 15000,
@@ -56,9 +61,12 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
         };
     };
 
-    const [formData, setFormData] = useState<Partial<AnyVehicle>>(vehicle || getDefaultStateForCategory(vehicleCategory));
+    const [formData, setFormData] = useState<Partial<AnyVehicle>>(() => {
+        if (vehicle) return vehicle;
+        return getDefaultStateForCategory(vehicleCategory);
+    });
 
-    const handleCategoryChange = (value: 'Car' | 'Bus' | 'Truck' | 'Specialized') => {
+    const handleCategoryChange = (value: 'Car' | 'Bus' | 'Truck') => {
         setVehicleCategory(value);
         if (!isEditing) {
             setFormData(getDefaultStateForCategory(value));
@@ -100,7 +108,13 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
             alert('Please fill in all required fields.');
             return;
         }
-        onSave(formData as AnyVehicle);
+
+        let finalCategory: VehicleCategory = vehicleCategory;
+        if(vehicleCategory === 'Car' && ['Bike', 'Scooter'].includes((formData as Car).type)) {
+            finalCategory = (formData as Car).type as VehicleCategory;
+        }
+
+        onSave(formData as AnyVehicle, finalCategory);
     };
 
     return (
@@ -444,14 +458,14 @@ export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUp
     setIsDialogOpen(true);
   };
 
-  const handleSave = async (vehicleData: AnyVehicle) => {
+  const handleSave = async (vehicleData: AnyVehicle, category: VehicleCategory) => {
     try {
         if (vehicleData.id) { // Editing existing
-            await updatePartnerVehicle(vehicleData);
-            setVehicles(prev => prev.map(v => v.id === vehicleData.id ? vehicleData : v));
+            await updatePartnerVehicle({...vehicleData, category });
+            setVehicles(prev => prev.map(v => v.id === vehicleData.id ? {...vehicleData, category} : v));
             toast({ title: "Vehicle Updated!", description: `${vehicleData.name} has been updated.` });
         } else { // Adding new
-            await addPartnerVehicle(vehicleData);
+            await addPartnerVehicle(vehicleData, category);
             // Re-fetch to get the new vehicle with its ID
             getVehiclesForPartner(user.email).then(setVehicles);
             toast({ title: "Vehicle Added!", description: `${vehicleData.name} has been added to your fleet.` });
