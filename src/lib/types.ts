@@ -1,5 +1,4 @@
 
-import type { Timestamp } from "firebase/firestore";
 
 export type VehicleCategory = 'Car' | 'Bike' | 'Scooter' | 'Bus' | 'Truck' | 'Specialized';
 
@@ -62,7 +61,7 @@ export type SpecializedVehicle = BaseVehicle & {
 export type AnyVehicle = Car | Bus | Truck | SpecializedVehicle;
 
 export type Reservation = {
-  id: string; // Firestore document ID
+  id: string;
   userId: string; // email of the user
   vehicleId: string;
   vehicleName: string;
@@ -98,13 +97,14 @@ export type User = {
   partnerStats?: PartnerStats;
 };
 
+// This namespace is kept for compatibility but is no longer tied to Firestore.
 export namespace DB {
   export type User = Omit<User, "memberSince"> & {
-    memberSince: Timestamp;
+    memberSince: Date | string; // Allow string for JSON compatibility
   }
   export type Reservation = Omit<Reservation, "startDate" | "endDate"> & {
-    startDate: Timestamp;
-    endDate: Timestamp;
+    startDate: Date | string; // Allow string for JSON compatibility
+    endDate: Date | string; // Allow string for JSON compatibility
   }
   export type Vehicle = AnyVehicle;
 }
