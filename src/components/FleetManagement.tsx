@@ -477,7 +477,7 @@ export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUp
         }
         setIsDialogOpen(false);
         setEditingVehicle(null);
-        await fetchVehicles(); // Re-fetch all vehicles to ensure the list is up-to-date
+        await fetchVehicles();
     } catch (error) {
         console.error("Failed to save vehicle", error);
         toast({ title: "Save Failed", description: "Could not save vehicle details.", variant: "destructive" });

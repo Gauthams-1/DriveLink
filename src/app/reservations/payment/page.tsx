@@ -3,11 +3,11 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { findVehicleById, isVehicleAvailable, createReservation, getCurrentUser, updatePartnerVehicle } from '@/lib/data';
+import { findVehicleById, isVehicleAvailable, createReservation, getCurrentUser, updatePartnerVehicle, findOwnerOfVehicle } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Calendar, Banknote, CreditCard, MapPin, Car as CarIcon, Loader2 } from 'lucide-react';
+import { CheckCircle, Calendar, Banknote, CreditCard, MapPin, Car as CarIcon, Loader2, Phone } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
@@ -24,6 +24,7 @@ function CarPaymentContent() {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [pickup, setPickup] = useState('');
   const [dropoff, setDropoff] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
   const [vehicle, setVehicle] = useState<AnyVehicle | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -94,8 +95,14 @@ function CarPaymentContent() {
     try {
       await createReservation(newReservation);
       
-      // Update vehicle status
+      // Update vehicle status with renter info
       vehicle.status = 'Rented';
+      vehicle.renter = {
+        name: currentUser.name,
+        email: currentUser.email,
+        phone: contactPhone,
+        rentalPeriod: `${format(startDate, 'MMM d')} - ${format(endDate, 'MMM d, yyyy')}`
+      }
       await updatePartnerVehicle(vehicle);
 
       toast({
@@ -184,6 +191,13 @@ function CarPaymentContent() {
                      <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input id="dropoff" name="dropoff" placeholder="e.g., The Taj Mahal Palace, Mumbai" required className="pl-10" value={dropoff} onChange={(e) => setDropoff(e.target.value)} />
+                    </div>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="contactPhone">Contact Phone Number</Label>
+                     <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input id="contactPhone" name="contactPhone" type="tel" placeholder="e.g., 9876543210" required className="pl-10" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
                     </div>
                 </div>
             </CardContent>
