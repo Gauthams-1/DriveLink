@@ -75,6 +75,7 @@ function SpecializedVehicleList({ searchParams }: { searchParams: SearchParams }
 }
 
 export default function SpecializedVehiclesPage({ searchParams }: { searchParams: SearchParams }) {
+  const { 'service-type': serviceType } = searchParams;
   return (
     <div className="container mx-auto py-8 px-4 animate-fade-in">
       <div className="text-center mb-12">
@@ -95,7 +96,7 @@ export default function SpecializedVehiclesPage({ searchParams }: { searchParams
            <form className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
               <div className="md:col-span-3 space-y-2">
                 <Label htmlFor="service-type">What service are you looking for?</Label>
-                <Select name="service-type" defaultValue={searchParams['service-type']}>
+                <Select name="service-type" defaultValue={serviceType}>
                   <SelectTrigger id="service-type">
                     <SelectValue placeholder="Select a service type" />
                   </SelectTrigger>
@@ -117,7 +118,7 @@ export default function SpecializedVehiclesPage({ searchParams }: { searchParams
       <div className="mb-8">
         <h2 className="text-3xl font-bold font-headline">Available Vehicles</h2>
         <p className="text-muted-foreground">
-          {searchParams['service-type'] ? `Showing results for ${searchParams['service-type']} friendly vehicles` : 'Choose from our fleet of specially equipped vehicles.'}
+          {serviceType ? `Showing results for ${serviceType} friendly vehicles` : 'Choose from our fleet of specially equipped vehicles.'}
         </p>
       </div>
       
