@@ -17,12 +17,12 @@ let app;
 let db: Firestore | null = null;
 let auth: Auth | null = null;
 
-if (firebaseConfig.apiKey) {
+if (firebaseConfig.apiKey && firebaseConfig.projectId) {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     db = getFirestore(app);
     auth = getAuth(app);
 } else {
-    console.warn("Firebase configuration is missing. Firebase features will be disabled. Please add your Firebase credentials to the .env file.");
+    console.warn("Firebase configuration is missing or incomplete. Firebase features will be disabled, and the app will run in a local-only mode. Please add your Firebase credentials to your .env file to connect to the database.");
 }
 
 
