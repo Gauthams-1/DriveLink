@@ -68,11 +68,68 @@ export async function getAllAvailableTrucks(): Promise<Truck[]> {
   ) as Truck[];
 }
 
+const staticSpecializedVehicles: SpecializedVehicle[] = [
+    {
+        id: 'spec-001',
+        name: 'MobilityMax Van',
+        category: 'Specialized',
+        type: 'Wheelchair Accessible Van',
+        pricePerDay: 4500,
+        images: [],
+        description: 'Spacious and comfortable van equipped with a hydraulic ramp for easy wheelchair access. Perfect for safe and secure travel for passengers with mobility challenges.',
+        status: 'Available',
+        ownerId: 'system@drivelink.com',
+        capacity: '4 Passengers + 1 Wheelchair',
+        features: ['Hydraulic Wheelchair Ramp', 'Secure Wheelchair Restraints', 'Spacious Interior', 'Trained Driver'],
+        driverRating: 4.9,
+    },
+    {
+        id: 'spec-002',
+        name: 'Paws & Go SUV',
+        category: 'Specialized',
+        type: 'Pet-Friendly SUV',
+        pricePerDay: 3500,
+        images: [],
+        description: 'Travel with your furry friends without worry. This SUV comes with protective seat covers, a pet safety harness, and ample space for carriers.',
+        status: 'Available',
+        ownerId: 'system@drivelink.com',
+        capacity: '4 Passengers + Pet Area',
+        features: ['Pet Seat Covers', 'Safety Harness Clip', 'Ventilated Carrier Space', 'Easy-to-clean interior'],
+        driverRating: 4.8,
+    },
+    {
+        id: 'spec-003',
+        name: 'ComfortRide Sedan',
+        category: 'Specialized',
+        type: 'Senior-Friendly Sedan',
+        pricePerDay: 3000,
+        images: [],
+        description: 'A comfortable and easy-to-access sedan ideal for senior citizens. Features extra cushioning, easy entry/exit, and a driver trained in providing assistance.',
+        status: 'Available',
+        ownerId: 'system@drivelink.com',
+        capacity: '4 Passengers',
+        features: ['Easy Entry & Exit', 'Extra Cushion Support', 'Polite & Trained Driver', 'Ample Legroom'],
+        driverRating: 4.9,
+    },
+    {
+        id: 'spec-004',
+        name: 'Guidance Vehicle',
+        category: 'Specialized',
+        type: 'Visually Impaired Support',
+        pricePerDay: 3200,
+        images: [],
+        description: 'This vehicle service provides a specially trained driver to offer descriptive guidance and assistance for visually impaired passengers, ensuring a safe and informed journey.',
+        status: 'Available',
+        ownerId: 'system@drivelink.com',
+        capacity: '3 Passengers',
+        features: ['Specially Trained Driver', 'Verbal Guidance Assistance', 'Braille Info Card', 'Predictable Interior Layout'],
+        driverRating: 5.0,
+    },
+];
+
 export async function getAllAvailableSpecializedVehicles(): Promise<SpecializedVehicle[]> {
-  const allVehicles = await getAllVehicles();
-  return allVehicles.filter(v => 
-    v.status === 'Available' && v.category === 'Specialized'
-  ) as SpecializedVehicle[];
+    // These vehicles are system-provided, not partner-owned.
+    return staticSpecializedVehicles.filter(v => v.status === 'Available');
 }
 
 export async function getAllRegisteredMechanics(): Promise<Mechanic[]> {
@@ -92,6 +149,9 @@ export async function getAllRegisteredMechanics(): Promise<Mechanic[]> {
 }
 
 export async function findVehicleById(id: string): Promise<AnyVehicle | undefined> {
+    if (id.startsWith('spec-')) {
+        return staticSpecializedVehicles.find(v => v.id === id);
+    }
     if (!db) {
         console.warn("Firestore is not initialized. Cannot find vehicle.");
         return undefined;
