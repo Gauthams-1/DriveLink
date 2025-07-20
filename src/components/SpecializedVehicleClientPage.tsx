@@ -21,6 +21,7 @@ export function SpecializedVehicleClientPage({ searchParams }: { searchParams: S
       const serviceType = searchParams['service-type'];
 
       if (serviceType) {
+        // Handle search filter if provided
         filteredVehicles = data.filter(vehicle => {
           const vehicleType = vehicle.type.toLowerCase();
           if (serviceType === 'wheelchair' && vehicleType.includes('wheelchair')) return true;
@@ -29,7 +30,18 @@ export function SpecializedVehicleClientPage({ searchParams }: { searchParams: S
           if (serviceType === 'visual' && vehicleType.includes('visually impaired')) return true;
           return false;
         });
+      } else {
+        // Default view: show disability-support vehicles
+        const disabilitySupportTypes = [
+            'wheelchair accessible van',
+            'senior-friendly sedan',
+            'visually impaired support'
+        ];
+        filteredVehicles = data.filter(vehicle => 
+            disabilitySupportTypes.includes(vehicle.type.toLowerCase())
+        ).slice(0, 4);
       }
+
       setVehicles(filteredVehicles);
       setLoading(false);
     });
@@ -37,8 +49,8 @@ export function SpecializedVehicleClientPage({ searchParams }: { searchParams: S
 
   if (loading) {
     return (
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(3)].map((_, i) => (
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {[...Array(4)].map((_, i) => (
                 <div key={i} className="flex flex-col space-y-3">
                     <Skeleton className="h-[224px] w-full rounded-lg" />
                     <div className="space-y-2">
@@ -54,14 +66,14 @@ export function SpecializedVehicleClientPage({ searchParams }: { searchParams: S
   return (
     <>
       {vehicles.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {vehicles.map(vehicle => (
             <SpecializedVehicleCard key={vehicle.id} vehicle={vehicle} />
           ))}
         </div>
       ) : (
-         <div className="text-center col-span-full py-16">
-          <h2 className="text-2xl font-semibold mb-2">No vehicles found</h2>
+         <div className="text-center col-span-full py-16 border-2 border-dashed rounded-lg">
+          <h2 className="text-2xl font-semibold mb-2">No Vehicles Found</h2>
           <p className="text-muted-foreground">Try adjusting your search filters or check back later.</p>
         </div>
       )}
