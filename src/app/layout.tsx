@@ -42,7 +42,7 @@ export default function RootLayout({
         )}
       >
         {!isPortalPage && <Header />}
-        <main className="flex-grow">{children}</main>
+        <main className="flex-grow animate-fade-in">{children}</main>
         {!isPortalPage && <Footer />}
         <Toaster />
       </body>
