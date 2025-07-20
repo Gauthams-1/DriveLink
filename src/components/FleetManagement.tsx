@@ -22,6 +22,29 @@ type VehicleFormProps = {
     onCancel: () => void 
 }
 
+const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck'): Partial<AnyVehicle> => {
+    switch (category) {
+        case 'Bus':
+            return {
+                name: '', type: 'Seater', seats: 45, pricePerDay: 15000,
+                amenities: ['Air Conditioning', 'Wi-Fi'], category: 'Bus',
+                driver: { name: '', phone: '' }, status: 'Available', driverRating: 4.5
+            };
+        case 'Truck':
+            return {
+                name: '', size: 'Medium', pricePerDay: 7000, payload: '3 Ton',
+                description: '', status: 'Available', category: 'Truck', driverRating: 4.5
+            }
+        case 'Car':
+        default:
+            return { // Car/Bike/Scooter
+                name: '', type: 'Sedan', pricePerDay: 2500, pricePerKm: 12, seats: 4,
+                luggage: 2, transmission: 'Automatic', mpg: 20, description: '',
+                features: [], status: 'Available', category: 'Car',
+            };
+    }
+};
+
 function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
     const isEditing = !!vehicle?.id;
 
@@ -29,44 +52,23 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
         if (!vehicle || !vehicle.category) return 'Car';
         if (vehicle.category === 'Bus') return 'Bus';
         if (vehicle.category === 'Truck') return 'Truck';
-        // Default to car for Bike/Scooter types
-        if (['Car', 'Bike', 'Scooter'].includes(vehicle.category)) return 'Car';
         return 'Car';
     };
-    
-    const [vehicleCategory, setVehicleCategory] = useState<'Car' | 'Bus' | 'Truck'>(getInitialCategory);
-    
-    const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck'): Partial<AnyVehicle> => {
-        if (category === 'Bus') {
-            return {
-                name: '', type: 'Seater', seats: 45, pricePerDay: 15000,
-                amenities: ['Air Conditioning', 'Wi-Fi'], category: 'Bus',
-                driver: { name: '', phone: '' }, status: 'Available', driverRating: 4.5
-            };
-        }
-        if (category === 'Truck') {
-            return {
-                name: '', size: 'Medium', pricePerDay: 7000, payload: '3 Ton',
-                description: '', status: 'Available', category: 'Truck', driverRating: 4.5
-            }
-        }
-        return { // Car/Bike/Scooter
-            name: '', type: 'Sedan', pricePerDay: 2500, pricePerKm: 12, seats: 4,
-            luggage: 2, transmission: 'Automatic', mpg: 20, description: '',
-            features: [], status: 'Available', category: 'Car',
-        };
-    };
 
-    const [formData, setFormData] = useState<Partial<AnyVehicle>>(
-        vehicle || getDefaultStateForCategory(vehicleCategory)
-    );
+    const [vehicleCategory, setVehicleCategory] = useState<'Car' | 'Bus' | 'Truck'>(getInitialCategory());
+    
+    const [formData, setFormData] = useState<Partial<AnyVehicle>>(() => {
+        if (vehicle) {
+            return vehicle;
+        }
+        return getDefaultStateForCategory(vehicleCategory);
+    });
 
-    const handleCategoryChange = (value: 'Car' | 'Bus' | 'Truck') => {
-        setVehicleCategory(value);
+    useEffect(() => {
         if (!isEditing) {
-            setFormData(getDefaultStateForCategory(value));
+            setFormData(getDefaultStateForCategory(vehicleCategory));
         }
-    }
+    }, [vehicleCategory, isEditing]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -98,7 +100,6 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Basic validation
         if (!formData.name || !formData.pricePerDay) {
             alert('Please fill in all required fields.');
             return;
@@ -113,7 +114,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                 finalCategory = 'Car';
             }
         }
-
+        
         const finalData = { ...formData, category: finalCategory };
         onSave(finalData as AnyVehicle, finalCategory);
     };
@@ -123,7 +124,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
             {!isEditing && (
                  <div className="space-y-2">
                     <Label>Vehicle Category</Label>
-                    <RadioGroup defaultValue={vehicleCategory} onValueChange={handleCategoryChange as any} className="grid grid-cols-3 gap-4">
+                    <RadioGroup value={vehicleCategory} onValueChange={(val) => setVehicleCategory(val as 'Car' | 'Bus' | 'Truck')} className="grid grid-cols-3 gap-4">
                         <div>
                             <RadioGroupItem value="Car" id="Car" className="peer sr-only" />
                             <Label htmlFor="Car" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
