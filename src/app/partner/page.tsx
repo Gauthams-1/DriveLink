@@ -18,7 +18,7 @@ import { FleetManagement } from '@/components/FleetManagement';
 import { MechanicDashboard } from '@/components/MechanicDashboard';
 import { DriverDashboard } from '@/components/DriverDashboard';
 import { MyJobs } from '@/components/MyJobs';
-import { LogOut, PanelLeft, DollarSign, Car, BarChart, LifeBuoy, Wrench, Briefcase } from 'lucide-react';
+import { LogOut, PanelLeft, DollarSign, Car, BarChart, LifeBuoy, Wrench, Briefcase, Accessibility } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
@@ -64,6 +64,7 @@ export default function PartnerPage() {
   const renderDashboard = () => {
     switch(partnerType) {
       case 'owner':
+      case 'specialized':
         return <PartnerDashboard user={user} />;
       case 'mechanic':
         return <MechanicDashboard user={user} />;
@@ -80,6 +81,7 @@ export default function PartnerPage() {
     }
     switch(partnerType) {
         case 'owner':
+        case 'specialized':
             if (activeTab === 'fleet') return <FleetManagement user={user} onFleetUpdate={setUser} />;
             if (activeTab === 'earnings') return <div>Earnings Details Coming Soon</div>;
             break;
@@ -98,6 +100,8 @@ export default function PartnerPage() {
      if (partnerType === 'driver') return 'Driver Dashboard';
      return activeTab.replace('-', ' ');
   }
+
+  const isFleetPartner = partnerType === 'owner' || partnerType === 'specialized';
 
   return (
     <SidebarProvider>
@@ -121,7 +125,7 @@ export default function PartnerPage() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     
-                    {partnerType === 'owner' && (
+                    {isFleetPartner && (
                        <SidebarMenuItem>
                         <SidebarMenuButton
                         onClick={() => setActiveTab('fleet')}

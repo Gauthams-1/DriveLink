@@ -21,7 +21,7 @@ import { useRouter } from 'next/navigation';
 import type { User as UserType } from '@/lib/types';
 import { saveUser } from '@/lib/data';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
-import { Car, Wrench, User as UserIcon } from 'lucide-react';
+import { Car, Wrench, User as UserIcon, Accessibility } from 'lucide-react';
 
 export function AuthPage() {
   const router = useRouter();
@@ -30,7 +30,7 @@ export function AuthPage() {
   const signUpNameRef = useRef<HTMLInputElement>(null);
   const signUpEmailRef = useRef<HTMLInputElement>(null);
   const signUpPasswordRef = useRef<HTMLInputElement>(null);
-  const [partnerType, setPartnerType] = useState<'owner' | 'mechanic' | 'driver'>('owner');
+  const [partnerType, setPartnerType] = useState<'owner' | 'mechanic' | 'driver' | 'specialized'>('owner');
   
   const { toast } = useToast();
 
@@ -125,24 +125,31 @@ export function AuthPage() {
                     <CardContent className="space-y-4">
                         <div className="space-y-2 text-left">
                            <Label>I am a...</Label>
-                           <RadioGroup value={partnerType} onValueChange={(val) => setPartnerType(val as 'owner' | 'mechanic' | 'driver')} className="grid grid-cols-3 gap-2">
+                           <RadioGroup value={partnerType} onValueChange={(val) => setPartnerType(val as 'owner' | 'mechanic' | 'driver' | 'specialized')} className="grid grid-cols-4 gap-2">
                                 <div>
                                     <RadioGroupItem value="owner" id="owner" className="peer sr-only" />
-                                    <Label htmlFor="owner" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary text-sm">
+                                    <Label htmlFor="owner" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary text-xs">
                                         <Car className="mb-2 h-5 w-5" />
                                         Owner
                                     </Label>
                                 </div>
                                 <div>
+                                    <RadioGroupItem value="specialized" id="specialized" className="peer sr-only" />
+                                    <Label htmlFor="specialized" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary text-xs">
+                                        <Accessibility className="mb-2 h-5 w-5" />
+                                        Specialized
+                                    </Label>
+                                </div>
+                                <div>
                                     <RadioGroupItem value="mechanic" id="mechanic" className="peer sr-only" />
-                                    <Label htmlFor="mechanic" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary text-sm">
+                                    <Label htmlFor="mechanic" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary text-xs">
                                         <Wrench className="mb-2 h-5 w-5" />
                                         Mechanic
                                     </Label>
                                 </div>
                                  <div>
                                     <RadioGroupItem value="driver" id="driver" className="peer sr-only" />
-                                    <Label htmlFor="driver" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary text-sm">
+                                    <Label htmlFor="driver" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary text-xs">
                                         <UserIcon className="mb-2 h-5 w-5" />
                                         Driver
                                     </Label>

@@ -1,5 +1,6 @@
 
 
+
 export type VehicleCategory = 'Car' | 'Bike' | 'Scooter' | 'Bus' | 'Truck' | 'Specialized';
 
 export type BaseVehicle = {
@@ -90,7 +91,7 @@ export type User = {
   memberSince: Date;
   isGuest?: boolean;
   isPartner?: boolean;
-  partnerType?: 'owner' | 'mechanic' | 'driver';
+  partnerType?: 'owner' | 'mechanic' | 'driver' | 'specialized';
   specialty?: string; // For mechanics
   jobs?: Job[];
   trips?: Trip[];

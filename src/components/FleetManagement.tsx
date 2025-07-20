@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { addPartnerVehicle, updatePartnerVehicle, getVehiclesForPartner } from '@/lib/data';
-import type { AnyVehicle, User, Car, Bus, Truck, VehicleCategory } from '@/lib/types';
+import type { AnyVehicle, User, Car, Bus, Truck, SpecializedVehicle, VehicleCategory } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Edit, Car as CarIcon, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route, Bus as BusIcon, Truck as TruckIcon, Weight, UserCircle, Loader2 } from 'lucide-react';
+import { PlusCircle, Edit, Car as CarIcon, Users, Gauge, GitBranch, Briefcase, User as UserIcon, Phone, Calendar, DollarSign, Info, Route, Bus as BusIcon, Truck as TruckIcon, Weight, UserCircle, Loader2, Accessibility } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 
@@ -22,7 +22,7 @@ type VehicleFormProps = {
     onCancel: () => void 
 }
 
-const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck'): Partial<AnyVehicle> => {
+const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck' | 'Specialized'): Partial<AnyVehicle> => {
     switch (category) {
         case 'Bus':
             return {
@@ -34,7 +34,13 @@ const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck'): Partial<
             return {
                 name: '', size: 'Medium', pricePerDay: 7000, payload: '3 Ton',
                 description: '', status: 'Available', category: 'Truck', driverRating: 4.5
-            }
+            };
+        case 'Specialized':
+             return {
+                name: '', type: 'Wheelchair Accessible Van', pricePerDay: 4500,
+                description: '', status: 'Available', category: 'Specialized',
+                capacity: '4 Passengers + 1 Wheelchair', features: ['Hydraulic Wheelchair Ramp', 'Secure Wheelchair Restraints'], driverRating: 4.9,
+            };
         case 'Car':
         default:
             return { // Car/Bike/Scooter
@@ -48,14 +54,15 @@ const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck'): Partial<
 function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
     const isEditing = !!vehicle?.id;
 
-    const getInitialCategory = (): 'Car' | 'Bus' | 'Truck' => {
+    const getInitialCategory = (): 'Car' | 'Bus' | 'Truck' | 'Specialized' => {
         if (!vehicle || !vehicle.category) return 'Car';
         if (vehicle.category === 'Bus') return 'Bus';
         if (vehicle.category === 'Truck') return 'Truck';
+        if (vehicle.category === 'Specialized') return 'Specialized';
         return 'Car';
     };
 
-    const [vehicleCategory, setVehicleCategory] = useState<'Car' | 'Bus' | 'Truck'>(getInitialCategory());
+    const [vehicleCategory, setVehicleCategory] = useState<'Car' | 'Bus' | 'Truck' | 'Specialized'>(getInitialCategory());
     
     const [formData, setFormData] = useState<Partial<AnyVehicle>>(() => {
         if (vehicle) {
@@ -124,7 +131,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
             {!isEditing && (
                  <div className="space-y-2">
                     <Label>Vehicle Category</Label>
-                    <RadioGroup value={vehicleCategory} onValueChange={(val) => setVehicleCategory(val as 'Car' | 'Bus' | 'Truck')} className="grid grid-cols-3 gap-4">
+                    <RadioGroup value={vehicleCategory} onValueChange={(val) => setVehicleCategory(val as 'Car' | 'Bus' | 'Truck' | 'Specialized')} className="grid grid-cols-4 gap-4">
                         <div>
                             <RadioGroupItem value="Car" id="Car" className="peer sr-only" />
                             <Label htmlFor="Car" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
@@ -144,6 +151,13 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                             <Label htmlFor="Truck" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
                                 <TruckIcon className="mb-3 h-6 w-6" />
                                 Truck
+                            </Label>
+                        </div>
+                        <div>
+                            <RadioGroupItem value="Specialized" id="Specialized" className="peer sr-only" />
+                            <Label htmlFor="Specialized" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                <Accessibility className="mb-3 h-6 w-6" />
+                                Specialized
                             </Label>
                         </div>
                     </RadioGroup>
@@ -302,6 +316,47 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                 </>
             )}
 
+            {vehicleCategory === 'Specialized' && (
+                 <>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <Label htmlFor="type">Service Type</Label>
+                            <Select name="type" value={(formData as SpecializedVehicle).type || 'Wheelchair Accessible Van'} onValueChange={(val) => handleSelectChange('type', val)}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Wheelchair Accessible Van">Wheelchair Accessible</SelectItem>
+                                    <SelectItem value="Pet-Friendly SUV">Pet Friendly</SelectItem>
+                                    <SelectItem value="Senior-Friendly Sedan">Senior Citizen Support</SelectItem>
+                                    <SelectItem value="Visually Impaired Support">Visually Impaired Support</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="pricePerDay">Price Per Day (₹)</Label>
+                            <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay || ''} onChange={handleChange} required />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <Label htmlFor="capacity">Capacity</Label>
+                            <Input id="capacity" name="capacity" value={(formData as SpecializedVehicle).capacity || ''} onChange={handleChange} placeholder="e.g., 4 Passengers + 1 Wheelchair"/>
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="driverRating">Driver Rating</Label>
+                            <Input id="driverRating" name="driverRating" type="number" step="0.1" max="5" value={(formData as SpecializedVehicle).driverRating || ''} onChange={handleChange} />
+                        </div>
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea id="description" name="description" value={(formData as SpecializedVehicle).description || ''} onChange={handleChange} />
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="features">Features (comma-separated)</Label>
+                        <Input id="features" name="features" value={(formData as SpecializedVehicle).features?.join(', ') || ''} onChange={handleFeatureChange} />
+                    </div>
+                 </>
+            )}
+
              <div className="space-y-1">
                 <Label htmlFor="status">Status</Label>
                 <Select name="status" value={formData.status || 'Available'} onValueChange={(val) => handleSelectChange('status', val as AnyVehicle['status'])}>
@@ -339,16 +394,19 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: AnyVehicle, onEdit: (v: Any
 
   const isBus = vehicle.category === 'Bus';
   const isTruck = vehicle.category === 'Truck';
-  const isCar = !isBus && !isTruck;
+  const isSpecialized = vehicle.category === 'Specialized';
+  const isCar = !isBus && !isTruck && !isSpecialized;
   
   const getVehicleIcon = () => {
     if (isBus) return <BusIcon className="w-5 h-5 mr-2"/>;
     if (isTruck) return <TruckIcon className="w-5 h-5 mr-2"/>;
+    if (isSpecialized) return <Accessibility className="w-5 h-5 mr-2"/>;
     return <CarIcon className="w-5 h-5 mr-2"/>;
   }
   
   const getVehicleType = () => {
     if (isTruck) return (vehicle as Truck).size;
+    if (isSpecialized) return (vehicle as SpecializedVehicle).type;
     return (vehicle as Car).type;
   }
 
@@ -411,6 +469,15 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: AnyVehicle, onEdit: (v: Any
                     <div className="flex items-center gap-2"><TruckIcon className="w-4 h-4 text-primary" /> {(vehicle as Truck).size}</div>
                     <div className="flex items-center gap-2"><Weight className="w-4 h-4 text-primary" /> {(vehicle as Truck).payload}</div>
                  </div>
+            )}
+
+            {isSpecialized && (
+                <div className="text-sm text-muted-foreground space-y-2">
+                    <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> {(vehicle as SpecializedVehicle).capacity}</div>
+                    <div className="flex flex-wrap gap-1">
+                        {(vehicle as SpecializedVehicle).features.slice(0, 3).map(f => <Badge key={f} variant="outline">{f}</Badge>)}
+                    </div>
+                </div>
             )}
             
             {vehicle.status === 'Rented' && vehicle.renter && (
