@@ -21,12 +21,6 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-muted/40 p-4">
       <div className="w-full max-w-6xl mb-12">
         <Logo />
-        <h1 className="text-3xl md:text-4xl font-headline font-bold mt-4">
-          Welcome to DriveLink
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Your complete transportation solution. Please choose your portal to continue.
-        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
