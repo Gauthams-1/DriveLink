@@ -37,7 +37,7 @@ export type CarRecommendationInput = z.infer<typeof CarRecommendationInputSchema
 
 
 const CarSchema = z.object({
-    id: z.number().describe("A unique ID for the car, set to 999."),
+    id: z.string().describe("A temporary unique ID for the car, set to 'temp-id'."),
     name: z.string().describe("A creative and fitting name for the generated car (e.g., 'Himalayan Explorer', 'Goa Beach Cruiser')."),
     type: z.enum(['Sedan', 'SUV', 'Minivan', 'Convertible', 'Coupe', 'Bike', 'Scooter']).describe("The vehicle type that best fits the user's needs."),
     pricePerDay: z.number().describe("An appropriate price per day in INR, considering the user's budget and the car's features. Should not exceed the user's budget."),
@@ -76,7 +76,7 @@ Create a single JSON object representing the perfect car for this trip. Adhere s
 - **seats**: Must match the user's passenger count.
 - **description**: Write an exciting and persuasive description.
 - **features**: List 3-4 features that are highly relevant to the user's activities.
-- **id**: Set the ID to 999.
+- **id**: Set the ID to 'temp-id'.
 - **images**: Set this to an array with a single empty string: \`[""]\`.
 
 Your response MUST be a single, valid JSON object matching the output schema.
@@ -91,6 +91,6 @@ const createCarFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    return output! as Car;
   }
 );

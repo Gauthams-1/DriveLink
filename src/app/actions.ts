@@ -4,6 +4,8 @@
 import { createCarFromPrompt, type CarRecommendationInput } from '@/ai/flows/create-car-from-prompt';
 import { generateAvatar, type GenerateAvatarInput } from '@/ai/flows/generate-avatar';
 import { findMechanics } from '@/ai/flows/find-mechanic';
+import { addPartnerVehicle } from '@/lib/data';
+import type { Car, VehicleCategory } from '@/lib/types';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
@@ -35,10 +37,21 @@ export async function getCarRecommendation(
   const rawFormData: CarRecommendationInput = validatedFields.data;
   
   try {
-    const result = await createCarFromPrompt(rawFormData);
+    const aiGeneratedCar = await createCarFromPrompt(rawFormData);
+    
+    // Determine the category based on the AI-generated type
+    let category: VehicleCategory = 'Car';
+    if (aiGeneratedCar.type === 'Bike' || aiGeneratedCar.type === 'Scooter') {
+      category = aiGeneratedCar.type;
+    }
+
+    // Save the AI-generated car to the database as a real vehicle
+    // The ownerId 'ai@drivelink.com' identifies it as system-generated
+    const newCar = await addPartnerVehicle(aiGeneratedCar, category, 'ai@drivelink.com');
+
     return {
       message: 'success',
-      recommendedCar: result,
+      recommendedCar: newCar,
     };
   } catch (error) {
     console.error(error);

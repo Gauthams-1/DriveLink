@@ -345,24 +345,35 @@ export async function updatePartnerVehicle(vehicle: AnyVehicle): Promise<void> {
     await updateDoc(vehicleRef, { ...vehicle });
 };
 
-export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>, category: VehicleCategory): Promise<AnyVehicle | null> {
+export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>, category: VehicleCategory, owner?: string): Promise<AnyVehicle | null> {
     const currentUser = getCurrentUser();
-    if (!currentUser.isPartner) {
+    const ownerId = owner || currentUser.email;
+    
+    if (!ownerId && !currentUser.isPartner) {
         throw new Error("User is not a partner.");
     }
+
     if (!db) {
         console.warn("Firestore not initialized. Vehicle not added to DB. This is a local-only operation.");
-        // Return a locally-created object for immediate UI update, but with a temporary ID.
         return {
             ...vehicle,
             id: `temp-${Date.now()}`,
-            ownerId: currentUser.email,
-            category: category
-        };
+            ownerId: ownerId,
+            category: category,
+            status: 'Available',
+        } as AnyVehicle;
     };
-    const vehicleData = { ...vehicle, ownerId: currentUser.email, category: category };
+    
+    // The category is now explicitly passed in, ensuring correctness.
+    const vehicleData = { ...vehicle, ownerId, category: category, status: 'Available' };
+    
+    // Remove the temporary ID from AI-generated cars before saving
+    if ('id' in vehicleData) {
+        delete (vehicleData as Partial<AnyVehicle>).id;
+    }
+
     const docRef = await addDoc(collection(db, 'vehicles'), vehicleData);
-    return { ...vehicleData, id: docRef.id };
+    return { ...vehicleData, id: docRef.id } as AnyVehicle;
 };
 
 export async function getVehiclesForPartner(ownerId: string): Promise<AnyVehicle[]> {
