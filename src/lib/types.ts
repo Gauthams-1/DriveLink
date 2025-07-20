@@ -1,5 +1,7 @@
 
 
+import type { Timestamp } from "firebase/firestore";
+
 export type Car = {
   id: number;
   name: string;
@@ -106,6 +108,12 @@ export type User = {
   partnerStats?: PartnerStats;
 };
 
+export namespace DB {
+  export type User = Omit<User, "memberSince"> & {
+    memberSince: Timestamp;
+  }
+}
+
 export type PartnerStats = {
   totalRevenue: number;
   avgRating: number;
@@ -167,3 +175,5 @@ export type Trip = {
 export type CarReservationWithDetails = Reservation & { car: Car };
 export type BusReservationWithDetails = BusReservation & { bus: Bus };
 export type SpecializedVehicleReservationWithDetails = SpecializedVehicleReservation & { vehicle: SpecializedVehicle };
+
+    

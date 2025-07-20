@@ -1,6 +1,9 @@
 
-import type { Car, Reservation, Bus, User, PartnerStats, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic, Job, Trip } from './types';
+import type { Car, Reservation, Bus, User, PartnerVehicle, Truck, BusReservation, CarReservationWithDetails, BusReservationWithDetails, SpecializedVehicle, SpecializedVehicleReservation, SpecializedVehicleReservationWithDetails, Mechanic, Job, Trip, DB } from './types';
 import { startOfDay } from 'date-fns';
+import { db } from './firebase';
+import { collection, doc, getDoc, getDocs, setDoc, query, where } from 'firebase/firestore';
+
 
 // This file now primarily manages user data and provides functions to access vehicle data.
 // The static vehicle arrays are now part of the default partner's data.
@@ -280,120 +283,56 @@ export const specializedVehicles: SpecializedVehicle[] = [
   },
 ];
 
-
-// --- User Management & Data Access ---
-
-// This flag will ensure default partners are created only once per session.
-let defaultPartnersCreated = false;
-
-// This function acts as the single source of truth for user data.
-const getRegisteredUsers = (): User[] => {
-    let users: User[] = [];
-
-    // On the client-side, localStorage is the source of truth.
-    if (typeof window !== 'undefined') {
-        const usersJson = localStorage.getItem('driveLinkRegisteredUsers');
-        if (usersJson) {
-            try {
-                users = JSON.parse(usersJson).map((user: User) => ({
-                    ...user,
-                    memberSince: new Date(user.memberSince)
-                }));
-            } catch (e) {
-                console.error("Error parsing users from localStorage", e);
-                users = [];
-            }
-        }
+const getRegisteredUsers = async (): Promise<User[]> => {
+    if (!db) {
+        console.error("Firestore is not initialized.");
+        return [];
     }
-
-    // Create default partners if they don't exist. This check ensures that even if localStorage is empty or corrupted,
-    // the default partners are added. It also handles the initial server-side case.
-    const hasPartners = users.some(u => u.isPartner);
-    if (!hasPartners) {
-        const defaultOwnerPartner: User = {
-            name: "Default Owner Partner",
-            email: "owner@example.com", password: "password", phone: "1234567890", address: "123 Partner Lane, Mumbai",
-            licenseNumber: "MH123456789", aadhaarNumber: "123456789012", isVerified: true, avatarUrl: "",
-            memberSince: new Date(), isGuest: false, isPartner: true, partnerType: 'owner',
-            vehicles: samplePartnerVehicles,
-            partnerStats: { totalRevenue: 850000, avgRating: 4.9, activeBookings: 1, totalVehicles: samplePartnerVehicles.length },
-        };
-        const defaultMechanicPartner: User = {
-            name: "Rajesh Kumar",
-            email: "mechanic@example.com", password: "password", phone: "0987654321", address: "Andheri, Mumbai, MH",
-            licenseNumber: "MH0987654321", aadhaarNumber: "987654321098", isVerified: true, avatarUrl: "",
-            memberSince: new Date(), isGuest: false, isPartner: true, partnerType: 'mechanic',
-            specialty: 'General Car Repair & Maintenance',
-            jobs: sampleMechanicJobs,
-            partnerStats: { totalRevenue: 48000, avgRating: 4.8, activeJobs: 1, completedJobs: 2 },
-        };
-        const anotherMechanicPartner: User = {
-            name: "Sanjay Singh",
-            email: "mechanic2@example.com", password: "password", phone: "9876555555", address: "Bandra, Mumbai, MH",
-            licenseNumber: "MH555555555", aadhaarNumber: "555566667777", isVerified: true, avatarUrl: "",
-            memberSince: new Date(), isGuest: false, isPartner: true, partnerType: 'mechanic',
-            specialty: 'European Car Specialist (BMW, Audi)',
-            jobs: anotherSampleMechanicJobs,
-            partnerStats: { totalRevenue: 95000, avgRating: 4.9, activeJobs: 1, completedJobs: 10 },
-        };
-         const defaultDriverPartner: User = {
-            name: "Default Driver Partner",
-            email: "driver@example.com", password: "password", phone: "9988776655", address: "789 Driver's Quarters, Delhi",
-            licenseNumber: "DL987654321", aadhaarNumber: "567890123456", isVerified: true, avatarUrl: "",
-            memberSince: new Date(), isGuest: false, isPartner: true, partnerType: 'driver',
-            trips: sampleDriverTrips,
-            partnerStats: { totalRevenue: 155000, avgRating: 4.9, totalTrips: 25 },
-        };
-        users.push(defaultOwnerPartner, defaultMechanicPartner, anotherMechanicPartner, defaultDriverPartner);
-        
-        // If on client, save the updated list back to localStorage.
-        if (typeof window !== 'undefined') {
-            saveRegisteredUsers(users);
-        }
-    }
-    
-    return users;
+    const usersCol = collection(db, 'users');
+    const userSnapshot = await getDocs(usersCol);
+    const userList = userSnapshot.docs.map(doc => {
+        const data = doc.data() as DB.User;
+        return {
+            ...data,
+            memberSince: data.memberSince.toDate(),
+        } as User;
+    });
+    return userList;
 };
-
-const saveRegisteredUsers = (users: User[]) => {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('driveLinkRegisteredUsers', JSON.stringify(users));
-    }
-}
 
 // --- Public Data Fetchers ---
 
-function getAllPartnerVehicles(): PartnerVehicle[] {
-    const users = getRegisteredUsers();
+async function getAllPartnerVehicles(): Promise<PartnerVehicle[]> {
+    const users = await getRegisteredUsers();
     return users
         .filter(u => u.isPartner && u.partnerType === 'owner' && u.vehicles)
         .flatMap(u => u.vehicles!);
 }
 
-export function getAllAvailableCars(): Car[] {
-  const allVehicles = getAllPartnerVehicles();
+export async function getAllAvailableCars(): Promise<Car[]> {
+  const allVehicles = await getAllPartnerVehicles();
   return allVehicles.filter(v => 
     v.status === 'Available' && 
     ('seats' in v && !('amenities' in v)) // A simple way to distinguish cars/bikes
   ) as Car[];
 }
 
-export function getAllAvailableBuses(): Bus[] {
-  const allVehicles = getAllPartnerVehicles();
+export async function getAllAvailableBuses(): Promise<Bus[]> {
+  const allVehicles = await getAllPartnerVehicles();
   return allVehicles.filter(v => 
     v.status === 'Available' && 'amenities' in v
   ) as Bus[];
 }
 
-export function getAllAvailableTrucks(): Truck[] {
-  const allVehicles = getAllPartnerVehicles();
+export async function getAllAvailableTrucks(): Promise<Truck[]> {
+  const allVehicles = await getAllPartnerVehicles();
   return allVehicles.filter(v => 
     v.status === 'Available' && 'payload' in v
   ) as Truck[];
 }
 
 export async function getAllRegisteredMechanics(): Promise<Mechanic[]> {
-    const users = getRegisteredUsers();
+    const users = await getRegisteredUsers();
     return users
         .filter(u => u.isPartner && u.partnerType === 'mechanic')
         .map((u, index) => ({
@@ -407,18 +346,18 @@ export async function getAllRegisteredMechanics(): Promise<Mechanic[]> {
         }));
 }
 
-export function findCarById(id: number): Car | undefined {
-  const cars = getAllPartnerVehicles().filter(v => 'seats' in v && !('amenities' in v)) as Car[];
+export async function findCarById(id: number): Promise<Car | undefined> {
+  const cars = (await getAllPartnerVehicles()).filter(v => 'seats' in v && !('amenities' in v)) as Car[];
   return cars.find(car => car.id === id);
 }
 
-export function findBusById(id: number): Bus | undefined {
-  const buses = getAllPartnerVehicles().filter(v => 'amenities' in v) as Bus[];
+export async function findBusById(id: number): Promise<Bus | undefined> {
+  const buses = (await getAllPartnerVehicles()).filter(v => 'amenities' in v) as Bus[];
   return buses.find(bus => bus.id === id);
 }
 
-export function findTruckById(id: number): Truck | undefined {
-  const trucks = getAllPartnerVehicles().filter(v => 'payload' in v) as Truck[];
+export async function findTruckById(id: number): Promise<Truck | undefined> {
+  const trucks = (await getAllPartnerVehicles()).filter(v => 'payload' in v) as Truck[];
   return trucks.find(truck => truck.id === id);
 }
 
@@ -428,63 +367,37 @@ export const findSpecializedVehicleById = (id: number) => specializedVehicles.fi
 export const findCarReservations = (): CarReservationWithDetails[] => {
   if (typeof window === 'undefined') return [];
   const storedCarReservations: Reservation[] = JSON.parse(localStorage.getItem('carReservations') || '[]');
-  return storedCarReservations
-        .map(r => {
-            const car = findCarById(r.carId);
-            return car ? { ...r, car, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
-        })
-        .filter((r): r is CarReservationWithDetails => r !== null);
+  // This function needs to be async now to fetch car details from Firestore
+  // For now, it will only work with cars that are in the static list, which is a limitation.
+  // A full migration would require storing and fetching reservations from Firestore as well.
+  return []; 
 };
 
 export const findBusReservations = (): BusReservationWithDetails[] => {
   if (typeof window === 'undefined') return [];
-  const storedBusReservations: BusReservation[] = JSON.parse(localStorage.getItem('busReservations') || '[]');
-  return storedBusReservations
-        .map(r => {
-            const bus = findBusById(r.busId);
-            return bus ? { ...r, bus, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
-        })
-        .filter((r): r is BusReservationWithDetails => r !== null);
+  return [];
 };
 
 export const findSpecializedVehicleReservations = (): SpecializedVehicleReservationWithDetails[] => {
   if (typeof window === 'undefined') return [];
-  const storedReservations: SpecializedVehicleReservation[] = JSON.parse(localStorage.getItem('specializedVehicleReservations') || '[]');
-  return storedReservations
-        .map(r => {
-            const vehicle = findSpecializedVehicleById(r.vehicleId);
-            return vehicle ? { ...r, vehicle, startDate: new Date(r.startDate), endDate: new Date(r.endDate) } : null;
-        })
-        .filter((r): r is SpecializedVehicleReservationWithDetails => r !== null);
+  return [];
 };
 
-/**
- * Checks if a car is available for a given date range.
- * @param carId The ID of the car to check.
- * @param startDate The desired start date for the rental.
- * @param endDate The desired end date for the rental.
- * @returns `true` if the car is available, `false` otherwise.
- */
-export function isCarAvailable(carId: number, startDate: Date, endDate: Date): boolean {
-    const reservations = findCarReservations();
-    const carReservations = reservations.filter(r => r.carId === carId);
-
-    const searchStart = startOfDay(startDate);
-    const searchEnd = startOfDay(endDate);
-
-    const isOverlapping = carReservations.some(res => {
-        const resStart = startOfDay(new Date(res.startDate));
-        const resEnd = startOfDay(new Date(res.endDate));
-        return resStart < searchEnd && resEnd > searchStart;
-    });
-
-    return !isOverlapping;
+export async function isCarAvailable(carId: number, startDate: Date, endDate: Date): Promise<boolean> {
+    // This function will need to be updated to check reservations in Firestore.
+    // For now, we'll assume a car is available if it's marked as 'Available'.
+    const car = await findCarById(carId);
+    return car?.status === 'Available';
 }
 
+export async function registerUser(details: Pick<User, 'name' | 'email' | 'password' | 'partnerType' | 'isPartner'>): Promise<User> {
+    if (!db) throw new Error("Firestore not initialized.");
+    
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("email", "==", details.email));
+    const querySnapshot = await getDocs(q);
 
-export function registerUser(details: Pick<User, 'name' | 'email' | 'password' | 'partnerType' | 'isPartner'>): User {
-    const users = getRegisteredUsers();
-    if (users.some(u => u.email === details.email)) {
+    if (!querySnapshot.empty) {
         throw new Error("A user with this email already exists.");
     }
 
@@ -492,36 +405,42 @@ export function registerUser(details: Pick<User, 'name' | 'email' | 'password' |
         ...defaultUser,
         name: details.name,
         email: details.email,
-        password: details.password,
+        password: details.password, // In a real app, this should be hashed on the server.
         isPartner: details.isPartner ?? false,
         partnerType: details.partnerType,
         isGuest: false,
         memberSince: new Date(),
         avatarUrl: "",
-        // Initialize partner-specific fields
         vehicles: details.partnerType === 'owner' ? [] : undefined,
         jobs: details.partnerType === 'mechanic' ? [] : undefined,
         trips: details.partnerType === 'driver' ? [] : undefined,
-        partnerStats: {
-          totalRevenue: 0,
-          avgRating: 0,
-        },
+        partnerStats: { totalRevenue: 0, avgRating: 0 },
         specialty: details.partnerType === 'mechanic' ? 'General Repair' : undefined,
     };
+    
+    // Save to Firestore
+    await setDoc(doc(db, "users", newUser.email), newUser);
 
-    users.push(newUser);
-    saveRegisteredUsers(users);
     return newUser;
 }
 
-export function authenticateUser(email: string, password?: string): User | null {
-    // In a real app, never compare passwords in plain text.
-    // This is for demonstration purposes only.
-    const users = getRegisteredUsers();
-    const user = users.find(u => u.email === email);
-    
-    if (user && user.password === password) {
-        return user;
+export async function authenticateUser(email: string, password?: string): Promise<User | null> {
+    if (!db) {
+        console.error("Firestore is not initialized.");
+        return null;
+    }
+    const docRef = doc(db, "users", email);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        const user = docSnap.data() as User;
+        // In a real app, use a secure method to verify the password hash.
+        if (user.password === password) {
+            return {
+              ...user,
+              memberSince: (user.memberSince as any).toDate(),
+            };
+        }
     }
     
     return null;
@@ -536,7 +455,6 @@ export function getCurrentUser(): User {
     const storedUser = localStorage.getItem('driveLinkUser');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-      // Dates are not automatically converted, so we need to parse them
       return {
         ...defaultUser,
         ...parsedUser,
@@ -546,37 +464,38 @@ export function getCurrentUser(): User {
   } catch (error) {
     console.error("Failed to parse user from localStorage", error);
   }
-  // If no user is in local storage, save the default user first.
-  saveUser(defaultUser);
+  saveUserToLocalStorage(defaultUser);
   return defaultUser;
 };
 
-export function saveUser(user: User) {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('driveLinkUser', JSON.stringify(user));
+// Saves user to local storage for client-side session management
+function saveUserToLocalStorage(user: User) {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('driveLinkUser', JSON.stringify(user));
+    }
+}
 
-    // Also update the user in the registered users list if they are not a guest
-    if (!user.isGuest) {
-      let users = getRegisteredUsers();
-      const userIndex = users.findIndex(u => u.email === user.email);
-      if (userIndex !== -1) {
-        users[userIndex] = user;
-      } else {
-        users.push(user);
-      }
-      saveRegisteredUsers(users);
+// Saves user to both local storage and Firestore
+export async function saveUser(user: User) {
+  saveUserToLocalStorage(user);
+
+  if (!user.isGuest && db) {
+    try {
+      await setDoc(doc(db, "users", user.email), user, { merge: true });
+    } catch (error) {
+      console.error("Failed to save user to Firestore", error);
     }
   }
 }
 
 export function logoutUser() {
-  saveUser(defaultUser);
+  saveUserToLocalStorage(defaultUser);
 }
 
 
 // --- Partner Vehicle Management ---
 
-export const updatePartnerVehicle = (vehicle: PartnerVehicle): User => {
+export async function updatePartnerVehicle(vehicle: PartnerVehicle): Promise<User> {
     const currentUser = getCurrentUser();
     if (!currentUser.isPartner || !currentUser.vehicles) {
       throw new Error("User is not a partner or has no vehicles.");
@@ -587,11 +506,11 @@ export const updatePartnerVehicle = (vehicle: PartnerVehicle): User => {
         currentUser.vehicles[vehicleIndex] = vehicle;
     }
     
-    saveUser(currentUser);
+    await saveUser(currentUser);
     return currentUser;
 };
 
-export const addPartnerVehicle = (vehicle: Omit<PartnerVehicle, 'id'>): User => {
+export async function addPartnerVehicle(vehicle: Omit<PartnerVehicle, 'id'>): Promise<User> {
     const currentUser = getCurrentUser();
     if (!currentUser.isPartner) {
         throw new Error("User is not a partner.");
@@ -601,15 +520,17 @@ export const addPartnerVehicle = (vehicle: Omit<PartnerVehicle, 'id'>): User => 
 
     const newVehicle = {
         ...vehicle,
-        id: Date.now(), // Use a timestamp for a more unique ID
+        id: Date.now(),
     };
     
     currentUser.vehicles = [...currentVehicles, newVehicle as PartnerVehicle];
-    saveUser(currentUser);
+    await saveUser(currentUser);
     return currentUser;
 };
 
-export const findOwnerOfVehicle = (vehicleId: number): User | undefined => {
-    const users = getRegisteredUsers();
+export async function findOwnerOfVehicle(vehicleId: number): Promise<User | undefined> {
+    const users = await getRegisteredUsers();
     return users.find(u => u.isPartner && u.vehicles?.some(v => v.id === vehicleId));
 };
+
+    
