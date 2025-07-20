@@ -22,24 +22,26 @@ export function SpecializedVehicleClientPage({ searchParams }: { searchParams: S
       let filteredVehicles = data;
       
       if (serviceType) {
-        // Handle search filter if provided
+        // Handle search filter if a service type is provided in the URL
         filteredVehicles = data.filter(vehicle => {
           const vehicleType = vehicle.type.toLowerCase();
-          if (serviceType === 'wheelchair' && vehicleType.includes('wheelchair')) return true;
-          if (serviceType === 'pet' && vehicleType.includes('pet')) return true;
-          if (serviceType === 'senior' && vehicleType.includes('senior')) return true;
-          if (serviceType === 'visual' && vehicleType.includes('visually impaired')) return true;
-          return false;
+          switch (serviceType) {
+            case 'wheelchair':
+              return vehicleType.includes('wheelchair');
+            case 'pet':
+              return vehicleType.includes('pet');
+            case 'senior':
+              return vehicleType.includes('senior');
+            case 'visual':
+              return vehicleType.includes('visually impaired');
+            default:
+              return false;
+          }
         });
       } else {
-        // Default view: show disability-support vehicles
-        const disabilitySupportTypes = [
-            'wheelchair accessible van',
-            'senior-friendly sedan',
-            'visually impaired support'
-        ];
+        // Default view: show disability-support vehicles by filtering out pet-friendly ones.
         filteredVehicles = data.filter(vehicle => 
-            disabilitySupportTypes.includes(vehicle.type.toLowerCase())
+            !vehicle.type.toLowerCase().includes('pet')
         ).slice(0, 4);
       }
 
