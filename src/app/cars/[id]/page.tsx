@@ -10,8 +10,8 @@ import { CostCalculator } from '@/components/CostCalculator';
 import { Separator } from '@/components/ui/separator';
 import { useMemo } from 'react';
 
-export default function CarDetailPage({ params: { id } }: { params: { id: string } }) {
-  const car = useMemo(() => findCarById(Number(id)), [id]);
+export default function CarDetailPage({ params }: { params: { id: string } }) {
+  const car = useMemo(() => findCarById(Number(params.id)), [params.id]);
 
   if (!car) {
     notFound();
