@@ -358,21 +358,21 @@ export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id'>, cat
         return null;
     };
     
-    const finalVehicleData: Omit<AnyVehicle, 'id'> = {
+    const finalVehicleData = {
         ...vehicleData,
         ownerId,
         status: 'Available',
-        category, // This is the provided category, e.g., 'Car', 'Bus', 'Truck', 'Bike', 'Scooter'
+        category,
     };
 
-    // Remove temporary ID if it exists (e.g., from AI generation)
+    // IMPORTANT: Remove any temporary ID property before sending to Firestore
+    // to allow Firestore to generate a unique ID.
     if ('id' in finalVehicleData) {
         delete (finalVehicleData as Partial<AnyVehicle>).id;
     }
 
     const docRef = await addDoc(collection(db, 'vehicles'), finalVehicleData);
     
-    // Fetch the newly created document to return it with its generated ID
     const newDocSnap = await getDoc(docRef);
     if (newDocSnap.exists()) {
         return { ...newDocSnap.data(), id: newDocSnap.id } as AnyVehicle;
