@@ -24,34 +24,30 @@ type VehicleFormProps = {
 
 function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
     const isEditing = !!vehicle?.id;
-    
-    const getInitialCategory = (): 'Car' | 'Bus' | 'Truck' | 'Specialized' => {
+
+    const getInitialCategory = (): 'Car' | 'Bus' | 'Truck' => {
         if (!vehicle || !vehicle.category) return 'Car';
         if (vehicle.category === 'Bus') return 'Bus';
         if (vehicle.category === 'Truck') return 'Truck';
-        if (vehicle.category === 'Specialized') return 'Specialized';
         // Default to car for Bike/Scooter types
-        if (vehicle.category === 'Bike' || vehicle.category === 'Scooter') return 'Car';
+        if (['Car', 'Bike', 'Scooter'].includes(vehicle.category)) return 'Car';
         return 'Car';
-    }
-
-    const [vehicleCategory, setVehicleCategory] = useState<'Car' | 'Bus' | 'Truck'>(() => {
-        const cat = getInitialCategory();
-        return cat === 'Specialized' ? 'Car' : cat;
-    });
+    };
+    
+    const [vehicleCategory, setVehicleCategory] = useState<'Car' | 'Bus' | 'Truck'>(getInitialCategory);
     
     const getDefaultStateForCategory = (category: 'Car' | 'Bus' | 'Truck'): Partial<AnyVehicle> => {
         if (category === 'Bus') {
             return {
                 name: '', type: 'Seater', seats: 45, pricePerDay: 15000,
                 amenities: ['Air Conditioning', 'Wi-Fi'], category: 'Bus',
-                driver: { name: '', phone: '' }, status: 'Available',
+                driver: { name: '', phone: '' }, status: 'Available', driverRating: 4.5
             };
         }
         if (category === 'Truck') {
             return {
                 name: '', size: 'Medium', pricePerDay: 7000, payload: '3 Ton',
-                description: '', status: 'Available', category: 'Truck',
+                description: '', status: 'Available', category: 'Truck', driverRating: 4.5
             }
         }
         return { // Car/Bike/Scooter
@@ -61,10 +57,9 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
         };
     };
 
-    const [formData, setFormData] = useState<Partial<AnyVehicle>>(() => {
-        if (vehicle) return vehicle;
-        return getDefaultStateForCategory(vehicleCategory);
-    });
+    const [formData, setFormData] = useState<Partial<AnyVehicle>>(
+        vehicle || getDefaultStateForCategory(vehicleCategory)
+    );
 
     const handleCategoryChange = (value: 'Car' | 'Bus' | 'Truck') => {
         setVehicleCategory(value);
@@ -84,7 +79,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
         setFormData(prev => ({
             ...prev,
             driver: {
-                ...((prev as Bus).driver || {}),
+                ...((prev as Bus).driver || { name: '', phone: '' }),
                 [name]: value,
             },
         }));
@@ -114,6 +109,8 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
             const carType = (formData as Car).type;
             if (carType === 'Bike' || carType === 'Scooter') {
                 finalCategory = carType;
+            } else {
+                finalCategory = 'Car';
             }
         }
 
@@ -154,7 +151,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
            
             <div className="space-y-1">
                 <Label htmlFor="name">Vehicle Name</Label>
-                <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
+                <Input id="name" name="name" value={formData.name || ''} onChange={handleChange} required />
             </div>
 
             {vehicleCategory === 'Car' && (
@@ -162,7 +159,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="type">Type</Label>
-                            <Select name="type" value={(formData as Car).type} onValueChange={(val) => handleSelectChange('type', val)}>
+                            <Select name="type" value={(formData as Car).type || 'Sedan'} onValueChange={(val) => handleSelectChange('type', val)}>
                                 <SelectTrigger><SelectValue/></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Sedan">Sedan</SelectItem>
@@ -177,7 +174,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="pricePerDay">Price Per Day (₹)</Label>
-                            <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay} onChange={handleChange} required />
+                            <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay || ''} onChange={handleChange} required />
                         </div>
                          <div className="space-y-1">
                             <Label htmlFor="pricePerKm">Price Per Kilometer (₹)</Label>
@@ -187,7 +184,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="seats">Seats</Label>
-                            <Input id="seats" name="seats" type="number" value={(formData as Car).seats} onChange={handleChange} />
+                            <Input id="seats" name="seats" type="number" value={(formData as Car).seats || ''} onChange={handleChange} />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="luggage">Luggage (bags)</Label>
@@ -210,11 +207,11 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="description">Description</Label>
-                        <Textarea id="description" name="description" value={(formData as Car).description} onChange={handleChange} />
+                        <Textarea id="description" name="description" value={(formData as Car).description || ''} onChange={handleChange} />
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="features">Features (comma-separated)</Label>
-                        <Input id="features" name="features" value={(formData as Car).features?.join(', ')} onChange={handleFeatureChange} />
+                        <Input id="features" name="features" value={(formData as Car).features?.join(', ') || ''} onChange={handleFeatureChange} />
                     </div>
                 </>
             )}
@@ -224,7 +221,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="type">Type</Label>
-                            <Select name="type" value={(formData as Bus).type} onValueChange={(val) => handleSelectChange('type', val)}>
+                            <Select name="type" value={(formData as Bus).type || 'Seater'} onValueChange={(val) => handleSelectChange('type', val)}>
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Seater">Seater</SelectItem>
@@ -235,13 +232,13 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                         </div>
                          <div className="space-y-1">
                             <Label htmlFor="pricePerDay">Price Per Day (₹)</Label>
-                            <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay} onChange={handleChange} required />
+                            <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay || ''} onChange={handleChange} required />
                         </div>
                     </div>
                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="seats">Seats</Label>
-                            <Input id="seats" name="seats" type="number" value={(formData as Bus).seats} onChange={handleChange} />
+                            <Input id="seats" name="seats" type="number" value={(formData as Bus).seats || ''} onChange={handleChange} />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="driverRating">Driver Rating</Label>
@@ -263,7 +260,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="amenities">Amenities (comma-separated)</Label>
-                        <Input id="amenities" name="amenities" value={(formData as Bus).amenities?.join(', ')} onChange={handleFeatureChange} placeholder="e.g., Wi-Fi, Air Conditioning"/>
+                        <Input id="amenities" name="amenities" value={(formData as Bus).amenities?.join(', ') || ''} onChange={handleFeatureChange} placeholder="e.g., Wi-Fi, Air Conditioning"/>
                     </div>
                 </>
             )}
@@ -273,7 +270,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="size">Size</Label>
-                            <Select name="size" value={(formData as Truck).size} onValueChange={(val) => handleSelectChange('size', val)}>
+                            <Select name="size" value={(formData as Truck).size || 'Medium'} onValueChange={(val) => handleSelectChange('size', val)}>
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Mini">Mini (e.g., Tata Ace)</SelectItem>
@@ -284,7 +281,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="pricePerDay">Price Per Day (₹)</Label>
-                            <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay} onChange={handleChange} required />
+                            <Input id="pricePerDay" name="pricePerDay" type="number" value={formData.pricePerDay || ''} onChange={handleChange} required />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -299,14 +296,14 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
                     </div>
                      <div className="space-y-1">
                         <Label htmlFor="description">Description</Label>
-                        <Textarea id="description" name="description" value={(formData as Truck).description} onChange={handleChange} />
+                        <Textarea id="description" name="description" value={(formData as Truck).description || ''} onChange={handleChange} />
                     </div>
                 </>
             )}
 
              <div className="space-y-1">
                 <Label htmlFor="status">Status</Label>
-                <Select name="status" value={formData.status} onValueChange={(val) => handleSelectChange('status', val as AnyVehicle['status'])}>
+                <Select name="status" value={formData.status || 'Available'} onValueChange={(val) => handleSelectChange('status', val as AnyVehicle['status'])}>
                     <SelectTrigger><SelectValue/></SelectTrigger>
                     <SelectContent>
                         <SelectItem value="Available">Available</SelectItem>
@@ -339,8 +336,8 @@ function VehicleCard({ vehicle, onEdit }: { vehicle: AnyVehicle, onEdit: (v: Any
     }
   }
 
-  const isBus = 'amenities' in vehicle;
-  const isTruck = 'payload' in vehicle;
+  const isBus = vehicle.category === 'Bus';
+  const isTruck = vehicle.category === 'Truck';
   const isCar = !isBus && !isTruck;
   
   const getVehicleIcon = () => {
