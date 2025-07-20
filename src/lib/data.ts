@@ -48,10 +48,83 @@ async function getAllVehicles(): Promise<AnyVehicle[]> {
 
 export async function getAllAvailableCars(): Promise<Car[]> {
   const allVehicles = await getAllVehicles();
-  return allVehicles.filter(v => 
+  const firestoreCars = allVehicles.filter(v => 
     v.status === 'Available' && 
     (v.category === 'Car' || v.category === 'Bike' || v.category === 'Scooter')
   ) as Car[];
+
+  const sampleCars: Car[] = [
+    {
+      id: 'sample-car-1',
+      name: 'Maruti Suzuki Swift',
+      category: 'Car',
+      type: 'Sedan',
+      pricePerDay: 2200,
+      images: [],
+      description: 'A reliable and fuel-efficient car, perfect for city driving and short trips.',
+      status: 'Available',
+      ownerId: 'system@drivelink.com',
+      seats: 5,
+      luggage: 2,
+      transmission: 'Manual',
+      mpg: 22,
+      location: 'Mumbai, MH',
+      features: ['Air Conditioning', 'Power Steering', 'Bluetooth Audio'],
+    },
+    {
+      id: 'sample-car-2',
+      name: 'Hyundai Creta',
+      category: 'Car',
+      type: 'SUV',
+      pricePerDay: 3500,
+      images: [],
+      description: 'A comfortable and spacious SUV, ideal for family vacations and long road trips.',
+      status: 'Available',
+      ownerId: 'system@drivelink.com',
+      seats: 5,
+      luggage: 4,
+      transmission: 'Automatic',
+      mpg: 17,
+      location: 'Delhi, DL',
+      features: ['Sunroof', 'Touchscreen Infotainment', 'Cruise Control', 'Air Purifier'],
+    },
+    {
+      id: 'sample-scooter-1',
+      name: 'Honda Activa 6G',
+      category: 'Scooter',
+      type: 'Scooter',
+      pricePerDay: 800,
+      images: [],
+      description: 'The perfect ride for zipping through city traffic with ease and great mileage.',
+      status: 'Available',
+      ownerId: 'system@drivelink.com',
+      seats: 2,
+      luggage: 1,
+      transmission: 'Automatic',
+      mpg: 45,
+      location: 'Bengaluru, KA',
+      features: ['Silent Start', 'External Fuel Filler', 'LED Headlamp'],
+    },
+     {
+      id: 'sample-bike-1',
+      name: 'Royal Enfield Classic 350',
+      category: 'Bike',
+      type: 'Bike',
+      pricePerDay: 1800,
+      images: [],
+      description: 'Experience the thrill of the open road with this iconic and powerful cruiser.',
+      status: 'Available',
+      ownerId: 'system@drivelink.com',
+      seats: 2,
+      luggage: 1,
+      transmission: 'Manual',
+      mpg: 35,
+      location: 'Goa, GA',
+      features: ['Classic Design', 'Comfortable Riding Position', 'Dual-Channel ABS'],
+    },
+  ];
+
+  return [...sampleCars, ...firestoreCars];
 }
 
 export async function getAllAvailableBuses(): Promise<Bus[]> {
@@ -152,6 +225,10 @@ export async function findVehicleById(id: string): Promise<AnyVehicle | undefine
     if (id.startsWith('spec-')) {
         return staticSpecializedVehicles.find(v => v.id === id);
     }
+     if (id.startsWith('sample-')) {
+        const sampleCars = await getAllAvailableCars();
+        return sampleCars.find(v => v.id === id);
+    }
     if (!db) {
         console.warn("Firestore is not initialized. Cannot find vehicle.");
         return undefined;
@@ -195,6 +272,10 @@ export async function getReservationsForUser(userId: string): Promise<Reservatio
 }
 
 export async function isVehicleAvailable(vehicleId: string, startDate: Date, endDate: Date): Promise<boolean> {
+    if (vehicleId.startsWith('sample-') || vehicleId.startsWith('spec-')) {
+        // Assume sample/static vehicles are always available for demonstration
+        return true;
+    }
     if (!db) {
         console.warn("Firestore is not initialized. Assuming vehicle is available.");
         return true;
@@ -345,7 +426,7 @@ export async function updatePartnerVehicle(vehicle: AnyVehicle): Promise<void> {
     await updateDoc(vehicleRef, { ...vehicle });
 };
 
-export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id' | 'category'>, category: VehicleCategory, owner?: string): Promise<AnyVehicle | null> {
+export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id' | 'category'>, category: VehicleCategory, owner?: string): Promise<AnyVehicle> {
     const currentUser = getCurrentUser();
     const ownerId = owner || currentUser.email;
 
@@ -354,20 +435,16 @@ export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id' | 'ca
     }
 
     if (!db) {
-        console.warn("Firestore not initialized. Vehicle not added to DB. This is a local-only operation.");
-        return null;
+        throw new Error("Firestore not initialized. Vehicle not added to DB.");
     };
 
+    let finalCategory: VehicleCategory = category;
     const dataToSave: any = { ...vehicleData };
     
-    // Ensure temporary ID from AI generation doesn't get saved
-    if (dataToSave.id === 'temp-id') {
+    if (dataToSave.id) {
       delete dataToSave.id;
     }
     
-    let finalCategory = category;
-
-    // Determine the final category based on the type for cars/bikes/scooters
     if (category === 'Car' && (dataToSave as Car).type) {
         const carType = (dataToSave as Car).type;
         if (carType === 'Bike' || carType === 'Scooter') {
@@ -385,11 +462,8 @@ export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id' | 'ca
     const docRef = await addDoc(collection(db, 'vehicles'), finalVehicleData);
     
     const newDocSnap = await getDoc(docRef);
-    if (newDocSnap.exists()) {
-        return { ...newDocSnap.data(), id: newDocSnap.id } as AnyVehicle;
-    }
-    
-    return null;
+    const newVehicle = { ...newDocSnap.data(), id: newDocSnap.id } as AnyVehicle;
+    return newVehicle;
 };
 
 export async function getVehiclesForPartner(ownerId: string): Promise<AnyVehicle[]> {
@@ -406,7 +480,7 @@ export async function getVehiclesForPartner(ownerId: string): Promise<AnyVehicle
 
 export async function findOwnerOfVehicle(vehicleId: string): Promise<User | undefined> {
     if (!db) {
-        console.warn("Firestore not initialized. Cannot find owner.");
+        console.warn("Firestore is not initialized. Cannot find owner.");
         return undefined;
     };
     const vehicle = await findVehicleById(vehicleId);
@@ -430,12 +504,21 @@ export async function createReservation(reservation: Omit<Reservation, 'id'>) {
         console.error("Firestore not initialized. Cannot create reservation.");
         throw new Error("Database not available.");
     };
+    // Do not create reservations for sample cars in the database
+    if (reservation.vehicleId.startsWith('sample-')) {
+        console.log("Reservation for sample vehicle created locally.");
+        return "sample-res-id";
+    }
     const docRef = await addDoc(collection(db, "reservations"), reservation);
     return docRef.id;
 }
 
 
 export async function cancelReservation(reservationId: string, vehicleId: string) {
+    if (reservationId.startsWith('sample-')) {
+        console.log("Sample reservation cancelled locally.");
+        return;
+    }
     if (!db) {
         console.error("Firestore not initialized. Cannot cancel reservation.");
         return;
