@@ -31,12 +31,12 @@ export type FindMechanicOutput = z.infer<typeof FindMechanicOutputSchema>;
 
 
 export async function findMechanics(input: FindMechanicInput): Promise<FindMechanicOutput> {
-  // For demonstration, return a hardcoded list of mechanics.
+  // For demonstration, return a hardcoded list of mechanics in the user's selected location.
   const sampleMechanics: Mechanic[] = [
     {
       id: 1,
       name: 'Ravi\'s Reliable Repairs',
-      location: 'Andheri, Mumbai',
+      location: `Near City Center, ${input.location}`,
       phone: '9876543210',
       rating: 4.8,
       specialty: 'Engine & Transmission Expert',
@@ -45,7 +45,7 @@ export async function findMechanics(input: FindMechanicInput): Promise<FindMecha
     {
       id: 2,
       name: 'Speedy Singh\'s Servicing',
-      location: 'Bandra, Mumbai',
+      location: `Main Highway, ${input.location}`,
       phone: '9876543211',
       rating: 4.7,
       specialty: 'Brakes & Suspension Specialist',
@@ -54,7 +54,7 @@ export async function findMechanics(input: FindMechanicInput): Promise<FindMecha
     {
       id: 3,
       name: 'Anil\'s Auto Care',
-      location: 'Dadar, Mumbai',
+      location: `Industrial Area, ${input.location}`,
       phone: '9876543212',
       rating: 4.9,
       specialty: 'General Maintenance & Electrical',
