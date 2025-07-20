@@ -73,7 +73,7 @@ function MechanicsList() {
                                 </div>
                             </div>
                             <div className="flex-1">
-                                <CardTitle className="text-2xl">{mechanic.name}</CardTitle>
+                                <CardTitle className="text-2xl">Top-Rated Mechanic</CardTitle>
                                 <p className="text-muted-foreground">{mechanic.specialty}</p>
                                 <p className="text-muted-foreground flex items-center justify-center sm:justify-start gap-2 mt-1">
                                     <MapPin className="w-4 h-4"/>

@@ -180,6 +180,29 @@ export const sampleMechanicJobs: Job[] = [
     }
 ];
 
+export const anotherSampleMechanicJobs: Job[] = [
+    {
+        id: 4,
+        customerName: 'Vikram Singh',
+        location: 'Bandra, Mumbai',
+        problemDescription: 'Brakes are making a squealing noise.',
+        status: 'Active',
+        date: new Date('2024-07-21T11:00:00Z'),
+        mechanicId: 3
+    },
+    {
+        id: 5,
+        customerName: 'Saanvi Gupta',
+        location: 'Powai, Mumbai',
+        problemDescription: 'Check engine light is on.',
+        status: 'Completed',
+        date: new Date('2024-07-20T14:00:00Z'),
+        mechanicId: 3,
+        invoiceAmount: 2200
+    }
+];
+
+
 export const sampleDriverTrips: Trip[] = [
     {
         id: 1,
@@ -304,6 +327,15 @@ const getRegisteredUsers = (): User[] => {
             jobs: sampleMechanicJobs,
             partnerStats: { totalRevenue: 48000, avgRating: 4.8, activeJobs: 1, completedJobs: 2 },
         };
+        const anotherMechanicPartner: User = {
+            name: "Sanjay Singh",
+            email: "mechanic2@example.com", password: "password", phone: "9876555555", address: "Bandra, Mumbai, MH",
+            licenseNumber: "MH555555555", aadhaarNumber: "555566667777", isVerified: true, avatarUrl: "",
+            memberSince: new Date(), isGuest: false, isPartner: true, partnerType: 'mechanic',
+            specialty: 'European Car Specialist (BMW, Audi)',
+            jobs: anotherSampleMechanicJobs,
+            partnerStats: { totalRevenue: 95000, avgRating: 4.9, activeJobs: 1, completedJobs: 10 },
+        };
          const defaultDriverPartner: User = {
             name: "Default Driver Partner",
             email: "driver@example.com", password: "password", phone: "9988776655", address: "789 Driver's Quarters, Delhi",
@@ -312,7 +344,7 @@ const getRegisteredUsers = (): User[] => {
             trips: sampleDriverTrips,
             partnerStats: { totalRevenue: 155000, avgRating: 4.9, totalTrips: 25 },
         };
-        users.push(defaultOwnerPartner, defaultMechanicPartner, defaultDriverPartner);
+        users.push(defaultOwnerPartner, defaultMechanicPartner, anotherMechanicPartner, defaultDriverPartner);
         
         // If on client, save the updated list back to localStorage.
         if (typeof window !== 'undefined') {
