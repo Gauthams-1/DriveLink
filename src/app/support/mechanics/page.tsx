@@ -7,7 +7,7 @@ import { findMechanics } from '@/ai/flows/find-mechanic';
 import type { Mechanic } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Star, Phone, MessageSquare, MapPin, User } from 'lucide-react';
+import { Loader2, Star, Phone, MessageSquare, MapPin, User, Wrench } from 'lucide-react';
 
 function MechanicsList() {
     const searchParams = useSearchParams();
@@ -40,7 +40,6 @@ function MechanicsList() {
             <div className="text-center py-16">
                 <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary mb-4" />
                 <h2 className="text-xl font-semibold">Finding nearby mechanics...</h2>
-                <p className="text-muted-foreground">Our AI is on the job!</p>
             </div>
         );
     }
@@ -51,9 +50,10 @@ function MechanicsList() {
 
     if (mechanics.length === 0) {
         return (
-            <div className="text-center py-16">
-                <h2 className="text-2xl font-semibold mb-2">No mechanics found</h2>
-                <p className="text-muted-foreground">We couldn't find any available mechanics for your request. Please try a different location.</p>
+            <div className="text-center py-16 border-2 border-dashed rounded-lg">
+                <Wrench className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h2 className="mt-4 text-2xl font-semibold mb-2">No Mechanics Found</h2>
+                <p className="text-muted-foreground">We couldn't find any available partner mechanics for your request. Please try again later.</p>
             </div>
         );
     }
@@ -82,12 +82,6 @@ function MechanicsList() {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-center bg-background/50 p-4 rounded-lg">
-                            <p className="font-semibold">Reason for selection:</p>
-                            <p className="text-muted-foreground text-sm">{mechanic.reasoning}</p>
-                        </div>
-                    </CardContent>
                     <CardFooter className="flex flex-col sm:flex-row gap-4">
                         <Button className="w-full" size="lg">
                             <Phone className="mr-2 h-5 w-5" /> Call Now ({mechanic.phone})
@@ -108,7 +102,7 @@ export default function MechanicsPage() {
             <div className="text-center mb-12">
                 <h1 className="text-4xl md:text-5xl font-bold font-headline">Available Mechanics</h1>
                 <p className="text-muted-foreground mt-3 text-lg max-w-2xl mx-auto">
-                    Here are the top mechanics we found for you. Help is on the way!
+                    Here are our top-rated partner mechanics. Help is on the way!
                 </p>
             </div>
             <Suspense fallback={<div>Loading...</div>}>
