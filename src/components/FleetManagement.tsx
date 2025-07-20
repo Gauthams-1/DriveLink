@@ -442,12 +442,15 @@ export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUp
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
+  const fetchVehicles = async () => {
     setLoading(true);
-    getVehiclesForPartner(user.email).then(data => {
-        setVehicles(data);
-        setLoading(false);
-    });
+    const data = await getVehiclesForPartner(user.email);
+    setVehicles(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchVehicles();
   }, [user.email]);
 
   const handleEdit = (vehicle: AnyVehicle) => {
@@ -464,17 +467,14 @@ export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUp
     try {
         if (vehicleData.id) { // Editing existing
             await updatePartnerVehicle({...vehicleData, category });
-            setVehicles(prev => prev.map(v => v.id === vehicleData.id ? {...vehicleData, category} : v));
             toast({ title: "Vehicle Updated!", description: `${vehicleData.name} has been updated.` });
         } else { // Adding new
-            const newVehicle = await addPartnerVehicle(vehicleData, category);
-            if (newVehicle) {
-                setVehicles(prev => [...prev, newVehicle]);
-                toast({ title: "Vehicle Added!", description: `${newVehicle.name} has been added to your fleet.` });
-            }
+            await addPartnerVehicle(vehicleData, category);
+            toast({ title: "Vehicle Added!", description: `${vehicleData.name} has been added to your fleet.` });
         }
         setIsDialogOpen(false);
         setEditingVehicle(null);
+        await fetchVehicles(); // Re-fetch all vehicles to ensure the list is up-to-date
     } catch (error) {
         console.error("Failed to save vehicle", error);
         toast({ title: "Save Failed", description: "Could not save vehicle details.", variant: "destructive" });
