@@ -525,9 +525,6 @@ export function FleetManagement({ user, onFleetUpdate }: { user: User, onFleetUp
                 <CarIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 <h2 className="text-2xl font-bold font-headline">Your fleet is empty</h2>
                 <p className="text-muted-foreground mt-2">Get started by adding your first car, bike, bus, or truck.</p>
-                <Button onClick={handleAddNew} className="mt-6">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Add Your First Vehicle
-                </Button>
             </Card>
         )}
     </div>
