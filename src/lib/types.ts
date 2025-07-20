@@ -1,6 +1,7 @@
 
 
 
+
 export type VehicleCategory = 'Car' | 'Bike' | 'Scooter' | 'Bus' | 'Truck' | 'Specialized';
 
 export type BaseVehicle = {
@@ -155,3 +156,10 @@ export type Trip = {
 
 // Types with joined details
 export type ReservationWithVehicle = Reservation & { vehicle: AnyVehicle };
+
+export type ChatMessage = {
+    id: number;
+    text: string;
+    sender: 'user' | 'mechanic';
+    timestamp: string;
+}

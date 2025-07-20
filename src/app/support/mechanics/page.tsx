@@ -8,6 +8,7 @@ import type { Mechanic } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Star, Phone, MessageSquare, MapPin, User, Wrench } from 'lucide-react';
+import Link from 'next/link';
 
 function MechanicsList() {
     const searchParams = useSearchParams();
@@ -86,8 +87,10 @@ function MechanicsList() {
                         <Button className="w-full" size="lg">
                             <Phone className="mr-2 h-5 w-5" /> Call Now ({mechanic.phone})
                         </Button>
-                        <Button variant="secondary" className="w-full" size="lg">
-                            <MessageSquare className="mr-2 h-5 w-5" /> Chat with Mechanic
+                        <Button variant="secondary" className="w-full" size="lg" asChild>
+                           <Link href={`/support/chat?name=${encodeURIComponent(mechanic.name)}`}>
+                             <MessageSquare className="mr-2 h-5 w-5" /> Chat with Mechanic
+                           </Link>
                         </Button>
                     </CardFooter>
                 </Card>
