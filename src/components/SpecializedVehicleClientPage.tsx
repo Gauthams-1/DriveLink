@@ -14,12 +14,13 @@ type SearchParams = {
 export function SpecializedVehicleClientPage({ searchParams }: { searchParams: SearchParams }) {
   const [vehicles, setVehicles] = useState<SpecializedVehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const serviceType = searchParams['service-type'];
   
   useEffect(() => {
+    setLoading(true);
     getAllAvailableSpecializedVehicles().then(data => {
       let filteredVehicles = data;
-      const serviceType = searchParams['service-type'];
-
+      
       if (serviceType) {
         // Handle search filter if provided
         filteredVehicles = data.filter(vehicle => {
@@ -45,7 +46,7 @@ export function SpecializedVehicleClientPage({ searchParams }: { searchParams: S
       setVehicles(filteredVehicles);
       setLoading(false);
     });
-  }, [searchParams]);
+  }, [serviceType]);
 
   if (loading) {
     return (
