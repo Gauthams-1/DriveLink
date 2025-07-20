@@ -1,7 +1,7 @@
 
 import type { User, Mechanic, Job, Trip, DB, AnyVehicle, Car, Bus, Truck, SpecializedVehicle, Reservation, ReservationWithVehicle } from './types';
 import { db } from './firebase';
-import { collection, doc, getDoc, getDocs, setDoc, query, where, addDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, query, where, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 
 const defaultUser: User = {
@@ -21,7 +21,7 @@ const defaultUser: User = {
 
 const getRegisteredUsers = async (): Promise<User[]> => {
     if (!db) {
-        console.error("Firestore is not initialized.");
+        console.warn("Firestore is not initialized. Returning empty user list.");
         return [];
     }
     const usersCol = collection(db, 'users');
@@ -91,7 +91,10 @@ export async function getAllRegisteredMechanics(): Promise<Mechanic[]> {
 }
 
 export async function findVehicleById(id: string): Promise<AnyVehicle | undefined> {
-    if (!db) return undefined;
+    if (!db) {
+        console.warn("Firestore is not initialized. Cannot find vehicle.");
+        return undefined;
+    };
     const docRef = doc(db, 'vehicles', id);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
@@ -102,7 +105,10 @@ export async function findVehicleById(id: string): Promise<AnyVehicle | undefine
 
 
 export async function getReservationsForUser(userId: string): Promise<ReservationWithVehicle[]> {
-    if (!db) return [];
+    if (!db) {
+        console.warn("Firestore is not initialized. Cannot get reservations.");
+        return [];
+    }
     
     const reservationsRef = collection(db, 'reservations');
     const q = query(reservationsRef, where("userId", "==", userId));
@@ -110,13 +116,13 @@ export async function getReservationsForUser(userId: string): Promise<Reservatio
 
     const reservations: ReservationWithVehicle[] = [];
 
-    for (const doc of querySnapshot.docs) {
-        const resData = doc.data() as DB.Reservation;
+    for (const docSnap of querySnapshot.docs) {
+        const resData = docSnap.data() as DB.Reservation;
         const vehicle = await findVehicleById(resData.vehicleId);
         if (vehicle) {
             reservations.push({
                 ...resData,
-                id: doc.id,
+                id: docSnap.id,
                 startDate: resData.startDate.toDate(),
                 endDate: resData.endDate.toDate(),
                 vehicle,
@@ -128,7 +134,10 @@ export async function getReservationsForUser(userId: string): Promise<Reservatio
 }
 
 export async function isVehicleAvailable(vehicleId: string, startDate: Date, endDate: Date): Promise<boolean> {
-    if (!db) return false;
+    if (!db) {
+        console.warn("Firestore is not initialized. Assuming vehicle is available.");
+        return true;
+    }
 
     const vehicle = await findVehicleById(vehicleId);
     if (vehicle?.status !== 'Available') return false;
@@ -158,7 +167,10 @@ export async function isVehicleAvailable(vehicleId: string, startDate: Date, end
 }
 
 export async function registerUser(details: Pick<User, 'name' | 'email' | 'password' | 'partnerType' | 'isPartner'>): Promise<User> {
-    if (!db) throw new Error("Firestore not initialized.");
+    if (!db) {
+        console.error("Firestore not initialized. Cannot register user.");
+        throw new Error("Database is not configured. Please contact support.");
+    }
     
     const usersRef = collection(db, "users");
     const q = query(usersRef, where("email", "==", details.email));
@@ -192,7 +204,7 @@ export async function registerUser(details: Pick<User, 'name' | 'email' | 'passw
 
 export async function authenticateUser(email: string, password?: string): Promise<User | null> {
     if (!db) {
-        console.error("Firestore is not initialized.");
+        console.warn("Firestore is not initialized. Cannot authenticate user.");
         return null;
     }
     const docRef = doc(db, "users", email);
@@ -263,36 +275,32 @@ export function logoutUser() {
 
 // --- Partner Vehicle Management ---
 
-export async function updatePartnerVehicle(vehicle: AnyVehicle): Promise<User> {
-    const currentUser = getCurrentUser();
-    if (!currentUser.isPartner) {
-      throw new Error("User is not a partner or has no vehicles.");
-    }
-
-    if (db && vehicle.id) {
-        const vehicleRef = doc(db, 'vehicles', vehicle.id);
-        await updateDoc(vehicleRef, { ...vehicle });
-    }
-    
-    // No need to save the full user object if vehicle is in its own collection
-    return currentUser;
+export async function updatePartnerVehicle(vehicle: AnyVehicle): Promise<void> {
+    if (!db || !vehicle.id) {
+        console.error("Firestore not initialized or vehicle ID missing. Cannot update vehicle.");
+        return;
+    };
+    const vehicleRef = doc(db, 'vehicles', vehicle.id);
+    await updateDoc(vehicleRef, { ...vehicle });
 };
 
-export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>): Promise<User> {
+export async function addPartnerVehicle(vehicle: Omit<AnyVehicle, 'id'>): Promise<void> {
     const currentUser = getCurrentUser();
     if (!currentUser.isPartner) {
         throw new Error("User is not a partner.");
     }
-
-    if (db) {
-      await addDoc(collection(db, 'vehicles'), { ...vehicle, ownerId: currentUser.email });
-    }
-    
-    return currentUser;
+    if (!db) {
+        console.error("Firestore not initialized. Cannot add vehicle.");
+        return;
+    };
+    await addDoc(collection(db, 'vehicles'), { ...vehicle, ownerId: currentUser.email });
 };
 
 export async function getVehiclesForPartner(ownerId: string): Promise<AnyVehicle[]> {
-    if (!db) return [];
+    if (!db) {
+        console.warn("Firestore is not initialized. Cannot get vehicles for partner.");
+        return [];
+    }
     const vehiclesRef = collection(db, 'vehicles');
     const q = query(vehiclesRef, where("ownerId", "==", ownerId));
     const querySnapshot = await getDocs(q);
@@ -301,8 +309,12 @@ export async function getVehiclesForPartner(ownerId: string): Promise<AnyVehicle
 
 
 export async function findOwnerOfVehicle(vehicleId: string): Promise<User | undefined> {
+    if (!db) {
+        console.warn("Firestore not initialized. Cannot find owner.");
+        return undefined;
+    };
     const vehicle = await findVehicleById(vehicleId);
-    if (!vehicle || !db) return undefined;
+    if (!vehicle) return undefined;
 
     const userRef = doc(db, "users", vehicle.ownerId);
     const userSnap = await getDoc(userRef);
@@ -318,29 +330,31 @@ export async function findOwnerOfVehicle(vehicleId: string): Promise<User | unde
 
 
 export async function createReservation(reservation: Omit<Reservation, 'id'>) {
-    if (!db) throw new Error("Database not initialized");
+    if (!db) {
+        console.error("Firestore not initialized. Cannot create reservation.");
+        throw new Error("Database not available.");
+    };
     const docRef = await addDoc(collection(db, "reservations"), reservation);
     return docRef.id;
 }
 
 
 export async function cancelReservation(reservationId: string, vehicleId: string) {
-    // This function would typically involve more complex logic,
-    // like checking cancellation policies, issuing refunds, etc.
-    // For now, it will just delete the reservation.
-    // In a real app, you would probably mark it as "cancelled" instead.
-    // For the demo, we'll keep it simple and just assume we can update vehicle status.
-     if (!db) throw new Error("Database not initialized");
+    if (!db) {
+        console.error("Firestore not initialized. Cannot cancel reservation.");
+        return;
+    };
 
-    const owner = await findOwnerOfVehicle(vehicleId);
-    const vehicle = await findVehicleById(vehicleId);
-
-    if (owner && vehicle) {
-        vehicle.status = 'Available';
-        vehicle.renter = null;
-        await updatePartnerVehicle(vehicle);
-    }
+    // In a real app, you would probably just mark the reservation as "cancelled"
+    // and handle the vehicle status update in a more robust way (e.g., cloud function).
+    // For simplicity, we delete the reservation and update the vehicle status directly.
     
-    // We are not actually deleting the reservation record for this implementation
-    // to keep it simple. A real app would handle this differently.
+    const reservationRef = doc(db, 'reservations', reservationId);
+    await deleteDoc(reservationRef);
+    
+    const vehicleRef = doc(db, 'vehicles', vehicleId);
+    await updateDoc(vehicleRef, {
+        status: 'Available',
+        renter: null
+    });
 }
