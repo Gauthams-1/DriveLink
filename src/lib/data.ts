@@ -518,11 +518,12 @@ export function authenticateUser(email: string, password?: string): User | null 
     // In a real app, never compare passwords in plain text.
     // This is for demonstration purposes only.
     const users = getRegisteredUsers();
-    const user = users.find(u => u.email === email && u.password === password);
+    const user = users.find(u => u.email === email);
     
-    if (user) {
+    if (user && user.password === password) {
         return user;
     }
+    
     return null;
 }
 
