@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Handshake, Car, Accessibility } from "lucide-react";
+import { Handshake, Car, Accessibility, User } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { useRouter } from 'next/navigation';
@@ -19,8 +19,14 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-muted/40 p-4">
-      <header className="w-full max-w-6xl mx-auto py-4">
+      <header className="w-full max-w-6xl mx-auto py-4 flex justify-between items-center">
           <Logo />
+           <Button variant="outline" asChild>
+              <Link href="/profile">
+                  <User className="mr-2 h-4 w-4" />
+                  My Profile
+              </Link>
+          </Button>
       </header>
 
       <main className="flex flex-col items-center justify-center flex-grow">
