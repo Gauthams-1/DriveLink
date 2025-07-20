@@ -345,41 +345,43 @@ export async function updatePartnerVehicle(vehicle: AnyVehicle): Promise<void> {
     await updateDoc(vehicleRef, { ...vehicle });
 };
 
-export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id'>, category: VehicleCategory, owner?: string): Promise<AnyVehicle | null> {
+export async function addPartnerVehicle(vehicleData: Omit<AnyVehicle, 'id' | 'category'>, category: VehicleCategory, owner?: string): Promise<AnyVehicle | null> {
     const currentUser = getCurrentUser();
     const ownerId = owner || currentUser.email;
 
     if (!ownerId || (currentUser.isGuest && !owner)) {
         throw new Error("User must be a logged-in partner to add a vehicle.");
     }
-    
+
     if (!db) {
         console.warn("Firestore not initialized. Vehicle not added to DB. This is a local-only operation.");
         return null;
     };
+
+    const dataToSave: any = { ...vehicleData };
     
-    // IMPORTANT: Remove any temporary ID property before sending to Firestore
-    // to allow Firestore to generate a unique ID.
-    const dataToSave = { ...vehicleData };
-    if ('id' in dataToSave) {
-        delete (dataToSave as Partial<AnyVehicle>).id;
+    // Ensure temporary ID from AI generation doesn't get saved
+    if (dataToSave.id === 'temp-id') {
+      delete dataToSave.id;
     }
     
-    // Re-assign the category based on type for Car-like vehicles
+    let finalCategory = category;
+
+    // Determine the final category based on the type for cars/bikes/scooters
     if (category === 'Car' && (dataToSave as Car).type) {
         const carType = (dataToSave as Car).type;
         if (carType === 'Bike' || carType === 'Scooter') {
-            category = carType;
+            finalCategory = carType;
         }
     }
-
+    
     const finalVehicleData = {
         ...dataToSave,
         ownerId,
-        status: 'Available',
-        category: category, // Use the determined category
+        status: dataToSave.status || 'Available',
+        category: finalCategory,
     };
-
+    
     const docRef = await addDoc(collection(db, 'vehicles'), finalVehicleData);
     
     const newDocSnap = await getDoc(docRef);

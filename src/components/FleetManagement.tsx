@@ -109,10 +109,7 @@ function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormProps) {
             return;
         }
 
-        let finalCategory: VehicleCategory = vehicleCategory;
-        if(vehicleCategory === 'Car' && ['Bike', 'Scooter'].includes((formData as Car).type)) {
-            finalCategory = (formData as Car).type as VehicleCategory;
-        }
+        const finalCategory: VehicleCategory = vehicleCategory;
 
         const finalData = { ...formData, category: finalCategory };
         onSave(finalData as AnyVehicle, finalCategory);
